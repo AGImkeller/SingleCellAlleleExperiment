@@ -12,7 +12,7 @@
 #library(spatialLIBD)
 #library(SpatialExperiment
 
-#this version uses the SingleCellAlleleExperiment Constructor
+
 #----------------------------Helper_functions-----------------------------------
 #####
 #' `.check_for_compressed()` internal function that checks whether the input files are gzipped
@@ -38,8 +38,6 @@ check_for_compressed <- function(path, compressed, error=TRUE) {
   path
 }
 
-#more or less for single/spatial distinction // spatial data from 10X Visium are saved
-#as .tsv, not as txt
 #' `check_txt_tsv` internal function that checks if the input files are .txt or .tsv files; might be needed when
 #' spatial data get incorporated
 #'
@@ -188,7 +186,6 @@ readAlleleCounts <- function (samples,
     }
     colnames(full_data) <- cnames
   }
-  #write assay as an DelayedArray-Object
   full_data <- DelayedArray(full_data)
   lookup <-  readLookup(samples)
 
