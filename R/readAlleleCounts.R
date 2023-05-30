@@ -1,12 +1,11 @@
-library(BiocParallel)
-library(Matrix)
-library(S4Vectors)
-library(SingleCellExperiment)
-library(rhdf5)
-library(HDF5Array)
-library(SingleCellAlleleExperiment)
-library(Matrix)
-library(tools)
+#library(BiocParallel)
+#library(S4Vectors)
+#library(SingleCellExperiment)
+#library(rhdf5)
+#library(HDF5Array)
+#library(SingleCellAlleleExperiment)
+#library(Matrix)
+#library(tools)
 #library(DropletUtils)
 #library(BiocGenerics)
 #library(png)
@@ -16,8 +15,16 @@ library(tools)
 #this version uses the SingleCellAlleleExperiment Constructor
 #----------------------------Helper_functions-----------------------------------
 #####
-#if the input.txts are saved as .gz
-.check_for_compressed <- function(path, compressed, error=TRUE) {
+#' `.check_for_compressed()` internal function that checks whether the input files are gzipped
+#'
+#' @param path file path of the directory containing the input files as character string; taken from
+#' readAllleleCounts()
+#' @param compressed binary variable taken from readAlleleCounts() indicating if the user files are gzipped
+#' @param error binary variable taken from readAlleleCounts() indicating if there should be an error message, when the gzipped files
+#' cannot be found in the given directory
+#'
+#' @return character string adding ".gz" to the filenames
+check_for_compressed <- function(path, compressed, error=TRUE) {
   original <- path
   if (isTRUE(compressed)) {
     path <- paste0(path, ".gz")
@@ -33,6 +40,15 @@ library(tools)
 
 #more or less for single/spatial distinction // spatial data from 10X Visium are saved
 #as .tsv, not as txt
+#' `check_txt_tsv` internal function that checks if the input files are .txt or .tsv files; might be needed when
+#' spatial data get incorporated
+#'
+#' @param path file path of the directory containing the input files as character string; taken from
+#' readAllleleCounts()
+#' @param filename character string containing the names of the files to be checked
+#'
+#' @return file name either appended with .txt or .tsv - depending on what could be found
+#' in the input directory
 check_txt_tsv <- function(path, filename){
   files <- list.files(path, pattern = paste0("^", filename, "\\."), full.names = TRUE)
 
@@ -58,40 +74,85 @@ check_txt_tsv <- function(path, filename){
 #-------------------------------------------------------------------------------
 #-----------------------------Main_functions------------------------------------
 #####
-#wrapper choosing the right read_in function
-#raw or hdf5 data
-.allele_loader <- function(run, type, compressed){
+
+#' `allele_loader` internal wrapper function for choosing the right read-in function
+#'
+#' @param path character string input containing the path to the directory containing the
+#' input files; helper function used in readAlleleCounts()
+#' @param type character vector containing options for the input data_type
+#' @param compressed binary classification if the input data are .gz compressed
+#'
+#' @return depending on the chosen type, fitting read_in function will be used
+allele_loader <- function(path, type, compressed){
   temp_type <- type
   if (temp_type == "auto"){
-    temp_type <- if (grepl("\\.h5", run)) "HDF5" else "sparse"
+    temp_type <- if (grepl("\\.h5", path)) "HDF5" else "sparse"
   }
   if (temp_type == "sparse"){
-    read_from_sparse_allele(run, compressed = compressed)
+    read_from_sparse_allele(path, compressed = compressed)
   }else if (temp_type == "prefix"){
-    read_from_sparse_allele(run, is.prefix = TRUE, compressed = compressed)
-  }else {
-    read_from_hdf5_allele(run)
+    read_from_sparse_allele(path, is.prefix = TRUE, compressed = compressed)
   }
 }
 
-#main function -use this-
+#' `readLookup` internal function to read in the lookup table
+#'
+#' @param path character string input containing the path to the directory containing the
+#' input files; helper function used in readAlleleCounts()
+#' @importFrom utils read.csv
+#'
+#' @return lookup table
+readLookup <- function(path){
+  lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
+  lookup <- read.csv(lookup.loc)
+  lookup
+}
+
+
+#' `readAlleleCounts` main read_in function for reading in the allele quantification data and
+#' loading the data into an SingleCellAlleleExperiment object. Input data are stored in a shared folder.
+#' Expected naming scheme of the files: quantification matrix: "matrix.mtx"
+#'                                      barcode information: "barcodes.txt"
+#'                                      feature information: "features.txt"
+#'                                      allele lookup table: "lookup_table_HLA_only"
+#'
+#' @param samples character string input containing the path to the directory containing the
+#' input files
+#' @param sample.names character string for a sample_name identifier
+#' @param col.names binary variable indicating whether quantification assay should contain column names
+#' @param type vector of character strings containing options for the input data_type
+#' @param compressed binary variable whether the input files are .gz compressed
+#' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
+#'
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom S4Vectors DataFrame
+#' @import BiocParallel
+#' @import HDF5Array
+#' @import tools
+#' @import methods
+#' @import DelayedArray
+#'
+#' @return SingleCellAlleleExperiment object
+#' @export
 readAlleleCounts <- function (samples,
                               sample.names = names(samples),
                               col.names = TRUE,
                               type = c("auto", "sparse", "HDF5", "prefix"),
                               compressed = NULL,
-                              images = "lowres", load = TRUE,
-                              BPPARAM = SerialParam(),
-                              lookup){
+                              BPPARAM = SerialParam()){
   type = match.arg(type)
   if (is.null(sample.names)) {
     sample.names <- samples
   }
-  #load.out for loading the different data
-  load.out <- bplapply(samples, FUN = .allele_loader,
+  rt_one_readin_start <- Sys.time()
+  load.out <- bplapply(samples, FUN = allele_loader,
                        type = type, compressed = compressed,
                        BPPARAM = BPPARAM)
-  #determining how many samples are contained in samples
+  rt_one_readin_end <- Sys.time()
+  diff_rt_one <- rt_one_readin_end - rt_one_readin_start
+  print(paste("Runtime check (1/2) Read_in:",      diff_rt_one))
+
+  #determining how many samples are contained in "samples"
   #predefine the dataslots in the corresponding length
   nsets <- length(samples)
   full_data <- vector("list", nsets)
@@ -104,7 +165,7 @@ readAlleleCounts <- function (samples,
     feature_info_list[[i]] <- current$feature.info
     cell.names <- current$cell.names
     #creates DataFrame with info to put in colData of sce
-    cell_info_list[[i]] <- DataFrame(Sample = rep(sample.names[i],length(cell.names)),
+    cell_info_list[[i]] <- S4Vectors::DataFrame(Sample = rep(sample.names[i],length(cell.names)),
                                      Barcode = cell.names$V1, row.names = NULL)
   }
   if (nsets > 1 && length(unique(feature_info_list)) != 1L) {
@@ -112,7 +173,7 @@ readAlleleCounts <- function (samples,
   }
   #assignment of variables for object assignment, after variables contain data for all given samples
   feature_info <- feature_info_list[[1]]
-  ROWNAMES(feature_info) <- feature_info$ID
+  S4Vectors::ROWNAMES(feature_info) <- feature_info$ID
   full_data <- do.call(cbind, full_data)
   cell_info <- do.call(rbind, cell_info_list)
 
@@ -129,16 +190,38 @@ readAlleleCounts <- function (samples,
   }
   #write assay as an DelayedArray-Object
   full_data <- DelayedArray(full_data)
+  lookup <-  readLookup(samples)
 
+  rt_two_scae_start <- Sys.time()
   sce <- SingleCellAlleleExperiment(assays=list(counts = full_data),
                                     rowData = feature_info,
                                     colData = cell_info, lookup = lookup)
+  rt_two_scae_end <- Sys.time()
+  diff_rt_two <- rt_two_scae_end - rt_two_scae_start
+  print(paste("Runtime check (2/2) Generating SCAE completed:",     diff_rt_two))
+  diff_rt_total <- rt_two_scae_end - rt_one_readin_start
+  print(paste("Total runtime, completed read_in and generating scae object",     diff_rt_total))
+
   return(sce)
 }
 
+
+#' `read_from_sparse_allele` read in function for reading in raw data.
+#'
+#'
+#' @param path character string input containing the path to the directory containing the
+#' input files
+#' @param is.prefix binary if the input data contains sample_prefix information
+#' @param compressed binary classification if the input data are .gz compressed
+#'
+#' @import SingleCellExperiment
+#' @import utils
+#' @importFrom Matrix readMM
+#'
+#' @return list with the read_in data sorted into different slots
 read_from_sparse_allele <- function(path, is.prefix = FALSE, compressed = NULL){
   Fun <- if (is.prefix) paste0 else file.path
-  #check if barcodes/features
+  #check if barcodes/features are .txt or .tsv files
   barcode <- check_txt_tsv(path, "barcodes")
   features <- check_txt_tsv(path, "features")
 
@@ -146,9 +229,9 @@ read_from_sparse_allele <- function(path, is.prefix = FALSE, compressed = NULL){
   feature.loc <- Fun(path, features)
   matrix.loc <- Fun(path, "matrix.mtx")
 
-  barcode.loc <- .check_for_compressed(barcode.loc, compressed)
-  feature.loc <- .check_for_compressed(feature.loc, compressed)
-  matrix.loc <- .check_for_compressed(matrix.loc, compressed)
+  barcode.loc <- check_for_compressed(barcode.loc, compressed)
+  feature.loc <- check_for_compressed(feature.loc, compressed)
+  matrix.loc <- check_for_compressed(matrix.loc, compressed)
 
   feature.info <- read.delim(feature.loc, header = FALSE)
   cell.names <- read.csv(barcode.loc, sep = "", header = FALSE)
@@ -156,7 +239,7 @@ read_from_sparse_allele <- function(path, is.prefix = FALSE, compressed = NULL){
   possible.names <- c("ID", "Symbol", "Type", "Chromosome", "Start", "End")
   colnames(feature.info) <- head(possible.names, ncol(feature.info))
 
-  mat = readMM(matrix.loc)
+  mat = Matrix::readMM(matrix.loc)
 
   if (barcode == "barcodes.txt"){
     mat = t(mat)
@@ -168,45 +251,3 @@ read_from_sparse_allele <- function(path, is.prefix = FALSE, compressed = NULL){
   )
 }
 #####
-#-------------------------------------------------------------------------------
-
-####------------------------------test-case-------------------------------------
-lookup_hla <- read.csv("C:/Users/Jonas/OneDrive/Desktop/input_test_files/counts_unfiltered___/lookup_table_HLA_only.csv")
-sample_x7_auto_sparse_txt <- "C:/Users/Jonas/OneDrive/Desktop/input_test_files/counts_unfiltered___"
-
-sce_test7_sparse_auto_txt <- readAlleleCounts(sample_x7_auto_sparse_txt, sample.names = "sample_x",
-                                              type = "auto", col.names = TRUE, lookup=lookup_hla)
-
-sce_test7_sparse_auto_txt
-
-#counts(sce_test7_sparse_auto_txt)
-rowData(sce_test7_sparse_auto_txt)
-
-get_alleles(sce_test7_sparse_auto_txt)
-rowData(get_alleles(sce_test7_sparse_auto_txt))
-counts(get_alleles(sce_test7_sparse_auto_txt))
-rownames(get_alleles(sce_test7_sparse_auto_txt))
-
-get_agenes(sce_test7_sparse_auto_txt)
-rowData(get_agenes(sce_test7_sparse_auto_txt))
-counts(get_agenes(sce_test7_sparse_auto_txt))
-
-get_func(sce_test7_sparse_auto_txt)
-rowData(get_func(sce_test7_sparse_auto_txt))
-counts(get_func(sce_test7_sparse_auto_txt))
-
-
-counts(sce_test7_sparse_auto_txt)
-colData(sce_test7_sparse_auto_txt)
-
-
-#####
-
-
-
-lookup_hla <- read.csv("C:/Users/Jonas/OneDrive/Desktop/input_test_files/counts_unfiltered___/lookup_table_HLA_only.csv")
-lookup_hla
-
-lookup_hla[grepl("DRB1", lookup_hla$Allele, fixed = TRUE),]
-
-
