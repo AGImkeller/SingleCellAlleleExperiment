@@ -2,9 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{get_allelecounts}
 \alias{get_allelecounts}
-\title{\code{get_allelecounts} internal function used to build a subassay containing only the allelecounts.
-The rownames  of this subassay are already translated to the corresponding allele_gene names, which
-are extracted from the allele lookup table}
+\title{Get Subassay with allele gene names and raw allele quantification}
 \usage{
 get_allelecounts(sce, lookup)
 }
@@ -14,10 +12,10 @@ get_allelecounts(sce, lookup)
 \item{lookup}{allele lookup table}
 }
 \value{
-subsample of the sce containing all allele_counts with the allele_gen_names as rownames
+subsample of the sce containing all allele counts with the allele gene identifier as rownames
 }
 \description{
-\code{get_allelecounts} internal function used to build a subassay containing only the allelecounts.
-The rownames  of this subassay are already translated to the corresponding allele_gene names, which
+Internal function used to build a subassay containing counts from raw alleles
+The rownames  of this subassay are already translated to the corresponding allele gene identifier, which
 are extracted from the allele lookup table
 }

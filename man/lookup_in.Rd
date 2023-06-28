@@ -2,10 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{lookup_in}
 \alias{lookup_in}
-\title{\code{lookup_in} internal function adding information to the SingleCellAlleleExperiment object by
-extending the rowData by two columns. "NI_I" is a classifier for each feature_row if its considered a
-non-immune (NI) or immune (I) gene. "Quant_type" is a classifier for determinig which row is related to which
-subassay of the extended main assay in the SingleCellAlleleExperiment}
+\title{Extending rowData}
 \usage{
 lookup_in(sce)
 }
@@ -13,11 +10,12 @@ lookup_in(sce)
 \item{sce}{SingleCellExperiment object}
 }
 \value{
-SingleCellExperiment object with extended rowData
+SingleCellAlleleExperiment object with extended rowData
 }
 \description{
-\code{lookup_in} internal function adding information to the SingleCellAlleleExperiment object by
+Internal function used in the \code{SingleCellAlleleExperiment()} constructor adding information to the SingleCellAlleleExperiment object by
 extending the rowData by two columns. "NI_I" is a classifier for each feature_row if its considered a
 non-immune (NI) or immune (I) gene. "Quant_type" is a classifier for determinig which row is related to which
-subassay of the extended main assay in the SingleCellAlleleExperiment
+subassay of the extended main assay in the SingleCellAlleleExperiment. "A" corresponds to allele, "G" to allele gene and
+""F" to functional allele class.
 }

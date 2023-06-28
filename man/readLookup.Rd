@@ -2,17 +2,16 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{readLookup}
 \alias{readLookup}
-\title{\code{readLookup} internal function to read in the lookup table}
+\title{Read in allele lookup}
 \usage{
 readLookup(path)
 }
 \arguments{
-\item{path}{character string input containing the path to the directory containing the
-input files; helper function used in readAlleleCounts()}
+\item{path}{file path of the directory containing the input files as character string}
 }
 \value{
 lookup table
 }
 \description{
-\code{readLookup} internal function to read in the lookup table
+Internal function used in \code{readAlleleCounts()} to read in the allele lookup table.
 }

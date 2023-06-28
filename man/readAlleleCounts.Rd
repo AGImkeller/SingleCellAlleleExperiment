@@ -2,20 +2,15 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{readAlleleCounts}
 \alias{readAlleleCounts}
-\title{\code{readAlleleCounts} main read_in function for reading in the allele quantification data and
-loading the data into an SingleCellAlleleExperiment object. Input data are stored in a shared folder.
-Expected naming scheme of the files: quantification matrix: "matrix.mtx"
-barcode information: "barcodes.txt"
-feature information: "features.txt"
-allele lookup table: "lookup_table_HLA_only"}
+\title{Reading in allele quantification data into SingleCellAlleleExperiment object}
 \usage{
 readAlleleCounts(
   samples,
   sample.names = names(samples),
   col.names = TRUE,
-  type = c("auto", "sparse", "HDF5", "prefix"),
   compressed = NULL,
-  BPPARAM = SerialParam()
+  filter_threshold = 0,
+  BPPARAM = BiocParallel::SerialParam()
 )
 }
 \arguments{
@@ -26,9 +21,9 @@ input files}
 
 \item{col.names}{binary variable indicating whether quantification assay should contain column names}
 
-\item{type}{vector of character strings containing options for the input data_type}
-
 \item{compressed}{binary variable whether the input files are .gz compressed}
+
+\item{filter_threshold}{count threshold for filtering barcodes/cells}
 
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }
@@ -36,7 +31,7 @@ input files}
 SingleCellAlleleExperiment object
 }
 \description{
-\code{readAlleleCounts} main read_in function for reading in the allele quantification data and
+Main read in function for reading in given allele quantification data and
 loading the data into an SingleCellAlleleExperiment object. Input data are stored in a shared folder.
 Expected naming scheme of the files: quantification matrix: "matrix.mtx"
 barcode information: "barcodes.txt"

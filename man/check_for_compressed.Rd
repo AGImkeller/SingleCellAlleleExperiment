@@ -2,7 +2,7 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{check_for_compressed}
 \alias{check_for_compressed}
-\title{\code{.check_for_compressed()} internal function that checks whether the input files are gzipped}
+\title{Check if files in given directory are gzipped}
 \usage{
 check_for_compressed(path, compressed, error = TRUE)
 }
@@ -19,5 +19,5 @@ cannot be found in the given directory}
 character string adding ".gz" to the filenames
 }
 \description{
-\code{.check_for_compressed()} internal function that checks whether the input files are gzipped
+Internal function used in \code{read_from_sparse_allele()} that checks whether the input files are gzipped.
 }

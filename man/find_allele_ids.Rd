@@ -2,8 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{find_allele_ids}
 \alias{find_allele_ids}
-\title{\code{find_allele_ids} internal function used to subsample the quantification assay and only
-return the rows specifying allele-quantification information}
+\title{Identify rows containing allele information}
 \usage{
 find_allele_ids(sce)
 }
@@ -11,9 +10,9 @@ find_allele_ids(sce)
 \item{sce}{SingleCellExperiment object}
 }
 \value{
-subsample of the sce containing all rows with allele_counts
+subsample of the scae containing all rows with allele_counts
 }
 \description{
-\code{find_allele_ids} internal function used to subsample the quantification assay and only
-return the rows specifying allele-quantification information
+Internal function used in \code{get_allelecounts()} to subsample the quantification assay and only
+return the rows specifying allele-quantification information.
 }

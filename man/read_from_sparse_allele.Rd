@@ -4,13 +4,11 @@
 \alias{read_from_sparse_allele}
 \title{\code{read_from_sparse_allele} read in function for reading in raw data.}
 \usage{
-read_from_sparse_allele(path, is.prefix = FALSE, compressed = NULL)
+read_from_sparse_allele(path, compressed = NULL)
 }
 \arguments{
 \item{path}{character string input containing the path to the directory containing the
 input files}
-
-\item{is.prefix}{binary if the input data contains sample_prefix information}
 
 \item{compressed}{binary classification if the input data are .gz compressed}
 }

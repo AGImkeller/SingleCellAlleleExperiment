@@ -2,18 +2,23 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{SingleCellAlleleExperiment}
 \alias{SingleCellAlleleExperiment}
-\title{\code{SingleCellAlleleExperiment} Constructor for the scae class}
+\title{Constructor SingleCellAlleleExperiment-class}
 \usage{
-SingleCellAlleleExperiment(..., lookup)
+SingleCellAlleleExperiment(..., lookup, threshold)
 }
 \arguments{
-\item{...}{parameters to fill in the sce constructor}
+\item{...}{parameters to pass to SingleCellExperiment constructor}
 
 \item{lookup}{allele lookup file}
+
+\item{threshold}{count threshold for filtering barcodes/cells}
 }
 \value{
 SingleCellAlleleExperiment object
 }
 \description{
-\code{SingleCellAlleleExperiment} Constructor for the scae class
+Constructor for the SingleCellAllelExperiment-class.
+Constructor is used in the read in function \code{readAlleleCounts()}. Performing all necessary steps to transform
+a SingleCellExperiment object into the extended SingleCellAlleleExperiment object. SCAE objects
+contain an extended count-assay aswell as extended rowData.
 }
