@@ -4,10 +4,12 @@
 \alias{lookup_in}
 \title{Extending rowData}
 \usage{
-lookup_in(sce)
+lookup_in(sce, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 SingleCellAlleleExperiment object with extended rowData

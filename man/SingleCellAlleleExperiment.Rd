@@ -4,14 +4,16 @@
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment-class}
 \usage{
-SingleCellAlleleExperiment(..., lookup, threshold)
+SingleCellAlleleExperiment(..., threshold, exp_type, lookup)
 }
 \arguments{
 \item{...}{parameters to pass to SingleCellExperiment constructor}
 
-\item{lookup}{allele lookup file}
-
 \item{threshold}{count threshold for filtering barcodes/cells}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+
+\item{lookup}{allele lookup file}
 }
 \value{
 SingleCellAlleleExperiment object

@@ -10,6 +10,7 @@ readAlleleCounts(
   col.names = TRUE,
   compressed = NULL,
   filter_threshold = 0,
+  exp_type = c("WTA", "Amplicon"),
   BPPARAM = BiocParallel::SerialParam()
 )
 }
@@ -24,6 +25,8 @@ input files}
 \item{compressed}{binary variable whether the input files are .gz compressed}
 
 \item{filter_threshold}{count threshold for filtering barcodes/cells}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }

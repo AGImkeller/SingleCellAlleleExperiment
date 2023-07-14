@@ -4,13 +4,15 @@
 \alias{read_from_sparse_allele}
 \title{\code{read_from_sparse_allele} read in function for reading in raw data.}
 \usage{
-read_from_sparse_allele(path, compressed = NULL)
+read_from_sparse_allele(path, compressed = NULL, exp_type = exp_type)
 }
 \arguments{
 \item{path}{character string input containing the path to the directory containing the
 input files}
 
 \item{compressed}{binary classification if the input data are .gz compressed}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 list with the read_in data sorted into different slots

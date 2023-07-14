@@ -23,6 +23,7 @@
 #' @param compressed binary variable whether the input files are .gz compressed
 #' @param filter_threshold count threshold for filtering barcodes/cells
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
+#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
 #'
 #' @return SingleCellAlleleExperiment object
 #'
@@ -34,6 +35,7 @@ readAlleleCounts <- function (samples,
                               col.names = TRUE,
                               compressed = NULL,
                               filter_threshold = 0,
+                              exp_type = c("WTA", "Amplicon"),
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
@@ -44,6 +46,7 @@ readAlleleCounts <- function (samples,
   load.out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
                                      compressed = compressed,
+                                     exp_type = exp_type,
                                      BPPARAM = BPPARAM)
 
   current <- load.out[[1]]
@@ -55,7 +58,7 @@ readAlleleCounts <- function (samples,
                                          Barcode = cell.names$V1,
                                          row.names = NULL)
   feature_info <- feature_info_list
-  S4Vectors::ROWNAMES(feature_info) <- feature_info$ID
+  S4Vectors::ROWNAMES(feature_info) <- feature_info[,1]
 
   if (col.names) {
     cnames <- cell_info_list$Barcode
@@ -76,6 +79,7 @@ readAlleleCounts <- function (samples,
                                     rowData = feature_info,
                                     colData = cell_info_list,
                                     threshold = filter_threshold,
+                                    exp_type = exp_type,
                                     lookup = lookup)
   #####
   rt_two_scae_end <- Sys.time()
@@ -96,6 +100,7 @@ readAlleleCounts <- function (samples,
 #' @param path character string input containing the path to the directory containing the
 #' input files
 #' @param compressed binary classification if the input data are .gz compressed
+#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
 #'
 #' @import utils
 #' @importFrom Matrix readMM
@@ -103,7 +108,7 @@ readAlleleCounts <- function (samples,
 # @import SingleCellExperiment
 #'
 #' @return list with the read_in data sorted into different slots
-read_from_sparse_allele <- function(path, compressed = NULL){
+read_from_sparse_allele <- function(path, compressed = NULL, exp_type = exp_type){
   #defining path
   barcode.loc <- file.path(path, "barcodes.txt")
   feature.loc <- file.path(path, "features.txt")
@@ -117,8 +122,13 @@ read_from_sparse_allele <- function(path, compressed = NULL){
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
   mat <- Matrix::readMM(matrix.loc)
 
-  possible.names <- c("ID", "Symbol", "Type", "Chromosome", "Start", "End")
-  colnames(feature.info) <- utils::head(possible.names, ncol(feature.info))
+  possible.names <- c("Ensembl.ID", "Symbol")
+
+  if (exp_type == "WTA"){
+    colnames(feature.info) <- possible.names[1]
+  }else {
+    colnames(feature.info) <- possible.names[2]
+  }
 
   list(mat = Matrix::t(mat),
        cell.names = cell.names,

@@ -23,4 +23,5 @@ Imports:
   stats,
   tibble,
   dplyr,
-  ggplot2
+  ggplot2,
+  biomaRt

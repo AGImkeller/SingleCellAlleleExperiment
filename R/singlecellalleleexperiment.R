@@ -29,14 +29,15 @@
 #' @param ... parameters to pass to SingleCellExperiment constructor
 #' @param lookup allele lookup file
 #' @param threshold count threshold for filtering barcodes/cells
+#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
 #'
 #' @return SingleCellAlleleExperiment object
 #' @export
-SingleCellAlleleExperiment <- function(..., lookup, threshold){
+SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup){
   sce <- SingleCellExperiment::SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
-  sce_add_look <- lookup_in(sce)
+  sce_add_look <- lookup_in(sce, exp_type)
   #####
   rt_scae_lookup_end <- Sys.time()
   diff_rt_scae_lookup <- rt_scae_lookup_end - rt_scae_lookup_start
@@ -96,18 +97,56 @@ SingleCellAlleleExperiment <- function(..., lookup, threshold){
 #' ""F" to functional allele class.
 #'
 #' @param sce SingleCellExperiment object
+#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
 #'
 #' @return SingleCellAlleleExperiment object with extended rowData
-lookup_in <- function(sce){
+lookup_in <- function(sce, exp_type){
   new_sce <- sce
-  allele_names_all <- find_allele_ids(new_sce)
 
+  if (exp_type == "WTA"){
+    ensembl_ids <- unlist(rowData(new_sce)$Ensembl.ID)
+    gene_symbols <- get_ncbi_gene_names(ensembl_ids)
+    SummarizedExperiment::rowData(new_sce)$Symbol <- gene_symbols
+    allele_names_all <- find_allele_ids_ens(new_sce)
+  }else {
+    allele_names_all <- find_allele_ids_amp(new_sce)
+  }
   SummarizedExperiment::rowData(new_sce[allele_names_all,])$NI_I <- "I"
   SummarizedExperiment::rowData(new_sce[allele_names_all,])$Quant_type <- "A"
+  #add the rownames to the Symbol-col
 
   SummarizedExperiment::rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$NI_I <- "NI"
   SummarizedExperiment::rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$Quant_type <- "G"
   new_sce
+}
+
+#' Get Ncbi genes using biomaRt
+#'
+#' @param ensembl_ids vector containing ensembl.ids
+#'
+#' @return vector containing the ncbi names matching the right rows for the ensembl.ids
+get_ncbi_gene_names <- function(ensembl_ids) {
+
+  ensembl_ids <- gsub("\\..*", "", ensembl_ids)
+  # Connect to the Ensembl database through Biomart
+  ensembl <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+
+  # Get the attributes of interest
+  attributes <- c("ensembl_gene_id", "external_gene_name")
+
+  # Query Biomart to retrieve NCBI gene names for Ensembl IDs
+  results <- biomaRt::getBM(
+    attributes = attributes,
+    filters = "ensembl_gene_id",
+    values = ensembl_ids,
+    mart = ensembl
+  )
+  # Create a vector to store the NCBI gene names
+  ncbi_gene_names <- rep(NA, length(ensembl_ids))
+  # Map the retrieved gene names to the vector
+  ncbi_gene_names[match(results$ensembl_gene_id, ensembl_ids)] <- results$external_gene_name
+
+  return(ncbi_gene_names)
 }
 #####
 
@@ -126,8 +165,8 @@ lookup_in <- function(sce){
 sfactors <- function(sce, num_of_bins = 75){
   working_copy <- sce
   df_scales <- scuttle::computeLibraryFactors(working_copy)
-  normed_counts <- scuttle::normalizeCounts(df_scales, size_factors = SingleCellExperiment::sizeFactors(df_scales), transform = "none")
-  SingleCellExperiment::counts(df_scales) <- normed_counts
+  #normed_counts <- scuttle::normalizeCounts(df_scales, size_factors = SingleCellExperiment::sizeFactors(df_scales), transform = "none")
+  #SingleCellExperiment::counts(df_scales) <- normed_counts
   df_scales
 }
 
@@ -154,7 +193,7 @@ filter_norm <- function(sce, threshold = 0){
 #-3-----------------------------allele2genes-----------------------------------#
 
 #####
-#' Identify rows containing allele information
+#' Identify rows containing allele information for WTA
 #'
 #' @description
 #' Internal function used in `get_allelecounts()` to subsample the quantification assay and only
@@ -163,8 +202,20 @@ filter_norm <- function(sce, threshold = 0){
 #' @param sce SingleCellExperiment object
 #'
 #' @return subsample of the scae containing all rows with allele_counts
-find_allele_ids <- function(sce){
+find_allele_ids_ens <- function(sce){
   a <- !grepl("ENS", rownames(SingleCellExperiment::counts(sce)), fixed = TRUE)
+  allele_names_all <- rownames(SingleCellExperiment::counts(sce)[a,])
+  allele_names_all
+}
+
+
+#' Identify rows containing allele information for Amplicon
+#'
+#' @param sce singlecellexperiment object
+#'
+#' @return list of rownames starting with "HLA"
+find_allele_ids_amp <- function(sce){
+  a <- grepl("HLA-", rownames(SingleCellExperiment::counts(sce)), fixed = TRUE)
   allele_names_all <- rownames(SingleCellExperiment::counts(sce)[a,])
   allele_names_all
 }
@@ -240,7 +291,7 @@ cutname <- function(allele_id){
 get_allelecounts <- function(sce, lookup){
   wor_copy <- sce
 
-  allele_ids_lookup <- find_allele_ids(sce)
+  allele_ids_lookup <- find_allele_ids_ens(sce)
   check_unknowns(wor_copy, allele_ids_lookup)
   unknown <- FALSE
 
@@ -295,7 +346,7 @@ alleles2genes <- function(sce, lookup){
     alleletogene_counts <- v_acounts[1][[1]]
   }else {
     alleletogene_counts <- v_acounts[1][[1]]
-    not_ids <- v_acounts[2][[1]]
+    not_ids <- unlist(v_acounts[2:length(v_acounts)])
     unknown <- TRUE
   }
 
@@ -312,11 +363,15 @@ alleles2genes <- function(sce, lookup){
 
   if (unknown){
     al_gene <- al_gene[!(rownames(al_gene) %in% not_ids), , drop = FALSE]
-    SummarizedExperiment::rowData(w_copy[startsWith(rownames(SingleCellExperiment::rowData(w_copy)), not_ids)])$Quant_type <- "A_unknown"
+    filtered_rows <- sapply(rownames(SingleCellExperiment::rowData(w_copy)), function(rowname) {
+      any(startsWith(rowname, not_ids))
+    })
+    SummarizedExperiment::rowData(w_copy)[filtered_rows, "Quant_type"] <- "A_unknown"
   }
   al_sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = al_gene))
   SummarizedExperiment::colData(al_sce) <- SingleCellExperiment::colData(w_copy)
-  SummarizedExperiment::rowData(al_sce)$ID <- rownames(al_gene)
+  SummarizedExperiment::rowData(al_sce)$Ensembl.ID <- rownames(al_gene)
+  SummarizedExperiment::rowData(al_sce)$Symbol <- rownames(al_gene)
   new_sce <- rbind(w_copy, al_sce)
 
   SummarizedExperiment::rowData(new_sce[rownames(new_sce) %in% uniqs])$NI_I <- "I"
@@ -375,7 +430,8 @@ genes2functional <- function(sce, lookup){
 
   func_sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = gene_func))
   SummarizedExperiment::colData(func_sce) <- SingleCellExperiment::colData(func_copy)
-  SummarizedExperiment::rowData(func_sce)$ID <- unique(mtx[,2])
+  SummarizedExperiment::rowData(func_sce)$Ensembl.ID <- unique(mtx[,2])
+  SummarizedExperiment::rowData(func_sce)$Symbol <- unique(mtx[,2])
   final_scae <- rbind(func_copy, func_sce)
 
   SummarizedExperiment::rowData(final_scae[unique(mtx[,2])])$NI_I <-  "I"
@@ -400,8 +456,13 @@ genes2functional <- function(sce, lookup){
 #' log normalized counts
 log_transform <- function(sce){
   working_copy <- sce
-  log_counts <- log1p(SingleCellExperiment::counts(working_copy))
+
+  normed_counts <- scuttle::normalizeCounts(working_copy, size_factors = SingleCellExperiment::sizeFactors(working_copy), transform = "none")
+  SummarizedExperiment::assays(working_copy)$size_normed <- normed_counts
+  log_counts <- log1p(SummarizedExperiment::assays(working_copy)$size_normed)
+
   SummarizedExperiment::assays(working_copy)$logcounts <- log_counts
+  SummarizedExperiment::assays(working_copy)$size_normed <- NULL
 
   SingleCellExperiment::counts(working_copy) <- DelayedArray::DelayedArray(SingleCellExperiment::counts(working_copy))
   SingleCellExperiment::logcounts(working_copy) <- DelayedArray::DelayedArray(SingleCellExperiment::logcounts(working_copy))
