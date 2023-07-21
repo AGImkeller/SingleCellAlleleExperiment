@@ -2,10 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{alleles2genes}
 \alias{alleles2genes}
-\title{\code{allele2genes} first internal translation function used in the SingleCellAlleleExperiment constructor
-computing the one of the two new subassay that get appended to the
-quantification assay. This subassay contains the allele-gene names instead of the allele-identifiers and
-sums up the expression counts of alleles that have the same allele-gene name.}
+\title{Building first new subassay for SingleCellAllelexperiment object}
 \usage{
 alleles2genes(sce, lookup)
 }
@@ -15,11 +12,11 @@ alleles2genes(sce, lookup)
 \item{lookup}{allele lookup table}
 }
 \value{
-adds allele-gene subassay containing summarized count-information for the allele-genes to the main assay
+adds allele gene-subassay containing summarized count information for the allele genes
 }
 \description{
-\code{allele2genes} first internal translation function used in the SingleCellAlleleExperiment constructor
-computing the one of the two new subassay that get appended to the
-quantification assay. This subassay contains the allele-gene names instead of the allele-identifiers and
-sums up the expression counts of alleles that have the same allele-gene name.
+Internal function for the first assay extension used in the \code{SingleCellAlleleExperiment()} constructor
+computing the first of the two new subassays that get appended to the
+quantification assay. This subassay contains the allele gene identifiers instead of the allelen identifiers and
+sums up the expression counts of alleles that have the same allele gene identifiers.
 }

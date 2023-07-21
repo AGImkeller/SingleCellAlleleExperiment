@@ -2,10 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{genes2functional}
 \alias{genes2functional}
-\title{\code{genes2functional} second internal translation function used in the SingleCellAlleleExperiment constructor
-computing the second of the two new subassays that get appended to the
-quantification assay. This subassay contains the functional allele classes and
-sums up the expression counts of the allele genes that are in the same functional group}
+\title{Building second new subassay for the SingleCellAlleleExperiment object}
 \usage{
 genes2functional(sce, lookup)
 }
@@ -18,8 +15,8 @@ genes2functional(sce, lookup)
 adds functional subassay containing summarized count information for the functional allele classes
 }
 \description{
-\code{genes2functional} second internal translation function used in the SingleCellAlleleExperiment constructor
+Internal function for the second assay extension used in the \code{SingleCellAlleleExperiment()} constructor
 computing the second of the two new subassays that get appended to the
 quantification assay. This subassay contains the functional allele classes and
-sums up the expression counts of the allele genes that are in the same functional group
+sums up the expression counts of the allele genes that are in the same functional group.
 }
