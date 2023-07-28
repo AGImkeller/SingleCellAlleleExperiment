@@ -20,13 +20,16 @@
 #' @import dplyr
 #' @import tibble
 #' @import ggplot2
+#' @importFrom Matrix rowSums readMM
+#' @importFrom utils read.csv read.delim
+#'
 #'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
 plotKnee <- function(path){
-  barcodes_loc <- file.path(path, "barcodes.txt")
-  features_loc <- file.path(path, "features.txt")
-  matrix_loc   <- file.path(path, "matrix.mtx")
+  barcodes_loc <- file.path(path, "cells_x_genes.barcodes.txt")
+  features_loc <- file.path(path, "cells_x_genes.genes.txt")
+  matrix_loc   <- file.path(path, "cells_x_genes.mtx")
 
   barcodes <- read.csv(barcodes_loc, sep = "", header = FALSE)
   features <- read.delim(features_loc, header = FALSE)
@@ -47,7 +50,7 @@ plotKnee <- function(path){
 
   total <- df$total
 
-  ggplot2::ggplot(df, aes(total, rank)) +
+  ggplot(df, aes(total, rank)) +
     geom_path() +
     scale_x_log10() + scale_y_log10() + annotation_logticks() +
     labs(y = "Barcode rank", x = "Total UMI count")

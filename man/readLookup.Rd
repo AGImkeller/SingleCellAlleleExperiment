@@ -4,10 +4,12 @@
 \alias{readLookup}
 \title{Read in allele lookup}
 \usage{
-readLookup(path)
+readLookup(path, exp_type)
 }
 \arguments{
 \item{path}{file path of the directory containing the input files as character string}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 lookup table

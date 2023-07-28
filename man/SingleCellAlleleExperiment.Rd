@@ -4,7 +4,7 @@
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment-class}
 \usage{
-SingleCellAlleleExperiment(..., threshold, exp_type, lookup)
+SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 }
 \arguments{
 \item{...}{parameters to pass to SingleCellExperiment constructor}
@@ -12,6 +12,8 @@ SingleCellAlleleExperiment(..., threshold, exp_type, lookup)
 \item{threshold}{count threshold for filtering barcodes/cells}
 
 \item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+
+\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 
 \item{lookup}{allele lookup file}
 }

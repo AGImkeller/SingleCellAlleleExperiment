@@ -11,6 +11,7 @@ readAlleleCounts(
   compressed = NULL,
   filter_threshold = 0,
   exp_type = c("WTA", "Amplicon"),
+  symbols = NULL,
   BPPARAM = BiocParallel::SerialParam()
 )
 }
@@ -27,6 +28,8 @@ input files}
 \item{filter_threshold}{count threshold for filtering barcodes/cells}
 
 \item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+
+\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }

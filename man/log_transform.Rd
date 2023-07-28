@@ -11,7 +11,6 @@ log_transform(sce)
 }
 \value{
 SingleCellAlleleExperiment object with an additional assay containing
-log normalized counts
 }
 \description{
 Internal function used in in

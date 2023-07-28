@@ -4,12 +4,14 @@
 \alias{get_allelecounts}
 \title{Get Subassay with allele gene names and raw allele quantification}
 \usage{
-get_allelecounts(sce, lookup)
+get_allelecounts(sce, lookup, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
 \item{lookup}{allele lookup table}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 subsample of the sce containing all allele counts with the allele gene identifier as rownames

@@ -13,11 +13,14 @@
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+#' @importFrom stats complete.cases
+#' @importFrom SingleCellExperiment rowData
+#'
 #' @return subsampled SingleCellAlleleExperiment object
 #' @export
 get_alleles <- function(scae) {
-  subset_rows <- stats::complete.cases(SingleCellExperiment::rowData(scae)$NI_I, SingleCellExperiment::rowData(scae)$Quant_type)
-  alleles <- scae[subset_rows & SingleCellExperiment::rowData(scae)$NI_I == "I" & startsWith(SingleCellExperiment::rowData(scae)$Quant_type,"A"), ]
+  subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  alleles <- scae[subset_rows & rowData(scae)$NI_I == "I" & startsWith(rowData(scae)$Quant_type,"A"), ]
   return(alleles)
 }
 
@@ -29,11 +32,14 @@ get_alleles <- function(scae) {
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+#' @importFrom stats complete.cases
+#' @importFrom SingleCellExperiment rowData
+#'
 #' @return subsampled SingleCellAlleleExperiment object
 #' @export
 get_agenes <- function(scae) {
-  subset_rows <- stats::complete.cases(SingleCellExperiment::rowData(scae)$NI_I, SingleCellExperiment::rowData(scae)$Quant_type)
-  agenes <- scae[subset_rows & SingleCellExperiment::rowData(scae)$NI_I == "I" & SingleCellExperiment::rowData(scae)$Quant_type == "G", ]
+  subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  agenes <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
 
@@ -45,11 +51,14 @@ get_agenes <- function(scae) {
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+#' @importFrom stats complete.cases
+#' @importFrom SingleCellExperiment rowData
+#'
 #' @return subsampled SingleCellAlleleExperiment object
 #' @export
 get_nigenes <- function(scae) {
-  subset_rows <- stats::complete.cases(SingleCellExperiment::rowData(scae)$NI_I, SingleCellExperiment::rowData(scae)$Quant_type)
-  agenes <- scae[subset_rows & SingleCellExperiment::rowData(scae)$NI_I == "NI" & SingleCellExperiment::rowData(scae)$Quant_type == "G", ]
+  subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  agenes <- scae[subset_rows & rowData(scae)$NI_I == "NI" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
 
@@ -61,11 +70,14 @@ get_nigenes <- function(scae) {
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+#' @importFrom stats complete.cases
+#' @importFrom SingleCellExperiment rowData
+#'
 #' @return subsampled SingleCellAlleleExperiment object
 #' @export
 get_func <- function(scae) {
-  subset_rows <- stats::complete.cases(SingleCellExperiment::rowData(scae)$NI_I, SingleCellExperiment::rowData(scae)$Quant_type)
-  func <- scae[subset_rows & SingleCellExperiment::rowData(scae)$NI_I == "I" & SingleCellExperiment::rowData(scae)$Quant_type == "F", ]
+  subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  func <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "F", ]
   return(func)
 }
 
@@ -77,11 +89,14 @@ get_func <- function(scae) {
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+#' @importFrom stats complete.cases
+#' @importFrom SingleCellExperiment rowData
+#'
 #' @return subsampled SingleCellAlleleExperiment object
 #' @export
 get_unknown <- function(scae) {
-  subset_rows <- stats::complete.cases(SingleCellExperiment::rowData(scae)$NI_I, SingleCellExperiment::rowData(scae)$Quant_type)
-  unknown <- scae[subset_rows & SingleCellExperiment::rowData(scae)$NI_I == "I" & SingleCellExperiment::rowData(scae)$Quant_type == "A_unknown", ]
+  subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  unknown <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "A_unknown", ]
   return(unknown)
 }
  #####

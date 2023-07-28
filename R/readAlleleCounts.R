@@ -24,6 +24,11 @@
 #' @param filter_threshold count threshold for filtering barcodes/cells
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
 #' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
+#'
+#' @importFrom BiocParallel SerialParam bplapply
+#' @importFrom S4Vectors DataFrame ROWNAMES
+#'
 #'
 #' @return SingleCellAlleleExperiment object
 #'
@@ -36,11 +41,20 @@ readAlleleCounts <- function (samples,
                               compressed = NULL,
                               filter_threshold = 0,
                               exp_type = c("WTA", "Amplicon"),
+                              symbols = NULL,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
   if (is.null(sample.names)) {
     sample.names <- samples
+  }
+
+  if (is.null(symbols)) {
+    symbols <- "biomart"
+  } else {
+    if (!symbols %in% c("biomart", "orgdb")) {
+      stop("Invalid value for symbols parameter. Allowed values are 'biomaRt' and 'orgdb'.")
+    }
   }
 
   load.out <- BiocParallel::bplapply(samples,
@@ -66,7 +80,7 @@ readAlleleCounts <- function (samples,
   }
 
   full_data <- as(full_data, "CsparseMatrix")
-  lookup <- readLookup(samples)
+  lookup <- readLookup(samples, exp_type)
 
   #####
   rt_one_readin_end <- Sys.time()
@@ -80,7 +94,19 @@ readAlleleCounts <- function (samples,
                                     colData = cell_info_list,
                                     threshold = filter_threshold,
                                     exp_type = exp_type,
+                                    symbols = symbols,
                                     lookup = lookup)
+  if (exp_type == "Amplicon"){
+    rt_six_scae_start <- Sys.time()
+    sce <- add_sample_tags(samples, sce)
+    #####
+    rt_six_scae_end <- Sys.time()
+    diff_rt_six <- rt_six_scae_end - rt_six_scae_start
+    print(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six))
+    #####
+  }
+
+
   #####
   rt_two_scae_end <- Sys.time()
   diff_rt_two <- rt_two_scae_end - rt_two_scae_start
@@ -102,10 +128,8 @@ readAlleleCounts <- function (samples,
 #' @param compressed binary classification if the input data are .gz compressed
 #' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
 #'
-#' @import utils
-#' @importFrom Matrix readMM
-#' @importFrom Matrix t
-# @import SingleCellExperiment
+#' @importFrom utils read.delim read.csv
+#' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
 read_from_sparse_allele <- function(path, compressed = NULL, exp_type = exp_type){
@@ -120,7 +144,7 @@ read_from_sparse_allele <- function(path, compressed = NULL, exp_type = exp_type
   #read in the files
   feature.info <- utils::read.delim(feature.loc, header = FALSE)
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
-  mat <- Matrix::readMM(matrix.loc)
+  mat          <- Matrix::readMM(matrix.loc)
 
   possible.names <- c("Ensembl.ID", "Symbol")
 
@@ -168,11 +192,19 @@ check_for_compressed <- function(path, compressed, error=TRUE) {
 #' Internal function used in `readAlleleCounts()` to read in the allele lookup table.
 #'
 #' @param path file path of the directory containing the input files as character string
+#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#'
+#' @importFrom utils read.csv
 #'
 #' @return lookup table
-readLookup <- function(path){
-  lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
-  lookup <- utils::read.csv(lookup.loc)
+readLookup <- function(path, exp_type){
+  if (exp_type == "WTA"){
+    lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
+    lookup <- utils::read.csv(lookup.loc)
+  }else if (exp_type == "Amplicon"){
+    lookup.loc <- file.path(path, "lookup_table_HLA_amplicon.csv")
+    lookup <- utils::read.csv(lookup.loc)
+  }
   lookup
 }
 #####

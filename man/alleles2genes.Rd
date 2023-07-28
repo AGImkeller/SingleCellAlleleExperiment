@@ -4,12 +4,14 @@
 \alias{alleles2genes}
 \title{Building first new subassay for SingleCellAllelexperiment object}
 \usage{
-alleles2genes(sce, lookup)
+alleles2genes(sce, lookup, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
 \item{lookup}{allele lookup table}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 adds allele gene-subassay containing summarized count information for the allele genes

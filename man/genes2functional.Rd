@@ -4,12 +4,14 @@
 \alias{genes2functional}
 \title{Building second new subassay for the SingleCellAlleleExperiment object}
 \usage{
-genes2functional(sce, lookup)
+genes2functional(sce, lookup, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
 \item{lookup}{allele lookup table}
+
+\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 }
 \value{
 adds functional subassay containing summarized count information for the functional allele classes

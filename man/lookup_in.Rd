@@ -4,12 +4,14 @@
 \alias{lookup_in}
 \title{Extending rowData}
 \usage{
-lookup_in(sce, exp_type)
+lookup_in(sce, exp_type, symbols)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
 \item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+
+\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 }
 \value{
 SingleCellAlleleExperiment object with extended rowData

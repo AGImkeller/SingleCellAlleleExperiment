@@ -24,4 +24,8 @@ Imports:
   tibble,
   dplyr,
   ggplot2,
-  biomaRt
+  biomaRt,
+  org.Hs.eg.db,
+  AnnotationDbi,
+  MatrixGenerics,
+  BiocGenerics
