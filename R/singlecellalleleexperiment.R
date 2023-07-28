@@ -163,6 +163,7 @@ get_ncbi_gene_names <- function(ensembl_ids) {
   ncbi_gene_names[ncbi_gene_names == ""] <- NA
   return(ncbi_gene_names)
 }
+#####
 
 #' Get NCBI genes using the org.HS.db package
 #'
@@ -197,10 +198,6 @@ get_ncbi_org <- function(scae){
   return(ncbi_symbols)
 }
 
-
-
-#####
-
 #-2------------------barcode filtering and normalization-----------------------#
 
 #####
@@ -210,6 +207,7 @@ get_ncbi_org <- function(scae){
 #' @description
 #' Internal function used in `SingleCellAlleleExperiment()` constructor as a preprocessing step for
 #' filtering the barcodes and normalizing the count values.
+#'
 #'
 #' @param sce SingleCellExperiment object
 #' @param threshold Counts threshold for barcodes
@@ -221,9 +219,9 @@ get_ncbi_org <- function(scae){
 #' @return filtered and normalized SingleCellExperiment object
 filter_norm <- function(sce, threshold = 0){
   working_copy <- sce
-  filtered <- working_copy[, colSums(counts(working_copy)) > threshold]
-  normed <- scuttle::computeLibraryFactors(filtered)
-  normed
+  filtered  <- working_copy[, colSums(counts(working_copy)) > threshold]
+  df_scales <- computeLibraryFactors(filtered)
+  df_scales
 }
 #####
 
@@ -292,6 +290,7 @@ find_not_ident <- function(scae, agene_names){
   scae_copy_counts <- counts(get_alleles(scae_copy))
   rownames(scae_copy_counts) <- agene_names
   not_ids <- rownames(scae_copy_counts[!grepl(c("^HLA"), rownames(scae_copy_counts)), , drop = FALSE])
+
   not_ids
 }
 
@@ -420,6 +419,7 @@ alleles2genes <- function(sce, lookup, exp_type){
   rowData(new_sce[rownames(new_sce) %in% uniqs])$NI_I <- "I"
   rowData(new_sce[rownames(new_sce) %in% uniqs])$Quant_type <- "G"
 
+
   new_sce
 }
 #####
@@ -462,7 +462,6 @@ genes2functional <- function(sce, lookup, exp_type){
     func_genes <- mtx[mtx[,2] == i, 1]
     func_group_genes[[length(func_group_genes) + 1]] <- func_genes
   }
-
   gene_func <- matrix(0,
                       nrow = length(func_group_genes),
                       ncol = ncol(func_copy[1,]))
@@ -486,6 +485,7 @@ genes2functional <- function(sce, lookup, exp_type){
 
   rowData(final_scae[unique(mtx[,2])])$NI_I <- "I"
   rowData(final_scae[unique(mtx[,2])])$Quant_type <- "F"
+
 
   final_scae
 }
@@ -563,5 +563,3 @@ add_sample_tags <- function(path, scae){
   working_c <- working_c[, !is.na(colData(working_c)$sample.tags)]
   working_c
 }
-
-

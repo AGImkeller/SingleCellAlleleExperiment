@@ -13,7 +13,5 @@ get_ncbi_gene_names(ensembl_ids)
 vector containing the ncbi names matching the right rows for the ensembl.ids
 }
 \description{
-This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
-Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to do offline work then use the
-get_ncbi_org by specifying "symbols = "orgdb"" in the corresponding symbols parameter of the readAlleleCounts() function.
+Get Ncbi genes using biomaRt
 }

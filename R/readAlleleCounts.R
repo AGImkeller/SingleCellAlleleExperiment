@@ -29,7 +29,6 @@
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
 #'
-#'
 #' @return SingleCellAlleleExperiment object
 #'
 # #example
@@ -105,7 +104,6 @@ readAlleleCounts <- function (samples,
     print(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six))
     #####
   }
-
 
   #####
   rt_two_scae_end <- Sys.time()

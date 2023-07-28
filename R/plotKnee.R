@@ -23,10 +23,10 @@
 #' @importFrom Matrix rowSums readMM
 #' @importFrom utils read.csv read.delim
 #'
-#'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
 plotKnee <- function(path){
+
   barcodes_loc <- file.path(path, "cells_x_genes.barcodes.txt")
   features_loc <- file.path(path, "cells_x_genes.genes.txt")
   matrix_loc   <- file.path(path, "cells_x_genes.mtx")

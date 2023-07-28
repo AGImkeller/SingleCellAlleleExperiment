@@ -89,6 +89,7 @@ get_func <- function(scae) {
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
+
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
