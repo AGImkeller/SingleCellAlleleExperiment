@@ -269,8 +269,8 @@ check_unknowns <- function(sce, find_allele_ids){
     star <- !grepl("*", names, fixed = TRUE)
     unknown_info <- rownames(sce[names[star],])
     stop("Allele information contains unknown identifier.
-         Please check the data and remove rows of the following allele features identifiers: `",
-         unknown_info, " ` or use proper nomenclature.")
+         Please check the data and remove rows of the following
+         allele features identifiers: `",unknown_info, " ` or use proper nomenclature.")
   }
 }
 
