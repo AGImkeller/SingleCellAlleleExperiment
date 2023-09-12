@@ -9,7 +9,7 @@ find_allele_ids(sce, exp_type)
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
 }
 \value{
 subsample of the scae containing all rows with allele_counts

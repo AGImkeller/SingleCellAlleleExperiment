@@ -13,6 +13,6 @@ get_ncbi_org(scae)
 list of gene names
 }
 \description{
-This internal function is not as accurate (does not retrieve as many ncbi gene names as biomaRt) but can be used without
-internet connection
+This internal function is not as accurate (does not retrieve as many ncbi gene names as \code{biomaRt}) but can be used without
+internet connection.
 }

@@ -5,8 +5,6 @@
 \title{Preprocessing}
 \usage{
 filter_norm(sce, threshold = 0)
-
-filter_norm(sce, threshold = 0)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
@@ -15,13 +13,8 @@ filter_norm(sce, threshold = 0)
 }
 \value{
 filtered and normalized SingleCellExperiment object
-
-filtered and normalized SingleCellExperiment object
 }
 \description{
-Internal function used in \code{SingleCellAlleleExperiment()} constructor as a preprocessing step for
-filtering the barcodes and normalizing the count values.
-
 Internal function used in \code{SingleCellAlleleExperiment()} constructor as a preprocessing step for
 filtering the barcodes and normalizing the count values.
 }

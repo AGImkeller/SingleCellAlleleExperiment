@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Jonas", "Schuck", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: What the package does (one paragraph) **TODO**.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -28,5 +28,6 @@ Imports:
   org.Hs.eg.db,
   AnnotationDbi,
   MatrixGenerics,
-  BiocGenerics
+  BiocGenerics,
+  DropletUtils
 

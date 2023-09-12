@@ -2,7 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{SingleCellAlleleExperiment}
 \alias{SingleCellAlleleExperiment}
-\title{Constructor SingleCellAlleleExperiment-class}
+\title{Constructor SingleCellAlleleExperiment class}
 \usage{
 SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 }
@@ -11,7 +11,7 @@ SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 
 \item{threshold}{count threshold for filtering barcodes/cells}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
 
 \item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 
@@ -21,8 +21,8 @@ SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 SingleCellAlleleExperiment object
 }
 \description{
-Constructor for the SingleCellAllelExperiment-class.
+Constructor for the \code{SingleCellAllelExperiment} (SCAE) class.
 Constructor is used in the read in function \code{readAlleleCounts()}. Performing all necessary steps to transform
-a SingleCellExperiment object into the extended SingleCellAlleleExperiment object. SCAE objects
+a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects
 contain an extended count-assay aswell as extended rowData.
 }

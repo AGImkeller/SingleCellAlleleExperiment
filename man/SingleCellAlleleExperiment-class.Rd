@@ -4,10 +4,10 @@
 \name{SingleCellAlleleExperiment-class}
 \alias{SingleCellAlleleExperiment-class}
 \alias{.scae}
-\title{SingleCellAlleleExperiment-class definition}
+\title{SingleCellAlleleExperiment class definition}
 \value{
 definition for the scae class
 }
 \description{
-Defining the SingleCellAlleleExperiment-class derived from SingleCellExperiment-class.
+Defining the \code{SingleCellAlleleExperiment} class derived from \code{SingleCellExperiment} class.
 }

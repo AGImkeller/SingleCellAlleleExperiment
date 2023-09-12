@@ -2,7 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{log_transform}
 \alias{log_transform}
-\title{log transform normalized counts}
+\title{Log-transform normalized counts}
 \usage{
 log_transform(sce)
 }
@@ -13,5 +13,5 @@ log_transform(sce)
 SingleCellAlleleExperiment object with an additional assay containing
 }
 \description{
-Internal function used in in
+Internal function used in the \code{SingleCellAlleleExperiment()} constructor to log-normalize the raw counts and add them to \code{logcounts} assay.
 }

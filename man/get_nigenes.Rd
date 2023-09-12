@@ -2,7 +2,7 @@
 % Please edit documentation in R/getters.R
 \name{get_nigenes}
 \alias{get_nigenes}
-\title{Get non immune rows}
+\title{Get non-immune rows}
 \usage{
 get_nigenes(scae)
 }
@@ -13,6 +13,6 @@ get_nigenes(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE-object with all rows containing non immune gene information. These rows are
+Getter function returning subsampled SCAE object with all rows containing non immune gene information. These rows are
 identified by "NI" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{add_sample_tags}
 \alias{add_sample_tags}
-\title{adding sample tag information to colData}
+\title{Adding sample tag information to colData}
 \usage{
 add_sample_tags(path, scae)
 }
@@ -16,5 +16,6 @@ input files}
 updated SingleCellAlleleExperiment object
 }
 \description{
-adding sample tag information to colData
+Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
+Adding sample tag information to colData
 }

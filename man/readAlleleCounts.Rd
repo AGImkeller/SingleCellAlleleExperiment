@@ -7,8 +7,6 @@
 readAlleleCounts(
   samples,
   sample.names = names(samples),
-  col.names = TRUE,
-  compressed = NULL,
   filter_threshold = 0,
   exp_type = c("WTA", "Amplicon"),
   symbols = NULL,
@@ -21,13 +19,9 @@ input files}
 
 \item{sample.names}{character string for a sample_name identifier}
 
-\item{col.names}{binary variable indicating whether quantification assay should contain column names}
-
-\item{compressed}{binary variable whether the input files are .gz compressed}
-
 \item{filter_threshold}{count threshold for filtering barcodes/cells}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
 
 \item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 
@@ -38,9 +32,12 @@ SingleCellAlleleExperiment object
 }
 \description{
 Main read in function for reading in given allele quantification data and
-loading the data into an SingleCellAlleleExperiment object. Input data are stored in a shared folder.
-Expected naming scheme of the files: quantification matrix: "matrix.mtx"
-barcode information: "barcodes.txt"
-feature information: "features.txt"
-allele lookup table: "lookup_table_HLA_only"
+loading the data into an \code{SingleCellAlleleExperiment} object. Input data are stored in a shared folder.
+Expected naming scheme of the files:
+\itemize{
+\item quantification matrix: \code{matrix.mtx}
+\item barcode information: \code{barcodes.txt}
+\item feature information: \code{features.txt}
+\item allele lookup table: \code{lookup_table_HLA_only}
+}
 }

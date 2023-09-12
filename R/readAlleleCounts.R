@@ -10,20 +10,20 @@
 #'
 #' @description
 #' Main read in function for reading in given allele quantification data and
-#' loading the data into an SingleCellAlleleExperiment object. Input data are stored in a shared folder.
-#' Expected naming scheme of the files: quantification matrix: "matrix.mtx"
-#'                                      barcode information: "barcodes.txt"
-#'                                      feature information: "features.txt"
-#'                                      allele lookup table: "lookup_table_HLA_only"
+#' loading the data into an `SingleCellAlleleExperiment` object. Input data are stored in a shared folder.
+#' Expected naming scheme of the files:
+#'
+#'    * quantification matrix: `matrix.mtx`
+#'    * barcode information: `barcodes.txt`
+#'    * feature information: `features.txt`
+#'    * allele lookup table: `lookup_table_HLA_only`
 #'
 #' @param samples character string input containing the path to the directory containing the
 #'   input files
 #' @param sample.names character string for a sample_name identifier
-#' @param col.names binary variable indicating whether quantification assay should contain column names
-#' @param compressed binary variable whether the input files are .gz compressed
 #' @param filter_threshold count threshold for filtering barcodes/cells
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
 #' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
 #'
 #' @importFrom BiocParallel SerialParam bplapply
@@ -31,13 +31,9 @@
 #'
 #' @return SingleCellAlleleExperiment object
 #'
-# #example
-#'
 #' @export
 readAlleleCounts <- function (samples,
                               sample.names = names(samples),
-                              col.names = TRUE,
-                              compressed = NULL,
                               filter_threshold = 0,
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
@@ -56,27 +52,27 @@ readAlleleCounts <- function (samples,
     }
   }
 
+  #reading in files
   load.out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
-                                     compressed = compressed,
                                      exp_type = exp_type,
                                      BPPARAM = BPPARAM)
 
   current <- load.out[[1]]
   full_data <- current$mat
-  feature_info_list <- current$feature.info
+  feature_info <- current$feature.info
   cell.names <- current$cell.names
+
+  #prepare colData
   cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample.names,
                                                       length(cell.names)),
                                          Barcode = cell.names$V1,
                                          row.names = NULL)
-  feature_info <- feature_info_list
-  S4Vectors::ROWNAMES(feature_info) <- feature_info[,1]
+  #prepare rowData
+  rownames(feature_info) <- feature_info[,1]
 
-  if (col.names) {
-    cnames <- cell_info_list$Barcode
-    colnames(full_data) <- cnames
-  }
+  cnames <- cell_info_list$Barcode
+  colnames(full_data) <- cnames
 
   full_data <- as(full_data, "CsparseMatrix")
   lookup <- readLookup(samples, exp_type)
@@ -116,30 +112,25 @@ readAlleleCounts <- function (samples,
 }
 
 # Inspired from https://github.com/MarioniLab/DropletUtils/blob/devel/R/read10xCounts.R
-# TODO: das hier stimmt nicht, check Server-version fuer fertige Dokumentation
-#
-#' `read_from_sparse_allele` read in function for reading in raw data.
+#' Reading in allele-aware quantification data
+#'
+#' @description
+#' Internal function used in `readAlleleCounts()` that reads in the data stated in the given directory path.
 #'
 #'
 #' @param path character string input containing the path to the directory containing the
 #' input files
-#' @param compressed binary classification if the input data are .gz compressed
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
 #'
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
-read_from_sparse_allele <- function(path, compressed = NULL, exp_type = exp_type){
-  #defining path
+read_from_sparse_allele <- function(path, exp_type = exp_type){
   barcode.loc <- file.path(path, "cells_x_genes.barcodes.txt")
   feature.loc <- file.path(path, "cells_x_genes.genes.txt")
   matrix.loc  <- file.path(path, "cells_x_genes.mtx")
-  #check for compression
-  barcode.loc <- check_for_compressed(barcode.loc, compressed)
-  feature.loc <- check_for_compressed(feature.loc, compressed)
-  matrix.loc  <- check_for_compressed(matrix.loc, compressed)
-  #read in the files
+
   feature.info <- utils::read.delim(feature.loc, header = FALSE)
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
   mat          <- Matrix::readMM(matrix.loc)
@@ -155,33 +146,6 @@ read_from_sparse_allele <- function(path, compressed = NULL, exp_type = exp_type
   list(mat = Matrix::t(mat),
        cell.names = cell.names,
        feature.info = feature.info)
-}
-
-# Taken from https://github.com/MarioniLab/DropletUtils/blob/devel/R/read10xCounts.R
-#' Check if files in given directory are gzipped
-#'
-#' @description
-#' Internal function used in `read_from_sparse_allele()` that checks whether the input files are gzipped.
-#'
-#' @param path file path of the directory containing the input files as character string; taken from
-#' readAllleleCounts()
-#' @param compressed binary variable taken from readAlleleCounts() indicating if the user files are gzipped
-#' @param error binary variable taken from readAlleleCounts() indicating if there should be an error message, when the gzipped files
-#' cannot be found in the given directory
-#'
-#' @return character string adding ".gz" to the filenames
-check_for_compressed <- function(path, compressed, error=TRUE) {
-  original <- path
-  if (isTRUE(compressed)) {
-    path <- paste0(path, ".gz")
-  }else if (is.null(compressed) && !file.exists(path)) {
-    path <- paste0(path, ".gz")
-    if (error && !file.exists(path)) {
-      # Explicit error here to avoid users getting confused.
-      stop(sprintf("cannot find '%s' or its gzip-compressed form", original))
-    }
-  }
-  path
 }
 
 #' Read in allele lookup

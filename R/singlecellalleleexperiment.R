@@ -6,10 +6,10 @@
 #---------SingleCellAlleleExperiment class definition and constructor----------#
 
 #####
-#' SingleCellAlleleExperiment-class definition
+#' SingleCellAlleleExperiment class definition
 #'
 #' @description
-#' Defining the SingleCellAlleleExperiment-class derived from SingleCellExperiment-class.
+#' Defining the `SingleCellAlleleExperiment` class derived from `SingleCellExperiment` class.
 #'
 #' @importFrom methods new
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
@@ -17,18 +17,18 @@
 #' @return definition for the scae class
 .scae <- setClass("SingleCellAlleleExperiment", contains = "SingleCellExperiment")
 
-#' Constructor SingleCellAlleleExperiment-class
+#' Constructor SingleCellAlleleExperiment class
 #'
 #' @description
-#' Constructor for the SingleCellAllelExperiment-class.
+#' Constructor for the `SingleCellAllelExperiment` (SCAE) class.
 #' Constructor is used in the read in function `readAlleleCounts()`. Performing all necessary steps to transform
-#' a SingleCellExperiment object into the extended SingleCellAlleleExperiment object. SCAE objects
+#' a `SingleCellExperiment` object into the extended `SingleCellAlleleExperiment` object. SCAE objects
 #' contain an extended count-assay aswell as extended rowData.
 #'
 #' @param ... parameters to pass to SingleCellExperiment constructor
 #' @param lookup allele lookup file
 #' @param threshold count threshold for filtering barcodes/cells
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment
@@ -39,7 +39,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   sce <- SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
-  sce_add_look <- lookup_in(sce, exp_type, symbols)
+  sce_add_look <- ext_rd(sce, exp_type, symbols)
   #####
   rt_scae_lookup_end <- Sys.time()
   diff_rt_scae_lookup <- rt_scae_lookup_end - rt_scae_lookup_start
@@ -86,27 +86,27 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #--------------------Functions used in the SCAE-Constructor--------------------#
 ################################################################################
 
-#-1-------------------------------lookup_in------------------------------------#
+#-1--------------------------------ext_rd--------------------------------------#
 
 #####
 #' Extending rowData
 #'
 #' @description
 #' Internal function used in the `SingleCellAlleleExperiment()` constructor adding information to the SingleCellAlleleExperiment object by
-#' extending the rowData by two columns. "NI_I" is a classifier for each feature_row if its considered a
-#' non-immune (NI) or immune (I) gene. "Quant_type" is a classifier for determinig which row is related to which
-#' subassay of the extended main assay in the SingleCellAlleleExperiment. "A" corresponds to allele, "G" to allele gene and
-#' ""F" to functional allele class.
+#' extending the rowData by two columns. `NI_I` is a classifier for each feature_row if its considered a
+#' non-immune (NI) or immune (I) gene. `Quant_type` is a classifier for determining which row is related to which
+#' subassay of the extended main assay in the `SingleCellAlleleExperiment`. "A" corresponds to allele, "G" to allele gene and
+#' "F" to functional allele class.
 #'
 #' @param sce SingleCellExperiment object
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
+#' @param symbols identifier used to choose which database-function to use to retrieve the NCBI gene names
 #'
 #' @importFrom SummarizedExperiment rowData<-
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return SingleCellAlleleExperiment object with extended rowData
-lookup_in <- function(sce, exp_type, symbols){
+ext_rd <- function(sce, exp_type, symbols){
   new_sce <- sce
 
   if (exp_type == "WTA"){
@@ -119,6 +119,7 @@ lookup_in <- function(sce, exp_type, symbols){
     }
     rowData(new_sce)$Symbol <- gene_symbols
   }
+  #extend rowData with new classification columns
   allele_names_all <- find_allele_ids(new_sce, exp_type)
 
   rowData(new_sce[allele_names_all,])$NI_I <- "I"
@@ -136,8 +137,8 @@ lookup_in <- function(sce, exp_type, symbols){
 #'
 #' @description
 #' This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
-#' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to do offline work then use the
-#' get_ncbi_org by specifying "symbols = "orgdb"" in the corresponding symbols parameter of the readAlleleCounts() function.
+#' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
+#' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `readAlleleCounts()` function.
 #'
 #' @param ensembl_ids vector containing ensembl.ids
 #'
@@ -163,13 +164,12 @@ get_ncbi_gene_names <- function(ensembl_ids) {
   ncbi_gene_names[ncbi_gene_names == ""] <- NA
   return(ncbi_gene_names)
 }
-#####
 
 #' Get NCBI genes using the org.HS.db package
 #'
 #' @description
-#' This internal function is not as accurate (does not retrieve as many ncbi gene names as biomaRt) but can be used without
-#' internet connection
+#' This internal function is not as accurate (does not retrieve as many ncbi gene names as `biomaRt`) but can be used without
+#' internet connection.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
@@ -197,6 +197,7 @@ get_ncbi_org <- function(scae){
 
   return(ncbi_symbols)
 }
+#####
 
 #-2------------------barcode filtering and normalization-----------------------#
 
@@ -235,7 +236,7 @@ filter_norm <- function(sce, threshold = 0){
 #' return the rows specifying allele-quantification information.
 #'
 #' @param sce SingleCellExperiment object
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #'
 #' @importFrom SingleCellExperiment counts
 #'
@@ -286,6 +287,7 @@ check_unknowns <- function(sce, find_allele_ids){
 #'
 #' @return list of identifiers that can not be found in the allele lookup table
 find_not_ident <- function(scae, agene_names){
+  #return allele genes that dont start with HLA (not found in lookup table)
   scae_copy <- scae
   scae_copy_counts <- counts(get_alleles(scae_copy))
   rownames(scae_copy_counts) <- agene_names
@@ -317,7 +319,7 @@ cutname <- function(allele_id){
 #'
 #' @param sce SingleCellExperiment object
 #' @param lookup allele lookup table
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #'
 #' @importFrom SingleCellExperiment counts
 #'
@@ -346,7 +348,6 @@ get_allelecounts <- function(sce, lookup, exp_type){
   alid_gene_names <- unlist(list_alid)
 
   alleletogene_counts <- counts(get_alleles(wor_copy))
-  #alleletogene_counts <- counts(wor_copy)[allele_ids_lookup,]
   rownames(alleletogene_counts) <- alid_gene_names
 
   if (unknown){
@@ -369,7 +370,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #'
 #' @param sce SingleCellExperiment object
 #' @param lookup allele lookup table
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #'
 #' @importFrom Matrix colSums
 #' @importFrom SummarizedExperiment rowData<- colData<-
@@ -402,11 +403,12 @@ alleles2genes <- function(sce, lookup, exp_type){
 
   if (unknown){
     al_gene <- al_gene[!(rownames(al_gene) %in% not_ids), , drop = FALSE]
-    filtered_rows <- sapply(rownames(rowData(w_copy)), function(rowname) {
+    filtered_rows <- sapply(rownames(rowData(w_copy)), function(rowname){
       any(startsWith(rowname, not_ids))
     })
     rowData(w_copy)[filtered_rows, "Quant_type"] <- "A_unknown"
   }
+
   al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
                                  colData = colData(w_copy))
   rowData(al_sce)$Symbol <- rownames(al_gene)
@@ -418,7 +420,6 @@ alleles2genes <- function(sce, lookup, exp_type){
 
   rowData(new_sce[rownames(new_sce) %in% uniqs])$NI_I <- "I"
   rowData(new_sce[rownames(new_sce) %in% uniqs])$Quant_type <- "G"
-
 
   new_sce
 }
@@ -437,55 +438,51 @@ alleles2genes <- function(sce, lookup, exp_type){
 #'
 #' @param sce SingleCellExperiment object
 #' @param lookup allele lookup table
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment
 #' @importFrom SummarizedExperiment colData<- rowData<-
 #' @importFrom Matrix colSums
+#' @importFrom BiocGenerics rbind
 #'
 #' @return adds functional subassay containing summarized count information for the functional allele classes
 genes2functional <- function(sce, lookup, exp_type){
   func_copy <- sce
 
+  #find functional classes for each gene
   gene_names <- rownames(get_agenes(func_copy))
   list_func  <- list()
   for (i in 1:length(gene_names)){
     func_classes <- lookup$Function[lookup$Gene %in% gene_names[i]][1]
     list_func[[length(list_func) + 1]] <- func_classes
   }
-  mtx <- matrix(0, nrow=length(gene_names), ncol = 2)
-  mtx[,1] <- gene_names
-  mtx[,2] <- unlist(list_func)
+  gene_func_names <- unlist(list_func)
 
-  func_group_genes <- list()
-  for (i in unique(mtx[,2])){
-    func_genes <- mtx[mtx[,2] == i, 1]
-    func_group_genes[[length(func_group_genes) + 1]] <- func_genes
-  }
+  genetofunc_counts <- counts(get_agenes(func_copy))
+  rownames(genetofunc_counts) <- gene_func_names
+
+  uniqs     <- unique(rownames(genetofunc_counts))
   gene_func <- matrix(0,
-                      nrow = length(func_group_genes),
+                      nrow = length(uniqs),
                       ncol = ncol(func_copy[1,]))
-  rownames(gene_func) <- unique(mtx[,2])
+  rownames(gene_func) <- uniqs
 
-  agene_counts <- counts(get_agenes(func_copy))
-  #für jede klasse kombinieren wir die gencounts von allen genen, dieser klasse
-  for (i in 1:length(func_group_genes)){
-    gene_colsums  <- colSums(agene_counts[func_group_genes[[i]],])
+  for (i in 1:length(uniqs)){
+    gene_colsums  <- colSums(genetofunc_counts[rownames(genetofunc_counts) %in% uniqs[i], , drop = FALSE])
     gene_func[i,] <- gene_colsums
   }
 
   func_sce <- SingleCellExperiment(assays = list(counts = gene_func),
                                    colData = colData(func_copy))
-  rowData(func_sce)$Symbol <- unique(mtx[,2])
+  rowData(func_sce)$Symbol <- rownames(func_sce)
   if (exp_type == "WTA"){
-    rowData(func_sce)$Ensembl.ID <- unique(mtx[,2])
+    rowData(func_sce)$Ensembl.ID <- rownames(func_sce)
   }
 
-  final_scae <- rbind(func_copy, func_sce)
+  final_scae <- BiocGenerics::rbind(func_copy, func_sce)
 
-  rowData(final_scae[unique(mtx[,2])])$NI_I <- "I"
-  rowData(final_scae[unique(mtx[,2])])$Quant_type <- "F"
-
+  rowData(final_scae[rownames(final_scae) %in% uniqs])$NI_I <- "I"
+  rowData(final_scae[rownames(final_scae) %in% uniqs])$Quant_type <- "F"
 
   final_scae
 }
@@ -494,10 +491,10 @@ genes2functional <- function(sce, lookup, exp_type){
 #-5-------------------------log transform counts-------------------------------#
 
 #####
-#' log transform normalized counts
+#' Log-transform normalized counts
 #'
 #' @description
-#' Internal function used in in
+#' Internal function used in the `SingleCellAlleleExperiment()` constructor to log-normalize the raw counts and add them to `logcounts` assay.
 #'
 #' @param sce SingleCellExperiment object
 #'
@@ -512,12 +509,9 @@ log_transform <- function(sce){
 
   normed_counts <- normalizeCounts(working_copy,
                                    size_factors = sizeFactors(working_copy),
-                                   transform = "none")
+                                   transform = "log")
 
-  assays(working_copy)$size_normed <- normed_counts
-  log_counts <- log1p(assays(working_copy)$size_normed)
-  assays(working_copy)$logcounts   <- log_counts
-  assays(working_copy)$size_normed <- NULL
+  assays(working_copy)$logcounts   <- normed_counts
 
   counts(working_copy)    <- DelayedArray(counts(working_copy))
   logcounts(working_copy) <- DelayedArray(logcounts(working_copy))
@@ -528,7 +522,14 @@ log_transform <- function(sce){
 
 #-6-------------------------add sample tags------------------------------------#
 
-#' adding sample tag information to colData
+#####
+#' Adding sample tag information to colData
+#'
+#' @description
+#' Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
+#' Adding sample tag information to colData
+#'
+#'
 #'
 #' @param path character string input containing the path to the directory containing the
 #'   input files
@@ -550,7 +551,7 @@ add_sample_tags <- function(path, scae){
   cells <- utils::read.table(paste0(dir.tags, "/cells_x_features.barcodes.txt", ""), header = FALSE)
   rownames(tags) <- cells$V1
   colnames(tags) <- paste("ST_", 1:12, sep = "")
-  tags <- methods::as(tags, "dgCMatrix")
+  tags <- methods::as(tags, "CsparseMatrix")
   dom.tags <- data.frame(Cellular.Barcode = rownames(tags),
                          Sample.Tag = ifelse(rowMaxs(tags) >= 0.75 * rowSums(tags),
                                              colnames(tags)[max.col(tags)],
@@ -563,3 +564,4 @@ add_sample_tags <- function(path, scae){
   working_c <- working_c[, !is.na(colData(working_c)$sample.tags)]
   working_c
 }
+#####

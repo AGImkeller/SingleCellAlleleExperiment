@@ -4,15 +4,17 @@
 \alias{plotKnee}
 \title{Knee plot}
 \usage{
-plotKnee(path)
+plotKnee(path, mode = NULL)
 }
 \arguments{
 \item{path}{file path of the directory containing the input files as character string}
+
+\item{mode}{different knee plot versions}
 }
 \value{
 returns a knee plot for determining a count threshold used for filtering out barcodes
 }
 \description{
-Creates a Kneeplot ranking the barcodes according to their total UMI count. The plot is
+Creates a knee plot ranking the barcodes according to their total UMI count. The plot is
 used to determine a threshold for filtering barcodes in the preprocessing step.
 }

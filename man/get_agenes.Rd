@@ -2,7 +2,7 @@
 % Please edit documentation in R/getters.R
 \name{get_agenes}
 \alias{get_agenes}
-\title{Get allele gene rows}
+\title{Get immune gene rows}
 \usage{
 get_agenes(scae)
 }
@@ -13,6 +13,6 @@ get_agenes(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE-object with all rows containing allele gene information. These rows are
+Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
 identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 }

@@ -13,6 +13,6 @@ get_func(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE-object with all rows containing functional class information. These rows are
+Getter function returning subsampled SCAE object with all rows containing functional class information. These rows are
 identified by "I" in rowData(scae)$NI_I and "F" in rowData(scae)$Quant_type.
 }

@@ -13,6 +13,6 @@ get_unknown(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE-object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
+Getter function returning subsampled SCAE object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
 These rows are identified by "I" in rowData(scae)$NI_I and "A_unknown" in rowData(scae)$Quant_type.
 }

@@ -11,7 +11,7 @@ get_allelecounts(sce, lookup, exp_type)
 
 \item{lookup}{allele lookup table}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
 }
 \value{
 subsample of the sce containing all allele counts with the allele gene identifier as rownames

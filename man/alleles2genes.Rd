@@ -11,7 +11,7 @@ alleles2genes(sce, lookup, exp_type)
 
 \item{lookup}{allele lookup table}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
 }
 \value{
 adds allele gene-subassay containing summarized count information for the allele genes

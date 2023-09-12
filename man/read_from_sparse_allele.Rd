@@ -2,21 +2,19 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{read_from_sparse_allele}
 \alias{read_from_sparse_allele}
-\title{\code{read_from_sparse_allele} read in function for reading in raw data.}
+\title{Reading in allele-aware quantification data}
 \usage{
-read_from_sparse_allele(path, compressed = NULL, exp_type = exp_type)
+read_from_sparse_allele(path, exp_type = exp_type)
 }
 \arguments{
 \item{path}{character string input containing the path to the directory containing the
 input files}
 
-\item{compressed}{binary classification if the input data are .gz compressed}
-
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
 }
 \value{
 list with the read_in data sorted into different slots
 }
 \description{
-\code{read_from_sparse_allele} read in function for reading in raw data.
+Internal function used in \code{readAlleleCounts()} that reads in the data stated in the given directory path.
 }
