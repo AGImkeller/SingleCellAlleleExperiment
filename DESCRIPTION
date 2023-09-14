@@ -30,4 +30,15 @@ Imports:
   MatrixGenerics,
   BiocGenerics,
   DropletUtils
-
+Suggests: 
+    knitr,
+    rmarkdown,
+    scran,
+    scater,
+    gridExtra,
+    tidyverse,
+    patchwork,
+    cowplot,
+    viridis,
+    BiocStyle
+VignetteBuilder: knitr
