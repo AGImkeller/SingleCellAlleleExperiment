@@ -74,7 +74,8 @@ plotKnee <- function(path, mode = NULL){
 
   if (mode == "advanced"){
     matrix <- t(matrix)
-
+    
+    # the automatic kneeplot filtering can be started from here
     br.out <- DropletUtils::barcodeRanks(matrix)
     names(br.out)
     fitteddf <- br.out$fitted

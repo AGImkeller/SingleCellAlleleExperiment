@@ -127,6 +127,7 @@ readAlleleCounts <- function (samples,
 #'
 #' @return list with the read_in data sorted into different slots
 read_from_sparse_allele <- function(path, exp_type = exp_type){
+  # this needs to be provided as an input argument, not hardcoded
   barcode.loc <- file.path(path, "cells_x_genes.barcodes.txt")
   feature.loc <- file.path(path, "cells_x_genes.genes.txt")
   matrix.loc  <- file.path(path, "cells_x_genes.mtx")
@@ -134,7 +135,9 @@ read_from_sparse_allele <- function(path, exp_type = exp_type){
   feature.info <- utils::read.delim(feature.loc, header = FALSE)
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
   mat          <- Matrix::readMM(matrix.loc)
-
+  
+  
+  # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
   possible.names <- c("Ensembl.ID", "Symbol")
 
   if (exp_type == "WTA"){
@@ -161,9 +164,11 @@ read_from_sparse_allele <- function(path, exp_type = exp_type){
 #' @return lookup table
 readLookup <- function(path, exp_type){
   if (exp_type == "WTA"){
+    # input argument, no hardcoding
     lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
     lookup <- utils::read.csv(lookup.loc)
   }else if (exp_type == "Amplicon"){
+    # input argument, no hardcoding
     lookup.loc <- file.path(path, "lookup_table_HLA_amplicon.csv")
     lookup <- utils::read.csv(lookup.loc)
   }

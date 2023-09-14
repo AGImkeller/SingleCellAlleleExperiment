@@ -23,7 +23,8 @@
 #' Constructor for the `SingleCellAllelExperiment` (SCAE) class.
 #' Constructor is used in the read in function `readAlleleCounts()`. Performing all necessary steps to transform
 #' a `SingleCellExperiment` object into the extended `SingleCellAlleleExperiment` object. SCAE objects
-#' contain an extended count-assay aswell as extended rowData.
+#' contain allele, gene and functional level quantification results. The additional layers are stored as additional
+#' rows in the count assays as well as in extended rowData.
 #'
 #' @param ... parameters to pass to SingleCellExperiment constructor
 #' @param lookup allele lookup file
@@ -107,6 +108,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #'
 #' @return SingleCellAlleleExperiment object with extended rowData
 ext_rd <- function(sce, exp_type, symbols){
+  # remove working copy
   new_sce <- sce
 
   if (exp_type == "WTA"){
@@ -122,10 +124,14 @@ ext_rd <- function(sce, exp_type, symbols){
   #extend rowData with new classification columns
   allele_names_all <- find_allele_ids(new_sce, exp_type)
 
+  # Group of genes for which extended informaton is stored
   rowData(new_sce[allele_names_all,])$NI_I <- "I"
+  # Allele level
   rowData(new_sce[allele_names_all,])$Quant_type <- "A"
 
+  # Group of genes for which classical (gene level) informaton is stored
   rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$NI_I <- "NI"
+  # Gene level
   rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$Quant_type <- "G"
 
   rowData(new_sce)[rownames(rowData(get_alleles(new_sce))),]$Symbol <- rownames(rowData(get_alleles(new_sce)))
@@ -219,6 +225,7 @@ get_ncbi_org <- function(scae){
 #'
 #' @return filtered and normalized SingleCellExperiment object
 filter_norm <- function(sce, threshold = 0){
+  # remove working copy
   working_copy <- sce
   filtered  <- working_copy[, colSums(counts(working_copy)) > threshold]
   df_scales <- computeLibraryFactors(filtered)
@@ -244,6 +251,8 @@ filter_norm <- function(sce, threshold = 0){
 find_allele_ids <- function(sce, exp_type){
   a <- switch(exp_type,
               "WTA"      = !grepl("ENS", rownames(counts(sce)), fixed = TRUE),
+              # This needs to be fixed on the long run, because not all genes with extended information
+              # match HLA
               "Amplicon" =  grepl("HLA-", rownames(counts(sce)), fixed = TRUE),
               NA)
   allele_names_all <- rownames(counts(sce)[a,])
@@ -288,9 +297,12 @@ check_unknowns <- function(sce, find_allele_ids){
 #' @return list of identifiers that can not be found in the allele lookup table
 find_not_ident <- function(scae, agene_names){
   #return allele genes that dont start with HLA (not found in lookup table)
+  # remove working copy
   scae_copy <- scae
   scae_copy_counts <- counts(get_alleles(scae_copy))
   rownames(scae_copy_counts) <- agene_names
+  # This needs to be fixed on the long run, because not all genes with extended information
+  # match HLA
   not_ids <- rownames(scae_copy_counts[!grepl(c("^HLA"), rownames(scae_copy_counts)), , drop = FALSE])
 
   not_ids
@@ -306,6 +318,7 @@ find_not_ident <- function(scae, agene_names){
 #' @return new identifier with a cut off name to be present in the list of gene_names
 cutname <- function(allele_id){
   id <- allele_id
+  # does this work for all alleles?
   id <- strsplit(id, "\\*")[[1]][1]
   id
 }
@@ -325,6 +338,7 @@ cutname <- function(allele_id){
 #'
 #' @return subsample of the sce containing all allele counts with the allele gene identifier as rownames
 get_allelecounts <- function(sce, lookup, exp_type){
+  # remove working copy
   wor_copy <- sce
 
   allele_ids_lookup <- find_allele_ids(sce, exp_type)
@@ -339,7 +353,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
       new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
       list_alid[[length(list_alid) + 1]] <- new_ids
     }else{
-      print(paste(allele_ids_lookup[i], "cant be found in the lookup table"))
+      print(paste(allele_ids_lookup[i], "can't be found in the lookup table"))
       new_ids <- list(cutname(allele_ids_lookup[i]))
       list_alid[[length(list_alid) + 1]] <- new_ids
       unknown <- TRUE
@@ -379,6 +393,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #'
 #' @return adds allele gene-subassay containing summarized count information for the allele genes
 alleles2genes <- function(sce, lookup, exp_type){
+  # remove working copy
   w_copy <- sce
   unknown <- FALSE
 
@@ -447,6 +462,7 @@ alleles2genes <- function(sce, lookup, exp_type){
 #'
 #' @return adds functional subassay containing summarized count information for the functional allele classes
 genes2functional <- function(sce, lookup, exp_type){
+  # remove working copy
   func_copy <- sce
 
   #find functional classes for each gene
@@ -480,8 +496,10 @@ genes2functional <- function(sce, lookup, exp_type){
   }
 
   final_scae <- BiocGenerics::rbind(func_copy, func_sce)
-
+  
+  # Genes with extended quantification
   rowData(final_scae[rownames(final_scae) %in% uniqs])$NI_I <- "I"
+  # Functional level
   rowData(final_scae[rownames(final_scae) %in% uniqs])$Quant_type <- "F"
 
   final_scae
@@ -505,6 +523,7 @@ genes2functional <- function(sce, lookup, exp_type){
 #'
 #' @return SingleCellAlleleExperiment object with an additional assay containing
 log_transform <- function(sce){
+  # remove working copy
   working_copy <- sce
 
   normed_counts <- normalizeCounts(working_copy,
@@ -544,8 +563,10 @@ log_transform <- function(sce){
 #'
 #' @return updated SingleCellAlleleExperiment object
 add_sample_tags <- function(path, scae){
+  # remove working copy
   working_c <- scae
 
+  # the file names of the input need to be provided as variables
   dir.tags <- paste0(path, "/sample_tag")
   tags  <- Matrix::readMM(paste0(dir.tags, "/cells_x_features.mtx", ""))
   cells <- utils::read.table(paste0(dir.tags, "/cells_x_features.barcodes.txt", ""), header = FALSE)

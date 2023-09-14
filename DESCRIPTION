@@ -1,10 +1,17 @@
 Package: SingleCellAlleleExperiment
-Title: Extending the SingleCellExperiment package for allele quantification data (One Line, Title Case)
+Title: S4 Class for Single Cell Data with Allele and Functional Levels for Immune Genes
 Version: 0.0.0.9000
 Authors@R: 
-    person("Jonas", "Schuck", , "first.last@example.com", role = c("aut", "cre"),
+    person("Jonas", "Schuck", "jonas.schuck@kgu.de", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph) **TODO**.
+    person("Al Ajami", "Ahmad", role = c("aut"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Marini", "Federico", role = c("aut"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Katharina", "Imkeller", role = c("aut"),
+           comment = c(ORCID = "0000-0002-5177-0852"))
+Description: Defines a S4 class that is based on SingleCellExperiment, but in addition      
+        to the usual gene layer can also store data for immune genes such as HLAs, Igs and KIRs at allele and functional level.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

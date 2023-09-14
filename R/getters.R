@@ -20,6 +20,7 @@
 #' @export
 get_alleles <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  # alleles of the genes with extended quantification
   alleles <- scae[subset_rows & rowData(scae)$NI_I == "I" & startsWith(rowData(scae)$Quant_type,"A"), ]
   return(alleles)
 }
@@ -39,6 +40,7 @@ get_alleles <- function(scae) {
 #' @export
 get_agenes <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  # genes with extended quantification
   agenes <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
@@ -58,6 +60,7 @@ get_agenes <- function(scae) {
 #' @export
 get_nigenes <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  # classical genes
   agenes <- scae[subset_rows & rowData(scae)$NI_I == "NI" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
@@ -77,6 +80,7 @@ get_nigenes <- function(scae) {
 #' @export
 get_func <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  # functional groups of the genes with extended quantification
   func <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "F", ]
   return(func)
 }
@@ -97,6 +101,7 @@ get_func <- function(scae) {
 #' @export
 get_unknown <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
+  # unknown alleles of the genes with extended quantification
   unknown <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "A_unknown", ]
   return(unknown)
 }
