@@ -341,7 +341,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
   unknown <- FALSE
 
   list_alid <- list()
-  for (i in 1:length(allele_ids_lookup)){
+  for (i in seq_along(allele_ids_lookup)){
     if (allele_ids_lookup[i] %in% lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]){
       new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
       list_alid[[length(list_alid) + 1]] <- new_ids
@@ -402,7 +402,7 @@ alleles2genes <- function(sce, lookup, exp_type){
   al_gene <- matrix(0, nrow = length(uniqs), ncol = ncol(alleletogene_counts))
   rownames(al_gene) <- uniqs
 
-  for (i in 1:length(uniqs)){
+  for (i in seq_along(uniqs)){
     uniq_sum <- colSums(alleletogene_counts[rownames(alleletogene_counts) %in% uniqs[i], , drop = FALSE])
     al_gene[i,] <- uniq_sum
   }
@@ -457,7 +457,7 @@ genes2functional <- function(sce, lookup, exp_type){
   #find functional classes for each gene
   gene_names <- rownames(get_agenes(sce))
   list_func  <- list()
-  for (i in 1:length(gene_names)){
+  for (i in seq_along(gene_names)){
     func_classes <- lookup$Function[lookup$Gene %in% gene_names[i]][1]
     list_func[[length(list_func) + 1]] <- func_classes
   }
@@ -472,7 +472,7 @@ genes2functional <- function(sce, lookup, exp_type){
                       ncol = ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 
-  for (i in 1:length(uniqs)){
+  for (i in seq_along(uniqs)){
     gene_colsums  <- colSums(genetofunc_counts[rownames(genetofunc_counts) %in% uniqs[i], , drop = FALSE])
     gene_func[i,] <- gene_colsums
   }
@@ -556,7 +556,7 @@ add_sample_tags <- function(path, scae){
   tags  <- Matrix::readMM(paste0(dir.tags, "/cells_x_features.mtx", ""))
   cells <- utils::read.table(paste0(dir.tags, "/cells_x_features.barcodes.txt", ""), header = FALSE)
   rownames(tags) <- cells$V1
-  colnames(tags) <- paste("ST_", 1:12, sep = "")
+  colnames(tags) <- paste("ST_", seq_len(12), sep = "")
   tags <- methods::as(tags, "CsparseMatrix")
   dom.tags <- data.frame(Cellular.Barcode = rownames(tags),
                          Sample.Tag = ifelse(rowMaxs(tags) >= 0.75 * rowSums(tags),
