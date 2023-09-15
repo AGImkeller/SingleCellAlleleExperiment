@@ -16,7 +16,6 @@
 #'
 #'
 #' @param path file path of the directory containing the input files as character string
-#' @param mode different knee plot versions
 #'
 #' @import dplyr
 #' @import tibble
@@ -27,27 +26,13 @@
 #'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
-plotKnee <- function(path, mode = NULL){
+plotKnee <- function(matrix_file, genes_file, barcodes_file){
 
-  if (is.null(mode)) {
-    mode <- "default"
-  } else {
-    if (!mode %in% c("default", "advanced")) {
-      stop("Invalid value for mode parameter. Allowed values are 'default' and 'advanced'.")
-    }
-  }
+  barcodes <- barcodes_file
+  genes <- genes_file
+  matrix <- matrix_file
 
-  barcodes_loc <- file.path(path, "cells_x_genes.barcodes.txt")
-  features_loc <- file.path(path, "cells_x_genes.genes.txt")
-  matrix_loc   <- file.path(path, "cells_x_genes.mtx")
-
-  barcodes <- read.csv(barcodes_loc, sep = "", header = FALSE)
-  features <- read.delim(features_loc, header = FALSE)
-  matrix   <- readMM(matrix_loc)
-
-
-  if (mode == "default"){
-
+  #basic knee plot
     rownames(matrix) <- paste(barcodes$V1, "_D1", sep = "")
     colnames(matrix) <- features$V1
     colnames(matrix) <- gsub("\\|.*","", colnames(matrix))
@@ -68,14 +53,8 @@ plotKnee <- function(path, mode = NULL){
                 scale_x_log10() + scale_y_log10() + annotation_logticks() +
                 labs(y = "Total UMI counts", x = "Barcode rank")
 
-   return(default)
 
-  }
-
-  if (mode == "advanced"){
-    matrix <- t(matrix)
-    
-    # the automatic kneeplot filtering can be started from here
+    #advanced knee plot
     br.out <- DropletUtils::barcodeRanks(matrix)
     names(br.out)
     fitteddf <- br.out$fitted
@@ -94,7 +73,15 @@ plotKnee <- function(path, mode = NULL){
           annotate("text", x = 2, y = S4Vectors::metadata(br.out)$knee * 1.2, label = "knee", color = "dodgerblue") +
           annotate("text", x = 2.25, y = S4Vectors::metadata(br.out)$inflection * 1.2, label = "inflection", color = "forestgreen") +
           theme_bw()
-    gg
-  }
+
+
+par(mfrow=c(1,2))
+plot(default)
+plot(gg)
+par(mfrow=c(1,1))
+
+inflection_p <- S4Vectors::metadata(br.out)$inflection
+
+return(inflection_p)
 }
 #####

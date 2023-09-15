@@ -21,10 +21,11 @@
 #' @param samples character string input containing the path to the directory containing the
 #'   input files
 #' @param sample.names character string for a sample_name identifier
-#' @param filter_threshold count threshold for filtering barcodes/cells
+#' @param filter count threshold for filtering barcodes/cells
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
 #' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
 #' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
+#'
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
@@ -33,16 +34,17 @@
 #'
 #' @export
 readAlleleCounts <- function (samples,
-                              sample.names = names(samples),
-                              filter_threshold = 0,
+                              sample_names = names(samples),
+                              filter = FALSE,
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
                               lookup_file = "lookup_table_HLA_only.txt",
                               barcode_file = "cells_x_genes.barcodes.txt",
                               gene_file = "cells_x_genes.genes.txt",
                               matrix_file = "cells_x_genes.mtx",
-                              tag_feature_mtx = "cells_x_features.mtx", 
+                              tag_feature_mtx = "cells_x_features.mtx",
                               tag_feature_barcodes = "cells_x_features.barcodes.txt",
+                              filter_threshold = NULL,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
@@ -70,7 +72,7 @@ readAlleleCounts <- function (samples,
   current <- load.out[[1]]
   full_data <- current$mat
   feature_info <- current$feature.info
-  cell.names <- current$cell.names
+  cell_names <- current$cell.names
 
   #prepare colData
   cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample.names,
@@ -86,6 +88,21 @@ readAlleleCounts <- function (samples,
   full_data <- as(full_data, "CsparseMatrix")
   lookup <- readLookup(samples, exp_type, lookup_file)
 
+
+
+  #put the knee plot here
+  if (filter = FALSE){
+    inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
+    cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
+    stop()
+  }
+
+  if (filter = TRUE){
+    inflection_threshold <- plotKnee(full_data, feature_info, cell.)
+    cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
+
+  }
+
   #####
   rt_one_readin_end <- Sys.time()
   diff_rt_one <- rt_one_readin_end - rt_one_readin_start
@@ -96,7 +113,7 @@ readAlleleCounts <- function (samples,
   sce <- SingleCellAlleleExperiment(assays = list(counts = full_data),
                                     rowData = feature_info,
                                     colData = cell_info_list,
-                                    threshold = filter_threshold,
+                                    threshold = inflection_threshold,
                                     exp_type = exp_type,
                                     symbols = symbols,
                                     lookup = lookup)
@@ -135,7 +152,7 @@ readAlleleCounts <- function (samples,
 #' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
-read_from_sparse_allele <- function(path, exp_type = exp_type, 
+read_from_sparse_allele <- function(path, exp_type = exp_type,
                                     barcode_file,
                                     gene_file,
                                     matrix_file){
@@ -147,8 +164,8 @@ read_from_sparse_allele <- function(path, exp_type = exp_type,
   feature.info <- utils::read.delim(feature.loc, header = FALSE)
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
   mat          <- Matrix::readMM(matrix.loc)
-  
-  
+
+
   # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
   possible.names <- c("Ensembl.ID", "Symbol")
 
