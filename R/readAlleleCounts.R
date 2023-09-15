@@ -37,6 +37,12 @@ readAlleleCounts <- function (samples,
                               filter_threshold = 0,
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
+                              lookup_file = "lookup_table_HLA_only.txt",
+                              barcode_file = "cells_x_genes.barcodes.txt",
+                              gene_file = "cells_x_genes.genes.txt",
+                              matrix_file = "cells_x_genes.mtx",
+                              tag_feature_mtx = "cells_x_features.mtx", 
+                              tag_feature_barcodes = "cells_x_features.barcodes.txt",
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
@@ -56,6 +62,9 @@ readAlleleCounts <- function (samples,
   load.out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
                                      exp_type = exp_type,
+                                     barcode_file = barcode_file,
+                                     gene_file = gene_file,
+                                     matrix_file = matrix_file,
                                      BPPARAM = BPPARAM)
 
   current <- load.out[[1]]
@@ -75,7 +84,7 @@ readAlleleCounts <- function (samples,
   colnames(full_data) <- cnames
 
   full_data <- as(full_data, "CsparseMatrix")
-  lookup <- readLookup(samples, exp_type)
+  lookup <- readLookup(samples, exp_type, lookup_file)
 
   #####
   rt_one_readin_end <- Sys.time()
@@ -93,7 +102,7 @@ readAlleleCounts <- function (samples,
                                     lookup = lookup)
   if (exp_type == "Amplicon"){
     rt_six_scae_start <- Sys.time()
-    sce <- add_sample_tags(samples, sce)
+    sce <- add_sample_tags(samples, sce, tag_feature_mtx, tag_feature_barcodes)
     #####
     rt_six_scae_end <- Sys.time()
     diff_rt_six <- rt_six_scae_end - rt_six_scae_start
@@ -126,11 +135,14 @@ readAlleleCounts <- function (samples,
 #' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
-read_from_sparse_allele <- function(path, exp_type = exp_type){
+read_from_sparse_allele <- function(path, exp_type = exp_type, 
+                                    barcode_file,
+                                    gene_file,
+                                    matrix_file){
   # this needs to be provided as an input argument, not hardcoded
-  barcode.loc <- file.path(path, "cells_x_genes.barcodes.txt")
-  feature.loc <- file.path(path, "cells_x_genes.genes.txt")
-  matrix.loc  <- file.path(path, "cells_x_genes.mtx")
+  barcode.loc <- file.path(path, barcode_file)
+  feature.loc <- file.path(path, gene_file)
+  matrix.loc  <- file.path(path, matrix_file)
 
   feature.info <- utils::read.delim(feature.loc, header = FALSE)
   cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
@@ -162,16 +174,9 @@ read_from_sparse_allele <- function(path, exp_type = exp_type){
 #' @importFrom utils read.csv
 #'
 #' @return lookup table
-readLookup <- function(path, exp_type){
-  if (exp_type == "WTA"){
-    # input argument, no hardcoding
-    lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
+readLookup <- function(path, exp_type, lookup_file){
+    lookup.loc <- file.path(path, lookup_file)
     lookup <- utils::read.csv(lookup.loc)
-  }else if (exp_type == "Amplicon"){
-    # input argument, no hardcoding
-    lookup.loc <- file.path(path, "lookup_table_HLA_amplicon.csv")
-    lookup <- utils::read.csv(lookup.loc)
-  }
   lookup
 }
 #####

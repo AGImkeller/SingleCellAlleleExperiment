@@ -8,7 +8,8 @@
 #' Get allele rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing raw allele information. These rows are
+#' Getter function returning subsampled SCAE object with all rows containing raw allele information. These rows 
+#' are
 #' identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
 #'
 #' @param scae SingleCellAlleleExperiment object

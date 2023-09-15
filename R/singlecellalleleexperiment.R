@@ -549,12 +549,10 @@ log_transform <- function(sce){
 #' @importFrom SingleCellExperiment colData
 #'
 #' @return updated SingleCellAlleleExperiment object
-add_sample_tags <- function(path, scae){
+add_sample_tags <- function(path, scae, tag_feature_mtx, tag_feature_barcodes){
 
-  # the file names of the input need to be provided as variables
-  dir.tags <- paste0(path, "/sample_tag")
-  tags  <- Matrix::readMM(paste0(dir.tags, "/cells_x_features.mtx", ""))
-  cells <- utils::read.table(paste0(dir.tags, "/cells_x_features.barcodes.txt", ""), header = FALSE)
+  tags  <- Matrix::readMM(paste0(path, tag_feature_mtx, sep = ""))
+  cells <- utils::read.table(paste0(path, tag_feature_barcodes, sep = ""), header = FALSE)
   rownames(tags) <- cells$V1
   colnames(tags) <- paste("ST_", seq_len(12), sep = "")
   tags <- methods::as(tags, "CsparseMatrix")
