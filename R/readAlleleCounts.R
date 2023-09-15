@@ -20,12 +20,18 @@
 #'
 #' @param samples character string input containing the path to the directory containing the
 #'   input files
-#' @param sample.names character string for a sample_name identifier
+#' @param sample_names character string for a sample_name identifier
 #' @param filter count threshold for filtering barcodes/cells
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
 #' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
 #' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
-#'
+#' @param lookup_file add text here
+#' @param barcode_file add text here
+#' @param gene_file add text here
+#' @param matrix_file add text here
+#' @param tag_feature_mtx add text here
+#' @param tag_feature_barcodes add text here
+#' @param filter_threshold add text here
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
@@ -35,7 +41,7 @@
 #' @export
 readAlleleCounts <- function (samples,
                               sample_names = names(samples),
-                              filter = FALSE,
+                              filter = c("yes", "no", "custom" ),
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
                               lookup_file = "lookup_table_HLA_only.txt",
@@ -48,8 +54,8 @@ readAlleleCounts <- function (samples,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
-  if (is.null(sample.names)) {
-    sample.names <- samples
+  if (is.null(sample_names)) {
+    sample_names <- samples
   }
 
   if (is.null(symbols)) {
@@ -60,8 +66,15 @@ readAlleleCounts <- function (samples,
     }
   }
 
+  if (filter == "custom" & is.null(filter_threshold)) {
+    stop("For custom filtering you need to state a integer value >0 in the 'filter_threshold' parameter.")
+  }
+
+
+
+
   #reading in files
-  load.out <- BiocParallel::bplapply(samples,
+  load_out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
                                      exp_type = exp_type,
                                      barcode_file = barcode_file,
@@ -69,15 +82,15 @@ readAlleleCounts <- function (samples,
                                      matrix_file = matrix_file,
                                      BPPARAM = BPPARAM)
 
-  current <- load.out[[1]]
+  current <- load_out[[1]]
   full_data <- current$mat
-  feature_info <- current$feature.info
-  cell_names <- current$cell.names
+  feature_info <- current$feature_info
+  cell_names <- current$cell_names
 
   #prepare colData
-  cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample.names,
-                                                      length(cell.names)),
-                                         Barcode = cell.names$V1,
+  cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample_names,
+                                                      length(cell_names)),
+                                         Barcode = cell_names$V1,
                                          row.names = NULL)
   #prepare rowData
   rownames(feature_info) <- feature_info[,1]
@@ -90,18 +103,25 @@ readAlleleCounts <- function (samples,
 
 
 
-  #put the knee plot here
-  if (filter = FALSE){
+  #preflight mode, only for plotting the knee plots
+  if (filter == "no"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
-    cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
+    cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
     stop()
   }
 
-  if (filter = TRUE){
-    inflection_threshold <- plotKnee(full_data, feature_info, cell.)
-    cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
+  #filtering on the inflection point of the shown in the advanced knee plot
+  if (filter == "yes"){
+    inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
+    cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.\n")
 
   }
+
+  #putting a custom filtering threshold
+  if (filter == "custom"){
+    inflection_threshold <- filter_threshold
+  }
+
 
   #####
   rt_one_readin_end <- Sys.time()
@@ -147,6 +167,9 @@ readAlleleCounts <- function (samples,
 #' @param path character string input containing the path to the directory containing the
 #' input files
 #' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
+#' @param barcode_file add text here
+#' @param gene_file add text here
+#' @param matrix_file add text here
 #'
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
@@ -157,27 +180,27 @@ read_from_sparse_allele <- function(path, exp_type = exp_type,
                                     gene_file,
                                     matrix_file){
   # this needs to be provided as an input argument, not hardcoded
-  barcode.loc <- file.path(path, barcode_file)
-  feature.loc <- file.path(path, gene_file)
-  matrix.loc  <- file.path(path, matrix_file)
+  barcode_loc <- file.path(path, barcode_file)
+  feature_loc <- file.path(path, gene_file)
+  matrix_loc  <- file.path(path, matrix_file)
 
-  feature.info <- utils::read.delim(feature.loc, header = FALSE)
-  cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
-  mat          <- Matrix::readMM(matrix.loc)
+  feature_info <- utils::read.delim(feature_loc, header = FALSE)
+  cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
+  mat          <- Matrix::readMM(matrix_loc)
 
 
   # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
-  possible.names <- c("Ensembl.ID", "Symbol")
+  possible_names <- c("Ensembl.ID", "Symbol")
 
   if (exp_type == "WTA"){
-    colnames(feature.info) <- possible.names[1]
+    colnames(feature_info) <- possible_names[1]
   }else {
-    colnames(feature.info) <- possible.names[2]
+    colnames(feature_info) <- possible_names[2]
   }
 
   list(mat = Matrix::t(mat),
-       cell.names = cell.names,
-       feature.info = feature.info)
+       cell_names = cell_names,
+       feature_info = feature_info)
 }
 
 #' Read in allele lookup
@@ -187,13 +210,14 @@ read_from_sparse_allele <- function(path, exp_type = exp_type,
 #'
 #' @param path file path of the directory containing the input files as character string
 #' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param lookup_file add text here
 #'
 #' @importFrom utils read.csv
 #'
 #' @return lookup table
 readLookup <- function(path, exp_type, lookup_file){
-    lookup.loc <- file.path(path, lookup_file)
-    lookup <- utils::read.csv(lookup.loc)
+    lookup_loc <- file.path(path, lookup_file)
+    lookup <- utils::read.csv(lookup_loc)
   lookup
 }
 #####

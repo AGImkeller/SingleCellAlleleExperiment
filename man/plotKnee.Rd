@@ -4,12 +4,14 @@
 \alias{plotKnee}
 \title{Knee plot}
 \usage{
-plotKnee(path, mode = NULL)
+plotKnee(matrix_file, genes_file, barcodes_file)
 }
 \arguments{
-\item{path}{file path of the directory containing the input files as character string}
+\item{matrix_file}{file path of the directory containing the input files as character string}
 
-\item{mode}{different knee plot versions}
+\item{genes_file}{file path of the directory containing the input files as character string}
+
+\item{barcodes_file}{file path of the directory containing the input files as character string}
 }
 \value{
 returns a knee plot for determining a count threshold used for filtering out barcodes

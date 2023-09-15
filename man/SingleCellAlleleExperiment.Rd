@@ -24,5 +24,6 @@ SingleCellAlleleExperiment object
 Constructor for the \code{SingleCellAllelExperiment} (SCAE) class.
 Constructor is used in the read in function \code{readAlleleCounts()}. Performing all necessary steps to transform
 a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects
-contain an extended count-assay aswell as extended rowData.
+contain allele, gene and functional level quantification results. The additional layers are stored as additional
+rows in the count assays as well as in extended rowData.
 }
