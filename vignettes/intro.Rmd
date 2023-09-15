@@ -1,0 +1,512 @@
+---
+title: "An introduction to the SingleCellAlleleExperiment class"
+package: SingleCellAlleleExperiment
+output: 
+   BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{An introduction to the SingleCellAlleleExperiment class}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r options, include=FALSE, echo=FALSE}
+library(BiocStyle)
+```
+
+# Introduction
+
+The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived
+from the `r Biocpkg("SingleCellExperiment")``(SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation.
+Data from a novel allele-aware quantification method contains information about alleles for immune genes. During object generation, the allele information is aggregated into two additional data layers
+via an ontology based MHC design principle and appended to the initial raw data using a lookup table. Thus the final SCAE object contains non-immune genes, alleles for immune genes, an immune gene layer and a functional class layer (refer to Figure 1). 
+
+For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be summed up and transformed into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be summed up and transformed into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database. 
+
+The implemented object follows similar conventions like the SCE class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the SCAE object to perform downstream analysis on immune gene expression. 
+
+This allows new insights on functional as well as allele level to uncover the high diversity of immune genes.
+
+![alt text here](../inst/extdata/scae_advanced.png)
+**Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
+
+## Expected input
+
+The read in function of the SCAE package `readAlleleCounts` expects specific files and file identifiers.
+The stated input directory should contain the following files:
+
+  - cells_x_genes.barcodes.txt  (list of barcodes/cell identifiers)
+  - cells_x_genes.features.txt  (list of feature identifiers)
+  - cells_x_genes.mtx           (Contains the quantification matrix)
+  - lookup_table.csv            (Info for generating multiple data layers)
+    
+
+The used dataset for later downstream analysis and testing of the functionalities of the multi-layer object is a dual-center, two-cohort study where whole blood and peripheral blood mononuclear cells underwent scRNA-sequencing. The whole transcriptome dataset is under controlled access and not for public use. The corresponding publication *Severe COVID-19 Is Marked by a Dysregulated Myeloid Cell Compartment* can be found [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7405822/).
+
+# Loading packages 
+
+The following packages are abundant for performing the downstream analysis and visualization.
+
+```{r, message = FALSE}
+library(SingleCellAlleleExperiment)
+library(scran)
+library(scater)
+library(gridExtra)
+library(tidyverse)
+library(patchwork)
+library(cowplot)
+library(ggplot2)
+library(viridis)
+```
+
+
+# Reading in data and quality check
+
+## Stating input directory containing the expected files
+
+First the directory path is stated. The directory should contain all expected files.
+
+```{r}
+
+dir_path <- "../inst/extdata"
+
+list.files("../inst/extdata")
+```
+
+
+## Knee plots
+
+Starting the workflow with assessing the quality of the underlying dataset. Prior to filtering out low-quality cells, the `plotKnee()` function of the SCAE package can be used. The function offers two different options for generating a knee plot. A default one (**plot B**) and an advanced one (**plot A**) with a computed knee and inflection point on the curve, which pose suggestions for potential threshold for filtering out low-quality cells.
+
+
+```{r fig1, fig.height = 5, fig.width = 10, fig.align = "center", warning = FALSE}
+
+ega_knee_adv <- plotKnee(dir_path, "advanced")
+ega_knee_def <- plotKnee(dir_path, "default")
+
+knee <- ega_knee_adv + labs(title = "A") + theme_bw() +
+        ega_knee_def + labs(title = "B") + theme_bw() + 
+        theme(axis.title.y=element_blank(), legend.position = "none")
+knee
+```
+
+
+In **plot A**, the advanced knee-plot, the inflection point suggests a threshold for filtering out low-quality cells at about 110 total UMI counts.
+This threshold is passed to the `filter_threshold` parameter of the `readAlleleCounts()` function.
+The exemplary dataset is a whole transcriptome dataset, which is why the `exp_type` parameter is set to `WTA`. The alternative would be to state `Amplicon`. The `symbols` parameter is for retrieving NCBI gene names for the ensemble gene names present in the raw data with the help of the `r Biocpkg("biomaRt")` package. This parameter is not abundant to state at function execution as the standard value is `biomart`. For offline execution, `orgdb` is suggested, which uses the `r Biocpkg("org.Hs.eg.db")` package.
+
+## Generate SingleCellAlleleExperiment object
+
+SCAE objects implements the same object architecture as SCE objects. 
+
+
+```{r}
+scae <- readAlleleCounts(dir_path,
+                         sample.names = "EGA_WTA",
+                         filter_threshold = 110,
+                         exp_type = "WTA",
+                         symbols = "biomart")
+scae
+```
+
+### RowData slot
+
+Two new classification columns are introduced in the `rowData` slot. Namely the `NI_I` column and `Quant_type` column. Both columns are used to identify each row of the object to its corresponding data layer (see **figure 1**).
+
+```{r}
+rowData(scae)
+```
+
+### ColData slot
+
+As the object extends the count matrix during the object generation, its abundant to compute scaling factors on the raw data prior to extending and integrating the data layers. The scaling factors are used for scaling normalization in a later step of the SCAE constructor.
+
+```{r}
+colData(scae)
+```
+
+### Extract information from the different data layers
+
+Additionally to the established `getters` from the SCE package, new getters are implemented to retrieve the different data layers integrated in the SCAE object.
+
+<br>
+
+#### Non-immune genes
+
+```{r}
+get_nigenes(scae)
+
+head(rownames(get_nigenes(scae)))
+```
+
+<br>
+
+#### Alleles
+
+```{r}
+get_alleles(scae)
+
+head(rownames(get_alleles(scae)))
+```
+
+<br>
+
+#### Immune genes
+
+```{r}
+get_agenes(scae)
+
+head(rownames(get_agenes(scae)))
+```
+
+<br>
+
+#### Functional class
+
+```{r}
+get_func(scae)
+
+head(rownames(get_func(scae)))
+```
+
+<br>
+
+#### Unknown alleles
+
+In case the raw input data contains allele information that is not present in the lookup table, these alleles will be classified accordingly in the `Quant_type` classification column in the `colData` slot and can be retrieved with the `get_unknown()` getter. These alleles have potentially invalid identifiers and will not be considered in further generated data-layers.
+
+```{r}
+get_unknown(scae)
+
+head(rownames(get_unknown(scae)))
+```
+
+
+# Expression evaluation
+
+Checking the expression for the allele-layer, immune gene layer and functional class layer. Allele identifiers are in the form of `A*02:01:01:01`. The immune genes are in the form of `HLA-A` and the functional classes `HLA_class_I`. Here we see that `HLA-class I` and `HLA-C` are the most abundant functional class and immune gene respectively, given the underlying dataset.
+
+```{r}
+all_alleles <- c(rownames(get_alleles(scae)),
+                 rownames(get_agenes(scae)),
+                 rownames(get_func(scae)))
+
+plotExpression(scae, all_alleles)
+```
+
+<br>
+
+# Downstream analysis
+
+In the following sections, main steps for dimensional reduction are performed, offering insights into the different data layers of the SCAE object as well giving an idea on how to perform immune gene expression analysis. 
+
+## Filtering low abundance features
+
+**Do we need to do this?????**
+
+```{r}
+scae <- scae[rowSums(counts(scae)) > 0, ]
+scae
+```
+
+## Subsetting the different layers
+
+The non-imune genes are combined with each of the integrated immune gene allele-aware layers to determine three different subsets.
+
+### Non-immune genes + alleles
+
+```{r}
+redim_scae <- scae
+
+ni_a <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_alleles(redim_scae))), ]
+
+ni_a
+```
+
+<br>
+
+### Non-immune genes + immune genes
+
+```{r}
+ni_g <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_agenes(redim_scae))), ]
+
+ni_g
+```
+
+<br>
+
+### Non-immune genes + functional class
+
+```{r}
+ni_f <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_func(redim_scae))), ]
+
+ni_f
+```
+
+
+## Dimensional Reduction
+
+
+### Model variance and HVGs for all data layers
+
+Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are part from the `r Biocpkg("scran")` package.
+
+```{r}
+df_ni_a <- modelGeneVar(ni_a)
+
+head(df_ni_a)
+```
+
+```{r}
+df_ni_g <- modelGeneVar(ni_g)
+
+head(df_ni_g)
+```
+
+```{r}
+df_ni_f <- modelGeneVar(ni_f)
+
+head(df_ni_f)
+```
+
+
+Plotting the variance for each data layer.
+
+```{r fig2, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
+#plot variance
+par(mfrow=c(1,3))
+fit_ni_a <- metadata(df_ni_a)
+plot(fit_ni_a$mean, fit_ni_a$var,
+     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-A")
+points(fit_ni_a$mean, fit_ni_a$var, col = "red", pch = 16)
+curve(fit_ni_a$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
+
+fit_ni_g <- metadata(df_ni_g)
+plot(fit_ni_g$mean, fit_ni_g$var,
+     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-G")
+points(fit_ni_g$mean, fit_ni_g$var, col = "red", pch = 16)
+curve(fit_ni_g$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
+
+fit_ni_f <- metadata(df_ni_f)
+plot(fit_ni_f$mean, fit_ni_f$var,
+     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-F")
+points(fit_ni_f$mean, fit_ni_f$var, col = "red", pch = 16)
+curve(fit_ni_f$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
+par(mfrow=c(1,1))
+```
+
+Compute a list of HVGs for each data layer. Return the top 0.1 % HVGs per layer using `getTopHVGs`.
+
+```{r}
+top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
+length(top_ni_a)
+head(top_ni_a, n = 15)
+
+```
+
+```{r}
+top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
+length(top_ni_g)
+head(top_ni_g, n = 15)
+
+```
+
+```{r}
+top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
+length(top_ni_f)
+head(top_ni_f, n = 15)
+
+```
+
+### PCA
+
+Compute PCA for each layer and store the results in the object. Its Important to make unique identifiers for each layer/run or the results will be overwritten and just saved as `PCA`. Here, the `runPCA` functions from the `r Biocpkg("scater")` package is used.
+
+```{r}
+
+set.seed(18)
+redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_a, exprs_values = "logcounts", name = "PCA_a")
+redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_g, exprs_values = "logcounts", name = "PCA_g")
+redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_f, exprs_values = "logcounts", name = "PCA_f")
+```
+
+```{r}
+reducedDimNames(redim_scae)
+```
+
+### t-SNE
+
+The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg("scater")` package. Unique identifiers are stated here for each layer as well.
+
+```{r}
+set.seed(18)
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_a", perplexity = 50,  name = "TSNE_a_50")
+set.seed(18)
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_g", perplexity = 50,  name = "TSNE_g_50")
+set.seed(18)
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_f", perplexity = 50,  name = "TSNE_f_50")
+
+```
+
+List of results from the performed reduced dimension analysis. 
+
+```{r}
+reducedDimNames(redim_scae)
+```
+
+
+## Visualization
+
+Exemplary visualization for the t-SNE results on gene level for immune genes that relate to HLA-class I. In the given dataset, these are the immune genes `HLA-A`, `HLA-B` and `HLA-C` plotted alongside their alleles. This allows for insights into potential genetic differences shown on allele-level.
+
+---
+
+### HLA-A immune gene and alleles
+
+```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
+#determining which t-SNE (perplexity) to choose for all visualizations
+which_tsne <- "TSNE_g_50"
+
+#EGA_hla_a_alleles
+tsne_g_a  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-A")
+tsne_g_a1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*02:01:01:01")
+tsne_g_a2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*26:01:01:01")
+
+p2 <- tsne_g_a  + ggtitle("HLA-A gene group") +
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["HLA-A",]), alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                        axis.title.y = element_text(size = 17), legend.box="vertical", 
+                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
+      tsne_g_a1 + ggtitle("Allele A*02:01:01:01") +
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["A*02:01:01:01",]), alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                        axis.title.y=element_blank(), legend.position = "none") +
+     tsne_g_a2 + ggtitle("Allele A*26:01:01:01") +
+                 geom_point(position="jitter", size = 0.8,
+                            aes(color = logcounts(redim_scae)["A*26:01:01:01",]), alpha = 0.8) +
+                 theme_bw() +
+                 theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                       axis.title.y=element_blank(), legend.position = "none") +
+                plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
+     scale_colour_gradient2(name = "log-norm",
+          low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                              "HLA-A"),])),
+          mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                              "HLA-A"),])/2),
+          high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                              "HLA-A"),])),
+          na.value = "gray80") &
+     theme(legend.box="vertical", legend.margin=margin(l = 10),
+           axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
+           axis.text.y = element_text(size =15), legend.text = element_text(size=12),
+           legend.title = element_text(size=17))
+
+p2
+```
+
+---
+
+### HLA-B immune gene and alleles
+
+```{r fig4, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
+
+tsne_g_b  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-B")
+tsne_g_b1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*51:01:01:01")
+tsne_g_b2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*57:01:01:01")
+
+p3 <- tsne_g_b  + ggtitle("HLA-B gene group") +    
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["HLA-B",]), alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                        axis.title.y = element_text(size = 17), legend.box="vertical",
+                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
+      tsne_g_b1 + ggtitle("Allele B*51:01:01:01") +
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["B*51:01:01:01",]), alpha = 0.8) +
+                  theme_bw() + 
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                                     axis.title.y=element_blank(), legend.position = "none") +
+      tsne_g_b2 + ggtitle("Allele B*57:01:01:01") +
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["B*57:01:01:01",]), alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                        axis.title.y=element_blank(), legend.position = "none") +
+                  plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
+      scale_colour_gradient2(name = "log-norm",
+           low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-B"),])),
+           mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-B"),])/2),
+           high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-B"),])),
+           na.value = "gray80") &
+      theme(legend.box="vertical", legend.margin=margin(l = 10),
+            axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
+            axis.text.y = element_text(size =15), legend.text = element_text(size=12), 
+            legend.title = element_text(size=17))
+
+p3
+```
+
+---
+
+### HLA-C immune gene and alleles
+
+```{r fig5, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
+which_tsne <- "TSNE_g_50"
+
+#EGA_hla_c_alleles
+tsne_g_g  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-C")
+tsne_g_c1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*04:01:01:01")
+tsne_g_c2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*06:02:01:01")
+
+p1 <- tsne_g_g  + ggtitle("HLA-C gene group") +    
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["HLA-C",]),alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                        axis.title.y = element_text(size = 17), legend.box="vertical",
+                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
+      tsne_g_c1 + ggtitle("Allele C*04:01:01:01") +
+                  geom_point(position="jitter", size = 0.8,
+                             aes(color = logcounts(redim_scae)["C*04:01:01:01",]), alpha = 0.8) +
+                  theme_bw() + 
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                                     axis.title.y=element_blank(), legend.position = "none") +
+      tsne_g_c2 + ggtitle("Allele C*06:02:01:01") +
+                  geom_point(position="jitter", size = 0.8,
+                            aes(color = logcounts(redim_scae)["C*06:02:01:01",]), alpha = 0.8) +
+                  theme_bw() +
+                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
+                                     axis.title.y=element_blank(), legend.position = "none") +
+                  plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
+      scale_colour_gradient2(name = "log-norm",
+           low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-C"),])),
+           mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-C"),])/2),
+           high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
+                                                               "HLA-C"),])),
+           na.value = "gray80") &
+      theme(legend.box="vertical", legend.margin=margin(l = 10),
+            axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
+            axis.text.y = element_text(size =15), legend.text = element_text(size=12),
+            legend.title = element_text(size=17))
+
+p1
+```
+
+
+# Session Information
+
+```{r}
+sessionInfo()
+```

@@ -108,35 +108,33 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #'
 #' @return SingleCellAlleleExperiment object with extended rowData
 ext_rd <- function(sce, exp_type, symbols){
-  # remove working copy
-  new_sce <- sce
 
   if (exp_type == "WTA"){
     if (symbols == "biomart"){
-      ensembl_ids  <- unlist(rowData(new_sce)$Ensembl.ID)
+      ensembl_ids  <- unlist(rowData(sce)$Ensembl.ID)
       gene_symbols <- get_ncbi_gene_names(ensembl_ids)
     }
     if (symbols == "orgdb"){
       gene_symbols <- get_ncbi_org(sce)
     }
-    rowData(new_sce)$Symbol <- gene_symbols
+    rowData(sce)$Symbol <- gene_symbols
   }
   #extend rowData with new classification columns
-  allele_names_all <- find_allele_ids(new_sce, exp_type)
+  allele_names_all <- find_allele_ids(sce, exp_type)
 
   # Group of genes for which extended informaton is stored
-  rowData(new_sce[allele_names_all,])$NI_I <- "I"
+  rowData(sce[allele_names_all,])$NI_I <- "I"
   # Allele level
-  rowData(new_sce[allele_names_all,])$Quant_type <- "A"
+  rowData(sce[allele_names_all,])$Quant_type <- "A"
 
   # Group of genes for which classical (gene level) informaton is stored
-  rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$NI_I <- "NI"
+  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
   # Gene level
-  rowData(new_sce)[!(rownames(new_sce) %in% allele_names_all), ]$Quant_type <- "G"
+  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
 
-  rowData(new_sce)[rownames(rowData(get_alleles(new_sce))),]$Symbol <- rownames(rowData(get_alleles(new_sce)))
+  rowData(sce)[rownames(rowData(get_alleles(sce))),]$Symbol <- rownames(rowData(get_alleles(sce)))
 
-  new_sce
+  sce
 }
 
 #' Get Ncbi genes using biomaRt
@@ -225,9 +223,8 @@ get_ncbi_org <- function(scae){
 #'
 #' @return filtered and normalized SingleCellExperiment object
 filter_norm <- function(sce, threshold = 0){
-  # remove working copy
-  working_copy <- sce
-  filtered  <- working_copy[, colSums(counts(working_copy)) > threshold]
+  
+  filtered  <- sce[, colSums(counts(sce)) > threshold]
   df_scales <- computeLibraryFactors(filtered)
   df_scales
 }
@@ -297,13 +294,11 @@ check_unknowns <- function(sce, find_allele_ids){
 #' @return list of identifiers that can not be found in the allele lookup table
 find_not_ident <- function(scae, agene_names){
   #return allele genes that dont start with HLA (not found in lookup table)
-  # remove working copy
-  scae_copy <- scae
-  scae_copy_counts <- counts(get_alleles(scae_copy))
-  rownames(scae_copy_counts) <- agene_names
+  scae_counts <- counts(get_alleles(scae))
+  rownames(scae_counts) <- agene_names
   # This needs to be fixed on the long run, because not all genes with extended information
   # match HLA
-  not_ids <- rownames(scae_copy_counts[!grepl(c("^HLA"), rownames(scae_copy_counts)), , drop = FALSE])
+  not_ids <- rownames(scae_counts[!grepl(c("^HLA"), rownames(scae_counts)), , drop = FALSE])
 
   not_ids
 }
@@ -338,12 +333,10 @@ cutname <- function(allele_id){
 #'
 #' @return subsample of the sce containing all allele counts with the allele gene identifier as rownames
 get_allelecounts <- function(sce, lookup, exp_type){
-  # remove working copy
-  wor_copy <- sce
 
   allele_ids_lookup <- find_allele_ids(sce, exp_type)
   if (exp_type == "WTA"){
-    check_unknowns(wor_copy, allele_ids_lookup)
+    check_unknowns(sce, allele_ids_lookup)
   }
   unknown <- FALSE
 
@@ -361,11 +354,11 @@ get_allelecounts <- function(sce, lookup, exp_type){
   }
   alid_gene_names <- unlist(list_alid)
 
-  alleletogene_counts <- counts(get_alleles(wor_copy))
+  alleletogene_counts <- counts(get_alleles(sce))
   rownames(alleletogene_counts) <- alid_gene_names
 
   if (unknown){
-    not_ids <- find_not_ident(wor_copy, alid_gene_names)
+    not_ids <- find_not_ident(sce, alid_gene_names)
     return_unknown <- c(alleletogene_counts, not_ids)
     return(return_unknown)
   }else {
@@ -393,11 +386,9 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #'
 #' @return adds allele gene-subassay containing summarized count information for the allele genes
 alleles2genes <- function(sce, lookup, exp_type){
-  # remove working copy
-  w_copy <- sce
   unknown <- FALSE
 
-  v_acounts <- get_allelecounts(w_copy, lookup, exp_type)
+  v_acounts <- get_allelecounts(sce, lookup, exp_type)
 
   if (length(v_acounts) < 2){
     alleletogene_counts <- v_acounts[1][[1]]
@@ -418,20 +409,20 @@ alleles2genes <- function(sce, lookup, exp_type){
 
   if (unknown){
     al_gene <- al_gene[!(rownames(al_gene) %in% not_ids), , drop = FALSE]
-    filtered_rows <- sapply(rownames(rowData(w_copy)), function(rowname){
+    filtered_rows <- sapply(rownames(rowData(sce)), function(rowname){
       any(startsWith(rowname, not_ids))
     })
-    rowData(w_copy)[filtered_rows, "Quant_type"] <- "A_unknown"
+    rowData(sce)[filtered_rows, "Quant_type"] <- "A_unknown"
   }
 
   al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
-                                 colData = colData(w_copy))
+                                 colData = colData(sce))
   rowData(al_sce)$Symbol <- rownames(al_gene)
   if (exp_type == "WTA"){
     rowData(al_sce)$Ensembl.ID <- rownames(al_gene)
   }
 
-  new_sce <- BiocGenerics::rbind(w_copy, al_sce)
+  new_sce <- BiocGenerics::rbind(sce, al_sce)
 
   rowData(new_sce[rownames(new_sce) %in% uniqs])$NI_I <- "I"
   rowData(new_sce[rownames(new_sce) %in% uniqs])$Quant_type <- "G"
@@ -462,11 +453,9 @@ alleles2genes <- function(sce, lookup, exp_type){
 #'
 #' @return adds functional subassay containing summarized count information for the functional allele classes
 genes2functional <- function(sce, lookup, exp_type){
-  # remove working copy
-  func_copy <- sce
 
   #find functional classes for each gene
-  gene_names <- rownames(get_agenes(func_copy))
+  gene_names <- rownames(get_agenes(sce))
   list_func  <- list()
   for (i in 1:length(gene_names)){
     func_classes <- lookup$Function[lookup$Gene %in% gene_names[i]][1]
@@ -474,13 +463,13 @@ genes2functional <- function(sce, lookup, exp_type){
   }
   gene_func_names <- unlist(list_func)
 
-  genetofunc_counts <- counts(get_agenes(func_copy))
+  genetofunc_counts <- counts(get_agenes(sce))
   rownames(genetofunc_counts) <- gene_func_names
 
   uniqs     <- unique(rownames(genetofunc_counts))
   gene_func <- matrix(0,
                       nrow = length(uniqs),
-                      ncol = ncol(func_copy[1,]))
+                      ncol = ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 
   for (i in 1:length(uniqs)){
@@ -489,13 +478,13 @@ genes2functional <- function(sce, lookup, exp_type){
   }
 
   func_sce <- SingleCellExperiment(assays = list(counts = gene_func),
-                                   colData = colData(func_copy))
+                                   colData = colData(sce))
   rowData(func_sce)$Symbol <- rownames(func_sce)
   if (exp_type == "WTA"){
     rowData(func_sce)$Ensembl.ID <- rownames(func_sce)
   }
 
-  final_scae <- BiocGenerics::rbind(func_copy, func_sce)
+  final_scae <- BiocGenerics::rbind(sce, func_sce)
   
   # Genes with extended quantification
   rowData(final_scae[rownames(final_scae) %in% uniqs])$NI_I <- "I"
@@ -523,19 +512,17 @@ genes2functional <- function(sce, lookup, exp_type){
 #'
 #' @return SingleCellAlleleExperiment object with an additional assay containing
 log_transform <- function(sce){
-  # remove working copy
-  working_copy <- sce
 
-  normed_counts <- normalizeCounts(working_copy,
-                                   size_factors = sizeFactors(working_copy),
+  normed_counts <- normalizeCounts(sce,
+                                   size_factors = sizeFactors(sce),
                                    transform = "log")
 
-  assays(working_copy)$logcounts   <- normed_counts
+  assays(sce)$logcounts   <- normed_counts
 
-  counts(working_copy)    <- DelayedArray(counts(working_copy))
-  logcounts(working_copy) <- DelayedArray(logcounts(working_copy))
+  counts(sce)    <- DelayedArray(counts(sce))
+  logcounts(sce) <- DelayedArray(logcounts(sce))
 
-  working_copy
+  sce
 }
 ######
 
@@ -563,8 +550,6 @@ log_transform <- function(sce){
 #'
 #' @return updated SingleCellAlleleExperiment object
 add_sample_tags <- function(path, scae){
-  # remove working copy
-  working_c <- scae
 
   # the file names of the input need to be provided as variables
   dir.tags <- paste0(path, "/sample_tag")
@@ -579,10 +564,10 @@ add_sample_tags <- function(path, scae){
                                              "Multiplet"))
   dom.tags <- dom.tags[!dom.tags$Sample.Tag == 'Multiplet', ]
 
-  inter <- intersect(rownames(colData(working_c)), dom.tags$Cellular.Barcode)
-  colData(working_c)$sample.tags <- NA
-  colData(working_c[, inter])$sample.tags <- dom.tags[inter, "Sample.Tag"]
-  working_c <- working_c[, !is.na(colData(working_c)$sample.tags)]
-  working_c
+  inter <- intersect(rownames(colData(scae)), dom.tags$Cellular.Barcode)
+  colData(scae)$sample.tags <- NA
+  colData(scae[, inter])$sample.tags <- dom.tags[inter, "Sample.Tag"]
+  scae <- scae[, !is.na(colData(scae)$sample.tags)]
+  scae
 }
 #####
