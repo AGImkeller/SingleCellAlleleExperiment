@@ -35,5 +35,5 @@ The implemented object follows similar conventions like the SCE class, where row
 
 This allows new insights on functional as well as allele level to uncover the high diversity of immune genes.
 
-![alt text here](../inst/extdata/scae_advanced.png)
+![alt text here](./inst/extdata/scae_advanced.png)
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
