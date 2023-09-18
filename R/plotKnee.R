@@ -15,9 +15,9 @@
 #' used to determine a threshold for filtering barcodes in the preprocessing step.
 #'
 #'
-#' @param matrix_file file path of the directory containing the input files as character string
-#' @param genes_file file path of the directory containing the input files as character string
-#' @param barcodes_file file path of the directory containing the input files as character string
+#' @param matrix_file count matrix that was read in in the `read_from_sparse_allele()` function
+#' @param genes_file list with gene identifiers that was read in in the `read_from_sparse_allele()` function
+#' @param barcodes_file list with barcode identifiers that was read in in the `read_from_sparse_allele()` function
 #'
 #' @import dplyr
 #' @import tibble
@@ -25,7 +25,6 @@
 #' @importFrom Matrix rowSums readMM
 #' @importFrom utils read.csv read.delim
 #' @importFrom S4Vectors metadata
-#' @importFrom graphics par
 #'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
@@ -34,7 +33,6 @@ plotKnee <- function(matrix_file, genes_file, barcodes_file){
   barcodes <- barcodes_file
   features <- genes_file
   matrix <- matrix_file
-
 
   #advanced knee plot
   br.out <- DropletUtils::barcodeRanks(matrix)

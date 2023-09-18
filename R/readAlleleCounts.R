@@ -21,17 +21,17 @@
 #' @param samples character string input containing the path to the directory containing the
 #'   input files
 #' @param sample_names character string for a sample_name identifier
-#' @param filter count threshold for filtering barcodes/cells
+#' @param filter character string determining the filter mode. `yes` uses the inflection point of the knee plot. `no` computes the knee plot and stops funciton execution. `custom` allows for setting a custom threshold in `filter_threshold`.
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
 #' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
-#' @param lookup_file add text here
-#' @param barcode_file add text here
-#' @param gene_file add text here
-#' @param matrix_file add text here
-#' @param tag_feature_mtx add text here
-#' @param tag_feature_barcodes add text here
-#' @param filter_threshold add text here
+#' @param symbols identifier used to choose which database-function to use for retrieving the ncbi gene names
+#' @param lookup_file character string determining the name of the lookup table file
+#' @param barcode_file character string determining the name of the file containing the barcode identifiers
+#' @param gene_file character string determining the name of the file containing the feature identifiers
+#' @param matrix_file character string determining the name of the file containing the count matrix
+#' @param tag_feature_mtx character string determining the name of the file containing the count matrix of sample tag information
+#' @param tag_feature_barcodes character string determining the name of the file containing the barcode identifiers of sample tag information
+#' @param filter_threshold NULL or integer value > 0 used for `custom` filtering if `filter = "custom"`
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
@@ -71,8 +71,6 @@ readAlleleCounts <- function (samples,
   }
 
 
-
-
   #reading in files
   load_out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
@@ -110,14 +108,14 @@ readAlleleCounts <- function (samples,
     stop()
   }
 
-  #filtering on the inflection point of the shown in the advanced knee plot
+  #filtering on the inflection point shown in the advanced knee plot
   if (filter == "yes"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
     cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.\n")
 
   }
 
-  #putting a custom filtering threshold
+  #putting a custom filter threshold
   if (filter == "custom"){
     inflection_threshold <- filter_threshold
   }
@@ -167,15 +165,16 @@ readAlleleCounts <- function (samples,
 #' @param path character string input containing the path to the directory containing the
 #' input files
 #' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
-#' @param barcode_file add text here
-#' @param gene_file add text here
-#' @param matrix_file add text here
+#' @param barcode_file character string determining the name of the file containing the barcode identifiers
+#' @param gene_file character string determining the name of the file containing the feature identifiers
+#' @param matrix_file character string determining the name of the file containing the count matrix
 #'
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
-read_from_sparse_allele <- function(path, exp_type = exp_type,
+read_from_sparse_allele <- function(path,
+                                    exp_type = exp_type,
                                     barcode_file,
                                     gene_file,
                                     matrix_file){
@@ -210,7 +209,7 @@ read_from_sparse_allele <- function(path, exp_type = exp_type,
 #'
 #' @param path file path of the directory containing the input files as character string
 #' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
-#' @param lookup_file add text here
+#' @param lookup_file character string determining the name of the lookup table file
 #'
 #' @importFrom utils read.csv
 #'

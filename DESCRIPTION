@@ -36,8 +36,7 @@ Imports:
   AnnotationDbi,
   MatrixGenerics,
   BiocGenerics,
-  DropletUtils,
-  graphics
+  DropletUtils
 Suggests: 
     knitr,
     rmarkdown,
