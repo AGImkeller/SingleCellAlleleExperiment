@@ -30,12 +30,12 @@ We have developed a workflow, that allows quantification and interactive explora
 donor-specific alleles of different immune genes. The workflow is composed of three steps: 
 1. Typing of donor-specific alleles, 
 2. Quantification of these alleles in single-cell transcriptomic data, 
-3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class (Fig. 1). 
+3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. The software for steps 1 and 2 is currently not yet publicly available.
 
 The aim of the here presented `SingleCellAlleleExperiment (SCAE)` 
 class is to provide an addition to the `SingleCellExperiment` object that
 can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes
-and thus allows data analysis across these immunologically relevent different layers of annotation. 
+and thus allows data analysis across these immunologically relevant different layers of annotation. 
 
 ## The `SingleCellAlleleExperiment (SCAE)` class
 
