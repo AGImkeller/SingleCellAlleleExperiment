@@ -363,42 +363,11 @@ Exemplary visualization for the t-SNE results on gene level for immune genes tha
 which_tsne <- "TSNE_g_50"
 
 #EGA_hla_a_alleles
-tsne_g_a  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-A")
-tsne_g_a1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*02:01:01:01")
-tsne_g_a2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*26:01:01:01")
+tsne_g_a  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-A") + ggtitle("HLA-A gene")
+tsne_g_a1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*02:01:01:01") + ggtitle("Allele A*02:01:01:01")
+tsne_g_a2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*26:01:01:01") + ggtitle("Allele A*26:01:01:01")
 
-p2 <- tsne_g_a  + ggtitle("HLA-A gene group") +
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["HLA-A",]), alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                        axis.title.y = element_text(size = 17), legend.box="vertical", 
-                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
-      tsne_g_a1 + ggtitle("Allele A*02:01:01:01") +
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["A*02:01:01:01",]), alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                        axis.title.y=element_blank(), legend.position = "none") +
-     tsne_g_a2 + ggtitle("Allele A*26:01:01:01") +
-                 geom_point(position="jitter", size = 0.8,
-                            aes(color = logcounts(redim_scae)["A*26:01:01:01",]), alpha = 0.8) +
-                 theme_bw() +
-                 theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                       axis.title.y=element_blank(), legend.position = "none") +
-                plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
-     scale_colour_gradient2(name = "log-norm",
-          low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                              "HLA-A"),])),
-          mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                              "HLA-A"),])/2),
-          high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                              "HLA-A"),])),
-          na.value = "gray80") &
-     theme(legend.box="vertical", legend.margin=margin(l = 10),
-           axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
-           axis.text.y = element_text(size =15), legend.text = element_text(size=12),
-           legend.title = element_text(size=17))
+p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
 
 p2
 ```
@@ -409,42 +378,11 @@ p2
 
 ```{r fig4, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
 
-tsne_g_b  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-B")
-tsne_g_b1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*51:01:01:01")
-tsne_g_b2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*57:01:01:01")
+tsne_g_b  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-B") + ggtitle("HLA-B gene")
+tsne_g_b1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*51:01:01:01") + ggtitle("Allele B*51:01:01:01")
+tsne_g_b2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*57:01:01:01") + ggtitle("Allele B*57:01:01:01")
 
-p3 <- tsne_g_b  + ggtitle("HLA-B gene group") +    
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["HLA-B",]), alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                        axis.title.y = element_text(size = 17), legend.box="vertical",
-                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
-      tsne_g_b1 + ggtitle("Allele B*51:01:01:01") +
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["B*51:01:01:01",]), alpha = 0.8) +
-                  theme_bw() + 
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                                     axis.title.y=element_blank(), legend.position = "none") +
-      tsne_g_b2 + ggtitle("Allele B*57:01:01:01") +
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["B*57:01:01:01",]), alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                        axis.title.y=element_blank(), legend.position = "none") +
-                  plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
-      scale_colour_gradient2(name = "log-norm",
-           low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-B"),])),
-           mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-B"),])/2),
-           high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-B"),])),
-           na.value = "gray80") &
-      theme(legend.box="vertical", legend.margin=margin(l = 10),
-            axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
-            axis.text.y = element_text(size =15), legend.text = element_text(size=12), 
-            legend.title = element_text(size=17))
+p3 <- tsne_g_b  + tsne_g_b1 + tsne_g_b2
 
 p3
 ```
@@ -454,45 +392,13 @@ p3
 ### HLA-C immune gene and alleles
 
 ```{r fig5, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
-which_tsne <- "TSNE_g_50"
 
-#EGA_hla_c_alleles
-tsne_g_g  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-C")
-tsne_g_c1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*04:01:01:01")
-tsne_g_c2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*06:02:01:01")
+#EGA_hla_c_alleles 
+tsne_g_g  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-C") + ggtitle("HLA-C gene")
+tsne_g_c1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*04:01:01:01") + ggtitle("Allele C*04:01:01:01")
+tsne_g_c2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*06:02:01:01") + ggtitle("Allele C*06:02:01:01")
 
-p1 <- tsne_g_g  + ggtitle("HLA-C gene group") +    
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["HLA-C",]),alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                        axis.title.y = element_text(size = 17), legend.box="vertical",
-                        legend.text = element_text(size = 10), legend.margin=margin(l = 20), ) +
-      tsne_g_c1 + ggtitle("Allele C*04:01:01:01") +
-                  geom_point(position="jitter", size = 0.8,
-                             aes(color = logcounts(redim_scae)["C*04:01:01:01",]), alpha = 0.8) +
-                  theme_bw() + 
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                                     axis.title.y=element_blank(), legend.position = "none") +
-      tsne_g_c2 + ggtitle("Allele C*06:02:01:01") +
-                  geom_point(position="jitter", size = 0.8,
-                            aes(color = logcounts(redim_scae)["C*06:02:01:01",]), alpha = 0.8) +
-                  theme_bw() +
-                  theme(title = element_text(size = 17), plot.title = element_text(face = "bold"),
-                                     axis.title.y=element_blank(), legend.position = "none") +
-                  plot_layout(guide = "collect", nrow = 1, heights = c(1, 1, 1)) &
-      scale_colour_gradient2(name = "log-norm",
-           low  = viridis(min(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-C"),])),
-           mid  = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-C"),])/2),
-           high = viridis(max(logcounts(redim_scae)[startsWith(rownames(logcounts(redim_scae)),
-                                                               "HLA-C"),])),
-           na.value = "gray80") &
-      theme(legend.box="vertical", legend.margin=margin(l = 10),
-            axis.title.x = element_text(size = 17), axis.text.x = element_text(size =15),
-            axis.text.y = element_text(size =15), legend.text = element_text(size=12),
-            legend.title = element_text(size=17))
+p1 <- tsne_g_g  + tsne_g_c1 + tsne_g_c2 
 
 p1
 ```
