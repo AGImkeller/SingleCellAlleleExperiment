@@ -18,6 +18,27 @@ library(BiocStyle)
 
 # Introduction
 
+## Biological background and motivation
+
+Immune molecules such as B and T cell receptors, human leukocyte antigens (HLAs) or killer Ig-like
+receptors (KIRs) are encoded in the genetically most diverse loci of the human genome. Many of
+these immune genes are hyperpolymorphic, showing high allelic diversity across human populations.
+In addition, typical immune molecules are polygenic, which means that multiple functionally similar
+genes encode the same protein subunit.
+
+We have developed a workflow, that allows quantification and interactive exploration of 
+donor-specific alleles of different immune genes. The workflow is composed of three steps: 
+1. Typing of donor-specific alleles, 
+2. Quantification of these alleles in single-cell transcriptomic data, 
+3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class (Fig. 1). 
+
+The aim of the here presented `SingleCellAlleleExperiment (SCAE)` 
+class is to provide an addition to the `SingleCellExperiment` object that
+can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes
+and thus allows data analysis across these immunologically relevent different layers of annotation. 
+
+## The `SingleCellAlleleExperiment (SCAE)` class
+
 The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived
 from the `r Biocpkg("SingleCellExperiment")``(SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation.
 Data from a novel allele-aware quantification method contains information about alleles for immune genes. During object generation, the allele information is aggregated into two additional data layers
@@ -76,36 +97,17 @@ list.files("../inst/extdata")
 ```
 
 
-## Knee plots
-
-Starting the workflow with assessing the quality of the underlying dataset. Prior to filtering out low-quality cells, the `plotKnee()` function of the SCAE package can be used. The function offers two different options for generating a knee plot. A default one (**plot B**) and an advanced one (**plot A**) with a computed knee and inflection point on the curve, which pose suggestions for potential threshold for filtering out low-quality cells.
-
-
-```{r fig1, fig.height = 5, fig.width = 10, fig.align = "center", warning = FALSE}
-
-ega_knee_adv <- plotKnee(dir_path, "advanced")
-ega_knee_def <- plotKnee(dir_path, "default")
-
-knee <- ega_knee_adv + labs(title = "A") + theme_bw() +
-        ega_knee_def + labs(title = "B") + theme_bw() + 
-        theme(axis.title.y=element_blank(), legend.position = "none")
-knee
-```
-
-
-In **plot A**, the advanced knee-plot, the inflection point suggests a threshold for filtering out low-quality cells at about 110 total UMI counts.
-This threshold is passed to the `filter_threshold` parameter of the `readAlleleCounts()` function.
-The exemplary dataset is a whole transcriptome dataset, which is why the `exp_type` parameter is set to `WTA`. The alternative would be to state `Amplicon`. The `symbols` parameter is for retrieving NCBI gene names for the ensemble gene names present in the raw data with the help of the `r Biocpkg("biomaRt")` package. This parameter is not abundant to state at function execution as the standard value is `biomart`. For offline execution, `orgdb` is suggested, which uses the `r Biocpkg("org.Hs.eg.db")` package.
-
 ## Generate SingleCellAlleleExperiment object
 
-SCAE objects implements the same object architecture as SCE objects. 
+SCAE objects implements the same object architecture as SCE objects. When reading 
+allele counts, the method by default filters cells from a knee-plot inflection point.
+Alternatively, manual filter settings can be provided.
 
 
 ```{r}
 scae <- readAlleleCounts(dir_path,
                          sample.names = "EGA_WTA",
-                         filter_threshold = 110,
+                         filter = TRUE,
                          exp_type = "WTA",
                          symbols = "biomart")
 scae
@@ -201,15 +203,6 @@ plotExpression(scae, all_alleles)
 # Downstream analysis
 
 In the following sections, main steps for dimensional reduction are performed, offering insights into the different data layers of the SCAE object as well giving an idea on how to perform immune gene expression analysis. 
-
-## Filtering low abundance features
-
-**Do we need to do this?????**
-
-```{r}
-scae <- scae[rowSums(counts(scae)) > 0, ]
-scae
-```
 
 ## Subsetting the different layers
 

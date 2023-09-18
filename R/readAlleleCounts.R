@@ -34,11 +34,11 @@
 #'
 #' @export
 readAlleleCounts <- function (samples,
-                              sample_names = names(samples),
-                              filter = FALSE,
+                              sample.names = names(samples),
+                              filter = TRUE,
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
-                              lookup_file = "lookup_table_HLA_only.txt",
+                              lookup_file = "lookup_table_HLA_only.csv",
                               barcode_file = "cells_x_genes.barcodes.txt",
                               gene_file = "cells_x_genes.genes.txt",
                               matrix_file = "cells_x_genes.mtx",
@@ -72,7 +72,7 @@ readAlleleCounts <- function (samples,
   current <- load.out[[1]]
   full_data <- current$mat
   feature_info <- current$feature.info
-  cell_names <- current$cell.names
+  cell.names <- current$cell.names
 
   #prepare colData
   cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample.names,
@@ -91,14 +91,14 @@ readAlleleCounts <- function (samples,
 
 
   #put the knee plot here
-  if (filter = FALSE){
-    inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
+  if (filter == FALSE){
+    inflection_threshold <- plotKnee(full_data, feature_info, cell.names)
     cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
     stop()
   }
 
-  if (filter = TRUE){
-    inflection_threshold <- plotKnee(full_data, feature_info, cell.)
+  if (filter == TRUE){
+    inflection_threshold <- plotKnee(full_data, feature_info, cell.names)
     cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
 
   }

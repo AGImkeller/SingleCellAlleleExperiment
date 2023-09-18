@@ -26,32 +26,32 @@
 #'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
-plotKnee <- function(matrix_file, genes_file, barcodes_file){
+plotKnee <- function(matrix_file, gene_file, barcode_file){
 
-  barcodes <- barcodes_file
-  genes <- genes_file
+  barcodes <- barcode_file
+  genes <- gene_file
   matrix <- matrix_file
 
   #basic knee plot
-    rownames(matrix) <- paste(barcodes$V1, "_D1", sep = "")
-    colnames(matrix) <- features$V1
-    colnames(matrix) <- gsub("\\|.*","", colnames(matrix))
-    colnames(matrix) <- gsub("\\-",".", colnames(matrix))
-
-    tot_counts <- Matrix::rowSums(matrix)
-
-    df <- tibble(cells = rownames(matrix),
-                 total = tot_counts,
-                 rank = row_number(dplyr::desc(total))) %>%
-      distinct() %>%
-      dplyr::arrange(rank)
-
-    total <- df$total
-
-    default <- ggplot(df, aes(x = rank, y = total)) +
-                geom_path() +
-                scale_x_log10() + scale_y_log10() + annotation_logticks() +
-                labs(y = "Total UMI counts", x = "Barcode rank")
+    # colnames(matrix) <- paste(barcodes$V1, "_D1", sep = "")
+    # rownames(matrix) <- genes$Ensembl.ID
+    # rownames(matrix) <- gsub("\\|.*","", rownames(matrix))
+    # rownames(matrix) <- gsub("\\-",".", rownames(matrix))
+    # 
+    # tot_counts <- Matrix::rowSums(matrix)
+    # 
+    # df <- tibble(cells = rownames(matrix),
+    #              total = tot_counts,
+    #              rank = row_number(dplyr::desc(total))) %>%
+    #   distinct() %>%
+    #   dplyr::arrange(rank)
+    # 
+    # total <- df$total
+    # 
+    # default <- ggplot(df, aes(x = rank, y = total)) +
+    #             geom_path() +
+    #             scale_x_log10() + scale_y_log10() + annotation_logticks() +
+    #             labs(y = "Total UMI counts", x = "Barcode rank")
 
 
     #advanced knee plot
@@ -76,7 +76,6 @@ plotKnee <- function(matrix_file, genes_file, barcodes_file){
 
 
 par(mfrow=c(1,2))
-plot(default)
 plot(gg)
 par(mfrow=c(1,1))
 
