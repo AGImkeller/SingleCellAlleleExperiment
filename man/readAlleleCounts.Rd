@@ -6,10 +6,17 @@
 \usage{
 readAlleleCounts(
   samples,
-  sample.names = names(samples),
-  filter_threshold = 0,
+  sample_names = names(samples),
+  filter = c("yes", "no", "custom"),
   exp_type = c("WTA", "Amplicon"),
   symbols = NULL,
+  lookup_file = "lookup_table_HLA_only.txt",
+  barcode_file = "cells_x_genes.barcodes.txt",
+  gene_file = "cells_x_genes.genes.txt",
+  matrix_file = "cells_x_genes.mtx",
+  tag_feature_mtx = "cells_x_features.mtx",
+  tag_feature_barcodes = "cells_x_features.barcodes.txt",
+  filter_threshold = NULL,
   BPPARAM = BiocParallel::SerialParam()
 )
 }
@@ -17,13 +24,27 @@ readAlleleCounts(
 \item{samples}{character string input containing the path to the directory containing the
 input files}
 
-\item{sample.names}{character string for a sample_name identifier}
+\item{sample_names}{character string for a sample_name identifier}
 
-\item{filter_threshold}{count threshold for filtering barcodes/cells}
+\item{filter}{count threshold for filtering barcodes/cells}
 
 \item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
 
 \item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
+
+\item{lookup_file}{add text here}
+
+\item{barcode_file}{add text here}
+
+\item{gene_file}{add text here}
+
+\item{matrix_file}{add text here}
+
+\item{tag_feature_mtx}{add text here}
+
+\item{tag_feature_barcodes}{add text here}
+
+\item{filter_threshold}{add text here}
 
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }

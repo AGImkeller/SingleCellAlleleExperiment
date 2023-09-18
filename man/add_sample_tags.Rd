@@ -4,13 +4,17 @@
 \alias{add_sample_tags}
 \title{Adding sample tag information to colData}
 \usage{
-add_sample_tags(path, scae)
+add_sample_tags(path, scae, tag_feature_mtx, tag_feature_barcodes)
 }
 \arguments{
 \item{path}{character string input containing the path to the directory containing the
 input files}
 
 \item{scae}{SingleCellAlleleExperiment object}
+
+\item{tag_feature_mtx}{add text here}
+
+\item{tag_feature_barcodes}{add text here}
 }
 \value{
 updated SingleCellAlleleExperiment object

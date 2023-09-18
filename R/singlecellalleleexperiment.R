@@ -223,7 +223,7 @@ get_ncbi_org <- function(scae){
 #'
 #' @return filtered and normalized SingleCellExperiment object
 filter_norm <- function(sce, threshold = 0){
-  
+
   filtered  <- sce[, colSums(counts(sce)) > threshold]
   df_scales <- computeLibraryFactors(filtered)
   df_scales
@@ -485,7 +485,7 @@ genes2functional <- function(sce, lookup, exp_type){
   }
 
   final_scae <- BiocGenerics::rbind(sce, func_sce)
-  
+
   # Genes with extended quantification
   rowData(final_scae[rownames(final_scae) %in% uniqs])$NI_I <- "I"
   # Functional level
@@ -540,6 +540,8 @@ log_transform <- function(sce){
 #' @param path character string input containing the path to the directory containing the
 #'   input files
 #' @param scae SingleCellAlleleExperiment object
+#' @param tag_feature_mtx add text here
+#' @param tag_feature_barcodes add text here
 #'
 #' @importFrom methods as
 #' @importFrom utils read.table
