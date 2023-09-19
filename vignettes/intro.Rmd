@@ -1,6 +1,7 @@
 ---
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
+author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
 output: 
    BiocStyle::html_document:
     toc: true
@@ -26,31 +27,26 @@ these immune genes are hyperpolymorphic, showing high allelic diversity across h
 In addition, typical immune molecules are polygenic, which means that multiple functionally similar
 genes encode the same protein subunit.
 
-We have developed a workflow, that allows quantification and interactive exploration of 
+We have developed a workflow, that allows quantification of expression and interactive exploration of 
 donor-specific alleles of different immune genes. The workflow is composed of three steps: 
-1. Typing of donor-specific alleles, 
-2. Quantification of these alleles in single-cell transcriptomic data, 
-3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. The software for steps 1 and 2 is currently not yet publicly available.
+1. typing of donor-specific alleles, 
+2. quantification of these alleles in single-cell transcriptomic data, 
+3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. 
 
-The aim of the here presented `SingleCellAlleleExperiment (SCAE)` 
-class is to provide an addition to the `SingleCellExperiment` object that
+The software for steps 1 and 2 is currently not yet publicly available. The present repository is dedicated to the implementation of the `SingleCellAlleleExperiment (SCAE)` class. The aim of the here presented
+class is to provide an addition to the `SingleCellExperiment (SCE)` object that
 can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes
 and thus allows data analysis across these immunologically relevant different layers of annotation. 
 
 ## The `SingleCellAlleleExperiment (SCAE)` class
 
-The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived
-from the `r Biocpkg("SingleCellExperiment")``(SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation.
-Data from a novel allele-aware quantification method contains information about alleles for immune genes. During object generation, the allele information is aggregated into two additional data layers
-via an ontology based MHC design principle and appended to the initial raw data using a lookup table. Thus the final SCAE object contains non-immune genes, alleles for immune genes, an immune gene layer and a functional class layer (refer to Figure 1). 
+The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived from the `SingleCellExperiment (SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation. During object generation, the allele information is aggregated into two additional data layers via an ontology based design principle and appended to the initial raw data using a lookup table. Thus the final `SCAE` object contains quantification of all classical genes ("non-immune genes") and additionally a multi-layer representation of a set of genes of interest (e.g. "immune genes" such as HLAs, Igs, KIRs). For these genes of interest, the quantification is stored on the levels of alleles, genes, and functionally similar groups of genes (refer to Figure 1). 
 
-For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be summed up and transformed into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be summed up and transformed into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database. 
+For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be combined into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be combined into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database and other immunogenetic databases. 
 
-The implemented object follows similar conventions like the SCE class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the SCAE object to perform downstream analysis on immune gene expression. 
+The implemented object follows similar conventions like the `SCE` class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the newly implemented `SCAE` object to perform downstream analysis on immune gene expression. This allows data exploration on functional as well as allele level.
 
-This allows new insights on functional as well as allele level to uncover the high diversity of immune genes.
-
-![alt text here](../inst/extdata/scae_advanced.png)
+![alt text here](./inst/extdata/scae_advanced.png)
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
 ## Expected input
@@ -90,9 +86,7 @@ library(viridis)
 First the directory path is stated. The directory should contain all expected files.
 
 ```{r}
-
 dir_path <- "../inst/extdata"
-
 list.files("../inst/extdata")
 ```
 
@@ -175,20 +169,10 @@ head(rownames(get_func(scae)))
 
 <br>
 
-#### Unknown alleles
-
-In case the raw input data contains allele information that is not present in the lookup table, these alleles will be classified accordingly in the `Quant_type` classification column in the `colData` slot and can be retrieved with the `get_unknown()` getter. These alleles have potentially invalid identifiers and will not be considered in further generated data-layers.
-
-```{r}
-get_unknown(scae)
-
-head(rownames(get_unknown(scae)))
-```
-
 
 # Expression evaluation
 
-Checking the expression for the allele-layer, immune gene layer and functional class layer. Allele identifiers are in the form of `A*02:01:01:01`. The immune genes are in the form of `HLA-A` and the functional classes `HLA_class_I`. Here we see that `HLA-class I` and `HLA-C` are the most abundant functional class and immune gene respectively, given the underlying dataset.
+Checking the expression for the allele-layer, immune gene layer and functional class layer. Allele identifiers are in the form of `A*02:01:01:01`. The immune genes are in the form of `HLA-A` and the functional classes `HLA_class_I`. Here we see that `HLA_class_I` and `HLA-C` are the most abundant functional class and immune gene respectively, given the underlying dataset.
 
 ```{r}
 all_alleles <- c(rownames(get_alleles(scae)),
@@ -244,73 +228,21 @@ ni_f
 
 ### Model variance and HVGs for all data layers
 
-Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are part from the `r Biocpkg("scran")` package.
+Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are part from the `r Biocpkg("scran")` package. Compute a list of HVGs for each data layer. Return the top 0.1 % HVGs per layer using `getTopHVGs`.
 
 ```{r}
 df_ni_a <- modelGeneVar(ni_a)
-
-head(df_ni_a)
+top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
 ```
 
 ```{r}
 df_ni_g <- modelGeneVar(ni_g)
-
-head(df_ni_g)
+top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
 ```
 
 ```{r}
 df_ni_f <- modelGeneVar(ni_f)
-
-head(df_ni_f)
-```
-
-
-Plotting the variance for each data layer.
-
-```{r fig2, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
-#plot variance
-par(mfrow=c(1,3))
-fit_ni_a <- metadata(df_ni_a)
-plot(fit_ni_a$mean, fit_ni_a$var,
-     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-A")
-points(fit_ni_a$mean, fit_ni_a$var, col = "red", pch = 16)
-curve(fit_ni_a$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
-
-fit_ni_g <- metadata(df_ni_g)
-plot(fit_ni_g$mean, fit_ni_g$var,
-     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-G")
-points(fit_ni_g$mean, fit_ni_g$var, col = "red", pch = 16)
-curve(fit_ni_g$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
-
-fit_ni_f <- metadata(df_ni_f)
-plot(fit_ni_f$mean, fit_ni_f$var,
-     xlab = "mean of log-expression", ylab = "variance of log-expression", main = "NI-F")
-points(fit_ni_f$mean, fit_ni_f$var, col = "red", pch = 16)
-curve(fit_ni_f$trend(x), col = "dodgerblue", add = TRUE, lwd = 2)
-par(mfrow=c(1,1))
-```
-
-Compute a list of HVGs for each data layer. Return the top 0.1 % HVGs per layer using `getTopHVGs`.
-
-```{r}
-top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
-length(top_ni_a)
-head(top_ni_a, n = 15)
-
-```
-
-```{r}
-top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
-length(top_ni_g)
-head(top_ni_g, n = 15)
-
-```
-
-```{r}
 top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
-length(top_ni_f)
-head(top_ni_f, n = 15)
-
 ```
 
 ### PCA
@@ -335,11 +267,11 @@ The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg(
 
 ```{r}
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_a", perplexity = 50,  name = "TSNE_a_50")
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_a",  name = "TSNE_a")
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_g", perplexity = 50,  name = "TSNE_g_50")
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_g",  name = "TSNE_g")
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_f", perplexity = 50,  name = "TSNE_f_50")
+redim_scae <- runTSNE(redim_scae, dimred= "PCA_f",  name = "TSNE_f")
 
 ```
 
@@ -360,7 +292,7 @@ Exemplary visualization for the t-SNE results on gene level for immune genes tha
 
 ```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
 #determining which t-SNE (perplexity) to choose for all visualizations
-which_tsne <- "TSNE_g_50"
+which_tsne <- "TSNE_g"
 
 #EGA_hla_a_alleles
 tsne_g_a  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-A") + ggtitle("HLA-A gene")

@@ -1,7 +1,8 @@
-# ScSpAlleleExperiment
+# SingleCellAlleleExperiment
 
-Defines a S4 class that is based on SingleCellExperiment, but in addition      
-to the usual gene layer can also store data for immune genes such as HLAs, Igs and KIRs at allele and functional level.
+Defines a S4 class that is based on `SingleCellExperiment`. In addition to the usual gene layer `SingleCellAlleleExperiment` can also store data for immune genes such as HLAs, Immunoglobulins and KIRs at the allele level and at the level of functionally similar groups of immune genes.
+
+*Authors: Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller*
 
 ## Biological background and motivation
 
@@ -11,29 +12,21 @@ these immune genes are hyperpolymorphic, showing high allelic diversity across h
 In addition, typical immune molecules are polygenic, which means that multiple functionally similar
 genes encode the same protein subunit.
 
-We have developed a workflow, that allows quantification and interactive exploration of 
+We have developed a workflow, that allows quantification of expression and interactive exploration of 
 donor-specific alleles of different immune genes. The workflow is composed of three steps: 
-1. Typing of donor-specific alleles, 
-2. Quantification of these alleles in single-cell transcriptomic data, 
-3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. The software for steps 1 and 2 is currently not yet publicly available.
+1. typing of donor-specific alleles, 
+2. quantification of these alleles in single-cell transcriptomic data, 
+3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. 
 
-The aim of the here presented `SingleCellAlleleExperiment (SCAE)` 
-class is to provide an addition to the `SingleCellExperiment` object that
-can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes
-and thus allows data analysis across these immunologically relevant different layers of annotation. 
+The software for steps 1 and 2 is currently not yet publicly available. The present repository is dedicated to the implementation of the `SingleCellAlleleExperiment (SCAE)` class. The aim of the here presented class is to provide an addition to the `SingleCellExperiment (SCE)` object that can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes and thus allows data analysis across these immunologically relevant different layers of annotation. 
 
 ## The `SingleCellAlleleExperiment (SCAE)` class
 
-The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived
-from the `r Biocpkg("SingleCellExperiment")``(SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation.
-Data from a novel allele-aware quantification method contains information about alleles for immune genes. During object generation, the allele information is aggregated into two additional data layers
-via an ontology based MHC design principle and appended to the initial raw data using a lookup table. Thus the final SCAE object contains non-immune genes, alleles for immune genes, an immune gene layer and a functional class layer (refer to Figure 1). 
+The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived from the `SingleCellExperiment (SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation. During object generation, the allele information is aggregated into two additional data layers via an ontology based design principle and appended to the initial raw data using a lookup table. Thus the final `SCAE` object contains quantification of all classical genes ("non-immune genes") and additionally a multi-layer representation of a set of genes of interest (e.g. "immune genes" such as HLAs, Igs, KIRs). For these genes of interest, the quantification is stored on the levels of alleles, genes, and functionally similar groups of genes (refer to Figure 1). 
 
-For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be summed up and transformed into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be summed up and transformed into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database. 
+For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be combined into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be combined into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database and other immunogenetic databases. 
 
-The implemented object follows similar conventions like the SCE class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the SCAE object to perform downstream analysis on immune gene expression. 
-
-This allows new insights on functional as well as allele level to uncover the high diversity of immune genes.
+The implemented object follows similar conventions like the `SCE` class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the newly implemented `SCAE` object to perform downstream analysis on immune gene expression. This allows data exploration on functional as well as allele level.
 
 ![alt text here](./inst/extdata/scae_advanced.png)
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
