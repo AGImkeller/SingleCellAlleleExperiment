@@ -26,25 +26,25 @@ input files}
 
 \item{sample_names}{character string for a sample_name identifier}
 
-\item{filter}{count threshold for filtering barcodes/cells}
+\item{filter}{character string determining the filter mode. \code{yes} uses the inflection point of the knee plot. \code{no} computes the knee plot and stops funciton execution. \code{custom} allows for setting a custom threshold in \code{filter_threshold}.}
 
 \item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
 
-\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
+\item{symbols}{identifier used to choose which database-function to use for retrieving the ncbi gene names}
 
-\item{lookup_file}{add text here}
+\item{lookup_file}{character string determining the name of the lookup table file}
 
-\item{barcode_file}{add text here}
+\item{barcode_file}{character string determining the name of the file containing the barcode identifiers}
 
-\item{gene_file}{add text here}
+\item{gene_file}{character string determining the name of the file containing the feature identifiers}
 
-\item{matrix_file}{add text here}
+\item{matrix_file}{character string determining the name of the file containing the count matrix}
 
-\item{tag_feature_mtx}{add text here}
+\item{tag_feature_mtx}{character string determining the name of the file containing the count matrix of sample tag information}
 
-\item{tag_feature_barcodes}{add text here}
+\item{tag_feature_barcodes}{character string determining the name of the file containing the barcode identifiers of sample tag information}
 
-\item{filter_threshold}{add text here}
+\item{filter_threshold}{NULL or integer value > 0 used for \code{custom} filtering if \code{filter = "custom"}}
 
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }

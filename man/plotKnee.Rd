@@ -7,11 +7,11 @@
 plotKnee(matrix_file, genes_file, barcodes_file)
 }
 \arguments{
-\item{matrix_file}{file path of the directory containing the input files as character string}
+\item{matrix_file}{count matrix that was read in in the \code{read_from_sparse_allele()} function}
 
-\item{genes_file}{file path of the directory containing the input files as character string}
+\item{genes_file}{list with gene identifiers that was read in in the \code{read_from_sparse_allele()} function}
 
-\item{barcodes_file}{file path of the directory containing the input files as character string}
+\item{barcodes_file}{list with barcode identifiers that was read in in the \code{read_from_sparse_allele()} function}
 }
 \value{
 returns a knee plot for determining a count threshold used for filtering out barcodes

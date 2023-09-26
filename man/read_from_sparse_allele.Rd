@@ -18,11 +18,11 @@ input files}
 
 \item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
 
-\item{barcode_file}{add text here}
+\item{barcode_file}{character string determining the name of the file containing the barcode identifiers}
 
-\item{gene_file}{add text here}
+\item{gene_file}{character string determining the name of the file containing the feature identifiers}
 
-\item{matrix_file}{add text here}
+\item{matrix_file}{character string determining the name of the file containing the count matrix}
 }
 \value{
 list with the read_in data sorted into different slots

@@ -11,7 +11,7 @@ readLookup(path, exp_type, lookup_file)
 
 \item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
 
-\item{lookup_file}{add text here}
+\item{lookup_file}{character string determining the name of the lookup table file}
 }
 \value{
 lookup table
