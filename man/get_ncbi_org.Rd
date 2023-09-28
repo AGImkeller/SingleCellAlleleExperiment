@@ -14,5 +14,5 @@ list of gene names
 }
 \description{
 This internal function is not as accurate (does not retrieve as many ncbi gene names as \code{biomaRt}) but can be used without
-internet connection.
+internet connection. This function is executed if the users specifies \code{symbols = "orgdb"} in the \code{readAlleleCounts()} function.
 }

@@ -9,13 +9,13 @@ SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 \arguments{
 \item{...}{parameters to pass to SingleCellExperiment constructor}
 
-\item{threshold}{count threshold for filtering barcodes/cells}
+\item{threshold}{positive integer value used as count threshold for filtering barcodes/cells. Default value is set at \code{filter_threshold = 0} in the \code{readAlleleCounts()} function.}
 
-\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}, passed from the \code{readAlleleCounts()} function.}
 
-\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
+\item{symbols}{character string to determine which database-function to use to retrieve the NCBI gene names if \code{exp_type = "WTA"}. Default is \code{symbols = "biomart"}. You can choose between \code{exp_type = c("biomart", "orgdb")}. \code{orgdb} parameter is suggested for offline-usage. Passed from the \code{readAlleleCounts()} function.}
 
-\item{lookup}{allele lookup file}
+\item{lookup}{read in lookup table}
 }
 \value{
 SingleCellAlleleExperiment object
@@ -23,6 +23,6 @@ SingleCellAlleleExperiment object
 \description{
 Constructor for the \code{SingleCellAllelExperiment} (SCAE) class.
 Constructor is used in the read in function \code{readAlleleCounts()}. Performing all necessary steps to transform
-a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects
-contain an extended count-assay aswell as extended rowData.
+a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects contain a multi-layer
+\code{counts} assay and extended \code{rowData} for classifying the different rows into the specific data layers.
 }

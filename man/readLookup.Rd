@@ -2,18 +2,18 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{readLookup}
 \alias{readLookup}
-\title{Read in allele lookup}
+\title{Read in lookup table}
 \usage{
 readLookup(path, exp_type)
 }
 \arguments{
-\item{path}{file path of the directory containing the input files as character string}
+\item{path}{character string of the file path to the directory containing the expected input files}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}.}
 }
 \value{
 lookup table
 }
 \description{
-Internal function used in \code{readAlleleCounts()} to read in the allele lookup table.
+Internal function used in \code{readAlleleCounts()} to read in the lookup table.
 }

@@ -9,9 +9,9 @@ alleles2genes(sce, lookup, exp_type)
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{lookup}{allele lookup table}
+\item{lookup}{lookup table info passed from \code{SingleCellAlleleExperiment()}.}
 
-\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}, passed from the \code{readAlleleCounts()} function.}
 }
 \value{
 adds allele gene-subassay containing summarized count information for the allele genes

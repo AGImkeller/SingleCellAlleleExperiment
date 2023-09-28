@@ -7,9 +7,9 @@
 find_not_ident(scae, agene_names)
 }
 \arguments{
-\item{scae}{SingleCellAlleleExperimentobject}
+\item{scae}{SingleCellAlleleExperiment object}
 
-\item{agene_names}{list of allele gene names}
+\item{agene_names}{list of character strings with allele gene names}
 }
 \value{
 list of identifiers that can not be found in the allele lookup table

@@ -6,25 +6,24 @@
 #-----------------------------readAlleleCounts---------------------------------#
 
 #####
-#' Reading in allele quantification data into SingleCellAlleleExperiment object
+#' Reading in allele quantification data into a SingleCellAlleleExperiment object
 #'
 #' @description
 #' Main read in function for reading in given allele quantification data and
-#' loading the data into an `SingleCellAlleleExperiment` object. Input data are stored in a shared folder.
+#' loading the data into a `SingleCellAlleleExperiment` object. Input data are stored in a shared folder with expected file names.
 #' Expected naming scheme of the files:
 #'
-#'    * quantification matrix: `matrix.mtx`
-#'    * barcode information: `barcodes.txt`
-#'    * feature information: `features.txt`
-#'    * allele lookup table: `lookup_table_HLA_only`
+#'    * quantification matrix: `cells_x_genes.matrix.mtx`
+#'    * barcode information:   `cells_x_genes.barcodes.txt`
+#'    * feature information:   `cells_x_genes.genes.txt`
+#'    * lookup table:          `lookup_table_HLA_only`
 #'
-#' @param samples character string input containing the path to the directory containing the
-#'   input files
-#' @param sample.names character string for a sample_name identifier
-#' @param filter_threshold count threshold for filtering barcodes/cells
-#' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
-#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
+#' @param samples character string of the file path to the directory containing the expected input files
+#' @param sample_names character string for a sample_name identifier. If left empty it will take the path to the files as a sample identifier.
+#' @param filter_threshold positive integer value used as count threshold for filtering barcodes/cells. Default value is set at `filter_threshold = 0`.
+#' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples. Default is `BiocParallel::SerialParam()`.
+#' @param exp_type character string to pass information about the used experimental approach. Either use `exp_type = "WTA"` or `exp_type = "Amplicon"`.
+#' @param symbols character string to determine which database-function to use to retrieve the NCBI gene names if `exp_type = "WTA"`. Default is `symbols = "biomart"`. You can choose between `exp_type = c("biomart", "orgdb")`. `orgdb` parameter is suggested for offline-usage.
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
@@ -33,15 +32,15 @@
 #'
 #' @export
 readAlleleCounts <- function (samples,
-                              sample.names = names(samples),
+                              sample_names = names(samples),
                               filter_threshold = 0,
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
-  if (is.null(sample.names)) {
-    sample.names <- samples
+  if (is.null(sample_names)) {
+    sample_names <- samples
   }
 
   if (is.null(symbols)) {
@@ -53,20 +52,20 @@ readAlleleCounts <- function (samples,
   }
 
   #reading in files
-  load.out <- BiocParallel::bplapply(samples,
+  load_out <- BiocParallel::bplapply(samples,
                                      FUN = read_from_sparse_allele,
                                      exp_type = exp_type,
                                      BPPARAM = BPPARAM)
 
-  current <- load.out[[1]]
+  current <- load_out[[1]]
   full_data <- current$mat
-  feature_info <- current$feature.info
-  cell.names <- current$cell.names
+  feature_info <- current$feature_info
+  cell_names <- current$cell_names
 
   #prepare colData
-  cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample.names,
-                                                      length(cell.names)),
-                                         Barcode = cell.names$V1,
+  cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample_names,
+                                                      length(cell_names)),
+                                         Barcode = cell_names$V1,
                                          row.names = NULL)
   #prepare rowData
   rownames(feature_info) <- feature_info[,1]
@@ -118,54 +117,54 @@ readAlleleCounts <- function (samples,
 #' Internal function used in `readAlleleCounts()` that reads in the data stated in the given directory path.
 #'
 #'
-#' @param path character string input containing the path to the directory containing the
-#' input files
-#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
+#' @param path character string of the file path to the directory containing the expected input files
+#' @param exp_type character string to pass information about the used experimental approach. Either use `exp_type = "WTA"` or `exp_type = "Amplicon"`.
 #'
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
 #'
 #' @return list with the read_in data sorted into different slots
 read_from_sparse_allele <- function(path, exp_type = exp_type){
-  barcode.loc <- file.path(path, "cells_x_genes.barcodes.txt")
-  feature.loc <- file.path(path, "cells_x_genes.genes.txt")
-  matrix.loc  <- file.path(path, "cells_x_genes.mtx")
+  barcode_loc <- file.path(path, "cells_x_genes.barcodes.txt")
+  feature_loc <- file.path(path, "cells_x_genes.genes.txt")
+  matrix_loc  <- file.path(path, "cells_x_genes.mtx")
 
-  feature.info <- utils::read.delim(feature.loc, header = FALSE)
-  cell.names   <- utils::read.csv(barcode.loc, sep = "", header = FALSE)
-  mat          <- Matrix::readMM(matrix.loc)
+  feature_info <- utils::read.delim(feature_loc, header = FALSE)
+  cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
+  mat          <- Matrix::readMM(matrix_loc)
 
-  possible.names <- c("Ensembl.ID", "Symbol")
+  possible_names <- c("Ensembl.ID", "Symbol")
 
   if (exp_type == "WTA"){
-    colnames(feature.info) <- possible.names[1]
+    colnames(feature_info) <- possible_names[1]
   }else {
-    colnames(feature.info) <- possible.names[2]
+    colnames(feature_info) <- possible_names[2]
   }
 
   list(mat = Matrix::t(mat),
-       cell.names = cell.names,
-       feature.info = feature.info)
+       cell_names = cell_names,
+       feature_info = feature_info)
 }
 
-#' Read in allele lookup
+#' Read in lookup table
 #'
 #' @description
-#' Internal function used in `readAlleleCounts()` to read in the allele lookup table.
+#' Internal function used in `readAlleleCounts()` to read in the lookup table.
 #'
-#' @param path file path of the directory containing the input files as character string
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
+#' @param path character string of the file path to the directory containing the expected input files
+#' @param exp_type character string to pass information about the used experimental approach. Either use `exp_type = "WTA"` or `exp_type = "Amplicon"`.
 #'
 #' @importFrom utils read.csv
 #'
 #' @return lookup table
 readLookup <- function(path, exp_type){
+  # check for different naming schemes of the lookup table for the different experimental approaches
   if (exp_type == "WTA"){
-    lookup.loc <- file.path(path, "lookup_table_HLA_only.csv")
-    lookup <- utils::read.csv(lookup.loc)
+    lookup_loc <- file.path(path, "lookup_table_HLA_only.csv")
+    lookup <- utils::read.csv(lookup_loc)
   }else if (exp_type == "Amplicon"){
-    lookup.loc <- file.path(path, "lookup_table_HLA_amplicon.csv")
-    lookup <- utils::read.csv(lookup.loc)
+    lookup_loc <- file.path(path, "lookup_table_HLA_amplicon.csv")
+    lookup <- utils::read.csv(lookup_loc)
   }
   lookup
 }

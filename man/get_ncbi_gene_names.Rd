@@ -2,18 +2,18 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{get_ncbi_gene_names}
 \alias{get_ncbi_gene_names}
-\title{Get Ncbi genes using biomaRt}
+\title{Get NCBI genes using biomaRt}
 \usage{
 get_ncbi_gene_names(ensembl_ids)
 }
 \arguments{
-\item{ensembl_ids}{vector containing ensembl.ids}
+\item{ensembl_ids}{vector containing character string ensembl.ids. Passed from \code{ext_rd()}.}
 }
 \value{
 vector containing the ncbi names matching the right rows for the ensembl.ids
 }
 \description{
-This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
+This internal function is used to retrieve the gene symbol names of the corresponding ENSG accession numbers in the \code{WTA} experiment approach.
 Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
-get_ncbi_org by specifying \code{symbols = "orgdb"} in the corresponding \code{symbols} parameter of the \code{readAlleleCounts()} function.
+get_ncbi_org by specifying \code{symbols = "orgdb"} in the \code{readAlleleCounts()} function.
 }

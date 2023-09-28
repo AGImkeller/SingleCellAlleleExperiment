@@ -2,19 +2,19 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{check_unknowns}
 \alias{check_unknowns}
-\title{Internal Error handler}
+\title{Internal error handler for unknown allele identifiers}
 \usage{
 check_unknowns(sce, find_allele_ids)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{find_allele_ids}{list containing all allele identifiers present in the raw data}
+\item{find_allele_ids}{list containing character strings of allele identifiers present in the raw data}
 }
 \value{
-stops code execution if condition not met
+a message and stops code execution if condition not met
 }
 \description{
-Internal function used in \code{get_allelecounts()} to check if an allele identifier cannot be found in the lookup table AND does not have proper nomenclature
-form, then the execution of further step and thus the generation of an SingleCellAlleleExperiment object stopped.
+Internal function used in \code{get_allelecounts()} to check if an allele identifier can not be found in the lookup table AND does not have proper nomenclature
+form, then the execution of further step and thus the generation of an SingleCellAlleleExperiment object stops, giving info about which allele identifiers are invalid.
 }

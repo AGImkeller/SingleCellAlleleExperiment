@@ -7,14 +7,16 @@
 plotKnee(path, mode = NULL)
 }
 \arguments{
-\item{path}{file path of the directory containing the input files as character string}
+\item{path}{character string of the file path to the directory containing the expected input files}
 
-\item{mode}{different knee plot versions}
+\item{mode}{choose knee plot version. \code{mode = "default"} for the default knee plot. \code{mode = "advanced"} for the advanced knee plot including a knee- and inflection point. The standard value is the default knee plot.}
 }
 \value{
 returns a knee plot for determining a count threshold used for filtering out barcodes
 }
 \description{
 Creates a knee plot ranking the barcodes according to their total UMI count. The plot is
-used to determine a threshold for filtering barcodes in the preprocessing step.
+used to determine a threshold for filtering barcodes in the preprocessing step. You can plot two different knee plots.
+The \verb{mode = "default} knee plot shows a default knee plot. The \code{mode = "advanced"} knee plot computes a knee- and inflection point
+which can be used as a suggestion for filtering out low-quality cells.
 }

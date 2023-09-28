@@ -9,12 +9,12 @@ filter_norm(sce, threshold = 0)
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{threshold}{Counts threshold for barcodes}
+\item{threshold}{positive integer value used as count threshold for filtering barcodes/cells. Default value is set at \code{filter_threshold = 0} in the \code{readAlleleCounts()} function. Value passed from \code{SingleCellAlleleExperiment()}.}
 }
 \value{
 filtered and normalized SingleCellExperiment object
 }
 \description{
 Internal function used in \code{SingleCellAlleleExperiment()} constructor as a preprocessing step for
-filtering the barcodes and normalizing the count values.
+filtering the barcodes and normalizing the count values. Computes the scaling factors for each cell later used for normalization.
 }

@@ -9,17 +9,17 @@ ext_rd(sce, exp_type, symbols)
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}. Passed from \code{SingleCellAlleleExperiment()}.}
 
-\item{symbols}{identifier used to choose which database-function to use to retrieve the NCBI gene names}
+\item{symbols}{character string to determine which database-function to use to retrieve the NCBI gene names if \code{exp_type = "WTA"}. Default is \code{symbols = "biomart"}. You can choose between \code{exp_type = c("biomart", "orgdb")}. \code{orgdb} parameter is suggested for offline-usage. Passed from the \code{readAlleleCounts()} function.}
 }
 \value{
 SingleCellAlleleExperiment object with extended rowData
 }
 \description{
 Internal function used in the \code{SingleCellAlleleExperiment()} constructor adding information to the SingleCellAlleleExperiment object by
-extending the rowData by two columns. \code{NI_I} is a classifier for each feature_row if its considered a
-non-immune (NI) or immune (I) gene. \code{Quant_type} is a classifier for determining which row is related to which
-subassay of the extended main assay in the \code{SingleCellAlleleExperiment}. "A" corresponds to allele, "G" to allele gene and
-"F" to functional allele class.
+extending the \code{rowData} by two columns. \code{NI_I} is a classifier for each feature_row if its considered a
+\code{non-immune (NI)} or \code{immune (I)} gene. \code{Quant_type} is a classifier for determining which row is related to which
+data layer of the extended \code{counts} assay in the \code{SingleCellAlleleExperiment} object. Identifier \code{A} corresponds to allele, \code{G} to allele gene and
+\code{F} to the functional allele class data layer.
 }

@@ -2,22 +2,22 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{get_allelecounts}
 \alias{get_allelecounts}
-\title{Get Subassay with allele gene names and raw allele quantification}
+\title{Get subassay with immune gene names and raw allele counts}
 \usage{
 get_allelecounts(sce, lookup, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{lookup}{allele lookup table}
+\item{lookup}{lookup table info passed from \code{alleles2genes()}.}
 
-\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}, passed from the \code{readAlleleCounts()} function.}
 }
 \value{
 subsample of the sce containing all allele counts with the allele gene identifier as rownames
 }
 \description{
-Internal function used to build a subassay containing counts from raw alleles
+Internal function used to build a immune gene intermediate subassay containing counts from raw alleles
 The rownames  of this subassay are already translated to the corresponding allele gene identifier, which
 are extracted from the allele lookup table
 }

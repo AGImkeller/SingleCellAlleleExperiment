@@ -13,6 +13,6 @@ get_alleles(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE object with all rows containing raw allele information. These rows are
-identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
+Getter function returning subsampled \verb{SCAE object} with all rows containing raw allele information. These rows are
+identified by \code{I} in \code{rowData(scae)$NI_I} and \code{A} in \code{rowData(scae)$Quant_type} columns.
 }

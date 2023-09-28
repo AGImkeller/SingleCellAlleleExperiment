@@ -10,8 +10,8 @@ log_transform(sce)
 \item{sce}{SingleCellExperiment object}
 }
 \value{
-SingleCellAlleleExperiment object with an additional assay containing
+SingleCellAlleleExperiment object
 }
 \description{
-Internal function used in the \code{SingleCellAlleleExperiment()} constructor to log-normalize the raw counts and add them to \code{logcounts} assay.
+Internal function used in the \code{SingleCellAlleleExperiment()} constructor to log-normalize the raw counts and add them to the \code{logcounts} assay.
 }

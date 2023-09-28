@@ -2,14 +2,14 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{find_allele_ids}
 \alias{find_allele_ids}
-\title{Identify rows containing allele information for WTA}
+\title{Identify rows containing allele information}
 \usage{
 find_allele_ids(sce, exp_type)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{exp_type}{either \code{"WTA"} or \code{"Amplicon"} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}. Passed from \code{SingleCellAlleleExperiment()}.}
 }
 \value{
 subsample of the scae containing all rows with allele_counts

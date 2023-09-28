@@ -7,10 +7,10 @@
 cutname(allele_id)
 }
 \arguments{
-\item{allele_id}{list of unidentified allele_names that are still in a proper nomenclature form}
+\item{allele_id}{list of character strings for unidentified allele_names that are still in proper nomenclature.}
 }
 \value{
-new identifier with a cut off name to be present in the list of gene_names
+list of character strings for new identifiers with a cut off name to be present in the list of gene_names
 }
 \description{
 Internal function used in \code{get_allelecounts()}. Function is used to cut character string at "*" character and return it.

@@ -2,11 +2,11 @@
 % Please edit documentation in R/readAlleleCounts.R
 \name{readAlleleCounts}
 \alias{readAlleleCounts}
-\title{Reading in allele quantification data into SingleCellAlleleExperiment object}
+\title{Reading in allele quantification data into a SingleCellAlleleExperiment object}
 \usage{
 readAlleleCounts(
   samples,
-  sample.names = names(samples),
+  sample_names = names(samples),
   filter_threshold = 0,
   exp_type = c("WTA", "Amplicon"),
   symbols = NULL,
@@ -14,30 +14,29 @@ readAlleleCounts(
 )
 }
 \arguments{
-\item{samples}{character string input containing the path to the directory containing the
-input files}
+\item{samples}{character string of the file path to the directory containing the expected input files}
 
-\item{sample.names}{character string for a sample_name identifier}
+\item{sample_names}{character string for a sample_name identifier. If left empty it will take the path to the files as a sample identifier.}
 
-\item{filter_threshold}{count threshold for filtering barcodes/cells}
+\item{filter_threshold}{positive integer value used as count threshold for filtering barcodes/cells. Default value is set at \code{filter_threshold = 0}.}
 
-\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}.}
 
-\item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
+\item{symbols}{character string to determine which database-function to use to retrieve the NCBI gene names if \code{exp_type = "WTA"}. Default is \code{symbols = "biomart"}. You can choose between \code{exp_type = c("biomart", "orgdb")}. \code{orgdb} parameter is suggested for offline-usage.}
 
-\item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
+\item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples. Default is \code{BiocParallel::SerialParam()}.}
 }
 \value{
 SingleCellAlleleExperiment object
 }
 \description{
 Main read in function for reading in given allele quantification data and
-loading the data into an \code{SingleCellAlleleExperiment} object. Input data are stored in a shared folder.
+loading the data into a \code{SingleCellAlleleExperiment} object. Input data are stored in a shared folder with expected file names.
 Expected naming scheme of the files:
 \itemize{
-\item quantification matrix: \code{matrix.mtx}
-\item barcode information: \code{barcodes.txt}
-\item feature information: \code{features.txt}
-\item allele lookup table: \code{lookup_table_HLA_only}
+\item quantification matrix: \code{cells_x_genes.matrix.mtx}
+\item barcode information:   \code{cells_x_genes.barcodes.txt}
+\item feature information:   \code{cells_x_genes.genes.txt}
+\item lookup table:          \code{lookup_table_HLA_only}
 }
 }

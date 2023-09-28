@@ -1,8 +1,7 @@
 ################################################################################
 ############---function plots a knee plot ranking barcode counts---#############
-################---majority of code taken from Ahmad Al Ajami---################
+#############--Code for default knee plot is from Ahmad Al Ajami--##############
 ################################################################################
-
 
 #------------------------------Knee plot---------------------------------------#
 
@@ -12,13 +11,15 @@
 #'
 #' @description
 #' Creates a knee plot ranking the barcodes according to their total UMI count. The plot is
-#' used to determine a threshold for filtering barcodes in the preprocessing step.
+#' used to determine a threshold for filtering barcodes in the preprocessing step. You can plot two different knee plots.
+#' The `mode = "default` knee plot shows a default knee plot. The `mode = "advanced"` knee plot computes a knee- and inflection point
+#' which can be used as a suggestion for filtering out low-quality cells.
 #'
 #'
-#' @param path file path of the directory containing the input files as character string
-#' @param mode different knee plot versions
+#' @param path character string of the file path to the directory containing the expected input files
+#' @param mode choose knee plot version. `mode = "default"` for the default knee plot. `mode = "advanced"` for the advanced knee plot including a knee- and inflection point. The standard value is the default knee plot.
 #'
-#' @import dplyr
+#' @importFrom dplyr desc arrange row_number distinct
 #' @import tibble
 #' @import ggplot2
 #' @importFrom Matrix rowSums readMM
@@ -29,6 +30,7 @@
 #' @export
 plotKnee <- function(path, mode = NULL){
 
+  # check validity of mode parameter
   if (is.null(mode)) {
     mode <- "default"
   } else {
@@ -37,6 +39,7 @@ plotKnee <- function(path, mode = NULL){
     }
   }
 
+  # expected file names
   barcodes_loc <- file.path(path, "cells_x_genes.barcodes.txt")
   features_loc <- file.path(path, "cells_x_genes.genes.txt")
   matrix_loc   <- file.path(path, "cells_x_genes.mtx")
@@ -45,7 +48,7 @@ plotKnee <- function(path, mode = NULL){
   features <- read.delim(features_loc, header = FALSE)
   matrix   <- readMM(matrix_loc)
 
-
+  # default knee plot
   if (mode == "default"){
 
     rownames(matrix) <- paste(barcodes$V1, "_D1", sep = "")
@@ -69,9 +72,9 @@ plotKnee <- function(path, mode = NULL){
                 labs(y = "Total UMI counts", x = "Barcode rank")
 
    return(default)
-
   }
 
+  # advanced knee plot with knee- and inflection point
   if (mode == "advanced"){
     matrix <- t(matrix)
 

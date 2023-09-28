@@ -7,10 +7,9 @@
 read_from_sparse_allele(path, exp_type = exp_type)
 }
 \arguments{
-\item{path}{character string input containing the path to the directory containing the
-input files}
+\item{path}{character string of the file path to the directory containing the expected input files}
 
-\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
+\item{exp_type}{character string to pass information about the used experimental approach. Either use \code{exp_type = "WTA"} or \code{exp_type = "Amplicon"}.}
 }
 \value{
 list with the read_in data sorted into different slots

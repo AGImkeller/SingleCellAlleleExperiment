@@ -2,14 +2,15 @@
  ##############---getters to use for subsampling the main assay---##############
  ###############################################################################
 
+
  #---------------------------------getters-------------------------------------#
 
  #####
 #' Get allele rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing raw allele information. These rows are
-#' identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
+#' Getter function returning subsampled `SCAE object` with all rows containing raw allele information. These rows are
+#' identified by `I` in `rowData(scae)$NI_I` and `A` in `rowData(scae)$Quant_type` columns.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
@@ -27,8 +28,8 @@ get_alleles <- function(scae) {
 #' Get immune gene rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
-#' identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+#' Getter function returning subsampled `SCAE object` with all rows containing immune gene information. These rows are
+#' identfied by `I` in `rowData(scae)$NI_I` and `G` in `rowData(scae)$Quant_type` columns.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
@@ -43,11 +44,11 @@ get_agenes <- function(scae) {
   return(agenes)
 }
 
-#' Get non-immune rows
+#' Get non-immune gene rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing non immune gene information. These rows are
-#' identified by "NI" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+#' Getter function returning subsampled `SCAE object` with all rows containing non immune gene information. These rows are
+#' identified by `NI` in `rowData(scae)$NI_I` and `G` in `rowData(scae)$Quant_type` columns.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
@@ -65,8 +66,8 @@ get_nigenes <- function(scae) {
 #' Get functional class rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing functional class information. These rows are
-#' identified by "I" in rowData(scae)$NI_I and "F" in rowData(scae)$Quant_type.
+#' Getter function returning subsampled `SCAE object` with all rows containing functional class information. These rows are
+#' identified by `I` in `rowData(scae)$NI_I` and `F` in `rowData(scae)$Quant_type` columns.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'
@@ -84,8 +85,8 @@ get_func <- function(scae) {
 #' Get unknown allele rows
 #'
 #' @description
-#' Getter function returning subsampled SCAE object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
-#' These rows are identified by "I" in rowData(scae)$NI_I and "A_unknown" in rowData(scae)$Quant_type.
+#' Getter function returning subsampled `SCAE object` with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
+#' These rows are identified by `I` in `rowData(scae)$NI_I` and `A_unknown` in `rowData(scae)$Quant_type` columns.
 #'
 #' @param scae SingleCellAlleleExperiment object
 #'

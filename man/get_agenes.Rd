@@ -13,6 +13,6 @@ get_agenes(scae)
 subsampled SingleCellAlleleExperiment object
 }
 \description{
-Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
-identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+Getter function returning subsampled \verb{SCAE object} with all rows containing immune gene information. These rows are
+identfied by \code{I} in \code{rowData(scae)$NI_I} and \code{G} in \code{rowData(scae)$Quant_type} columns.
 }

@@ -2,20 +2,19 @@
 % Please edit documentation in R/singlecellalleleexperiment.R
 \name{add_sample_tags}
 \alias{add_sample_tags}
-\title{Adding sample tag information to colData}
+\title{Adding sample tag information to \code{colData}}
 \usage{
 add_sample_tags(path, scae)
 }
 \arguments{
-\item{path}{character string input containing the path to the directory containing the
-input files}
+\item{path}{character string of the file path to the directory containing the expected input files}
 
 \item{scae}{SingleCellAlleleExperiment object}
 }
 \value{
-updated SingleCellAlleleExperiment object
+SingleCellAlleleExperiment object
 }
 \description{
-Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
-Adding sample tag information to colData
+Internal function used in \code{readAlleleCounts()}. Stated here and not in the \verb{readAlleleCounts file}, because its supposed to be a transformation step of the SCAE object.
+Adding sample tag information to \code{colData} (currently only used if \verb{exp_type = "Amplicon} in the \code{readAlleleCounts()} function).
 }
