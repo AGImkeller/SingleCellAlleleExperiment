@@ -30,8 +30,8 @@
 #' @export
 plotKnee <- function(matrix_file, gene_file, barcode_file){
 
-  barcodes <- barcodes_file
-  features <- genes_file
+  barcodes <- barcode_file
+  features <- gene_file
   matrix <- matrix_file
 
   #advanced knee plot

@@ -4,7 +4,7 @@
 \alias{plotKnee}
 \title{Knee plot}
 \usage{
-plotKnee(matrix_file, genes_file, barcodes_file)
+plotKnee(matrix_file, gene_file, barcode_file)
 }
 \arguments{
 \item{matrix_file}{count matrix that was read in in the \code{read_from_sparse_allele()} function}
