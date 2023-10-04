@@ -28,7 +28,7 @@
 #'
 #' @return returns a knee plot for determining a count threshold used for filtering out barcodes
 #' @export
-plotKnee <- function(matrix_file, genes_file, barcodes_file){
+plotKnee <- function(matrix_file, gene_file, barcode_file){
 
   barcodes <- barcodes_file
   features <- genes_file

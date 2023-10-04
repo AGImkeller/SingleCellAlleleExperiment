@@ -44,7 +44,7 @@ readAlleleCounts <- function (samples,
                               filter = c("yes", "no", "custom" ),
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
-                              lookup_file = "lookup_table_HLA_only.txt",
+                              lookup_file = "lookup_table_HLA_only.csv",
                               barcode_file = "cells_x_genes.barcodes.txt",
                               gene_file = "cells_x_genes.genes.txt",
                               matrix_file = "cells_x_genes.mtx",
@@ -82,6 +82,7 @@ readAlleleCounts <- function (samples,
 
   current <- load_out[[1]]
   full_data <- current$mat
+
   feature_info <- current$feature_info
   cell_names <- current$cell_names
 
@@ -98,7 +99,6 @@ readAlleleCounts <- function (samples,
 
   full_data <- as(full_data, "CsparseMatrix")
   lookup <- readLookup(samples, exp_type, lookup_file)
-
 
 
   #preflight mode, only for plotting the knee plots
