@@ -18,12 +18,14 @@ are
 identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
 }
 \examples{
+library(SingleCellAlleleExperiment)
+
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 
 scae <- readAlleleCounts(example_data,
                         sample_names = "example_data",
                         filter = "yes",
-                        symbols = NULL,
+                        symbols = "orgdb",
                         exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -36,9 +38,13 @@ scae <- readAlleleCounts(example_data,
 
 scae
 
+rownames(get_alleles(scae))
+
 scae_alleles <- get_alleles(scae)
 
 scae_alleles
+
+rownames(scae_alleles)
 
 
 }

@@ -17,12 +17,12 @@ readAlleleCounts(
   tag_feature_mtx = "cells_x_features.mtx",
   tag_feature_barcodes = "cells_x_features.barcodes.txt",
   filter_threshold = NULL,
+  verbose = FALSE,
   BPPARAM = BiocParallel::SerialParam()
 )
 }
 \arguments{
-\item{samples}{character string input containing the path to the directory containing the
-input files}
+\item{samples}{character string input containing the path to the directory containing the input files}
 
 \item{sample_names}{character string for a sample_name identifier}
 
@@ -46,6 +46,8 @@ input files}
 
 \item{filter_threshold}{NULL or integer value > 0 used for \code{custom} filtering if \code{filter = "custom"}}
 
+\item{verbose}{FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step}
+
 \item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
 }
 \value{
@@ -54,11 +56,76 @@ SingleCellAlleleExperiment object
 \description{
 Main read in function for reading in given allele quantification data and
 loading the data into an \code{SingleCellAlleleExperiment} object. Input data are stored in a shared folder.
-Expected naming scheme of the files:
+Expected naming scheme of the files from the data generating method:
 \itemize{
-\item quantification matrix: \code{matrix.mtx}
-\item barcode information: \code{barcodes.txt}
-\item feature information: \code{features.txt}
+\item quantification matrix: \code{cells_x_genes.mtx}
+\item barcode information: \code{cells_x_genes.barcodes.txt}
+\item feature information: \code{cells_x_genes.genes.txt}
 \item allele lookup table: \code{lookup_table_HLA_only}
 }
+
+File identifiers can be specifically stated if the identifiers are different.
+}
+\examples{
+library(SingleCellAlleleExperiment)
+
+example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+
+
+# preflight mode, not generating an SCAE object
+# used for quality-assessment by plotting the knee plot
+scae_preflight <- readAlleleCounts(example_data,
+                        sample_names = "example_data",
+                        filter = "no",
+                        symbols = "orgdb",
+                        exp_type = "WTA",
+                        lookup_file = "lookup_table_HLA_only.csv",
+                        barcode_file = "cells_x_genes.barcodes.txt",
+                        gene_file = "cells_x_genes.genes.txt",
+                        matrix_file = "cells_x_genes.mtx",
+                        tag_feature_mtx = "cells_x_genes.genes.txt",
+                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                        filter_threshold = NULL
+                        )
+
+
+# automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
+scae_filtered <- readAlleleCounts(example_data,
+                        sample_names = "example_data",
+                        filter = "yes",
+                        symbols = "orgdb",
+                        exp_type = "WTA",
+                        lookup_file = "lookup_table_HLA_only.csv",
+                        barcode_file = "cells_x_genes.barcodes.txt",
+                        gene_file = "cells_x_genes.genes.txt",
+                        matrix_file = "cells_x_genes.mtx",
+                        tag_feature_mtx = "cells_x_genes.genes.txt",
+                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                        filter_threshold = NULL,
+                        verbose = TRUE
+                        )
+
+scae_filtered
+
+
+# custom filtering mode, setting up a custom filter threshold for filtering out
+# low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
+scae_custom_filter <- readAlleleCounts(example_data,
+                        sample_names = "example_data",
+                        filter = "custom",
+                        symbols = "orgdb",
+                        exp_type = "WTA",
+                        lookup_file = "lookup_table_HLA_only.csv",
+                        barcode_file = "cells_x_genes.barcodes.txt",
+                        gene_file = "cells_x_genes.genes.txt",
+                        matrix_file = "cells_x_genes.mtx",
+                        tag_feature_mtx = "cells_x_genes.genes.txt",
+                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                        filter_threshold = 105
+                        )
+
+scae_custom_filter
+
+
+
 }

@@ -16,11 +16,9 @@
 #'
 #'
 #' @param matrix_file count matrix that was read in in the `read_from_sparse_allele()` function
-#' @param genes_file list with gene identifiers that was read in in the `read_from_sparse_allele()` function
-#' @param barcodes_file list with barcode identifiers that was read in in the `read_from_sparse_allele()` function
+#' @param gene_file list with gene identifiers that was read in in the `read_from_sparse_allele()` function
+#' @param barcode_file list with barcode identifiers that was read in in the `read_from_sparse_allele()` function
 #'
-#' @import dplyr
-#' @import tibble
 #' @import ggplot2
 #' @importFrom Matrix rowSums readMM
 #' @importFrom utils read.csv read.delim
@@ -35,12 +33,13 @@ plotKnee <- function(matrix_file, gene_file, barcode_file){
   matrix <- matrix_file
 
   #advanced knee plot
-  br.out <- DropletUtils::barcodeRanks(matrix)
+  br_out <- DropletUtils::barcodeRanks(matrix)
 
-  names(br.out)
-  fitteddf <- br.out$fitted
+  names(br_out)
+  fitteddf <- br_out$fitted
+  total = br_out$total
 
-  data_df <- data.frame(rank = br.out$rank, total = br.out$total, fitteddf = br.out$fitted)
+  data_df <- data.frame(rank = br_out$rank, total = br_out$total, fitteddf = br_out$fitted)
 
   gg <- ggplot(data_df, aes(x = rank, y = total)) +
         geom_point() +
@@ -49,14 +48,14 @@ plotKnee <- function(matrix_file, gene_file, barcode_file){
         scale_y_log10() +
         annotation_logticks() +
         labs(x = "Barcode rank", y = "Total UMI count") +
-        geom_hline(yintercept = S4Vectors::metadata(br.out)$knee, color = "dodgerblue", linetype = "dashed") +
-        geom_hline(yintercept = S4Vectors::metadata(br.out)$inflection, color = "forestgreen", linetype = "dashed") +
-        annotate("text", x = 2, y = S4Vectors::metadata(br.out)$knee * 1.2, label = "knee", color = "dodgerblue") +
-        annotate("text", x = 2.25, y = S4Vectors::metadata(br.out)$inflection * 1.2, label = "inflection", color = "forestgreen") +
+        geom_hline(yintercept = S4Vectors::metadata(br_out)$knee, color = "dodgerblue", linetype = "dashed") +
+        geom_hline(yintercept = S4Vectors::metadata(br_out)$inflection, color = "forestgreen", linetype = "dashed") +
+        annotate("text", x = 2, y = S4Vectors::metadata(br_out)$knee * 1.2, label = "knee", color = "dodgerblue") +
+        annotate("text", x = 2.25, y = S4Vectors::metadata(br_out)$inflection * 1.2, label = "inflection", color = "forestgreen") +
         theme_bw()
   print(gg)
 
-  inflection_p <- S4Vectors::metadata(br.out)$inflection
+  inflection_p <- S4Vectors::metadata(br_out)$inflection
   return(inflection_p)
 
 }

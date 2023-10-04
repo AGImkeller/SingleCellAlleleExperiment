@@ -31,52 +31,62 @@
 #' @param threshold count threshold for filtering barcodes/cells
 #' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
 #' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
+#' @param verbose FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @return SingleCellAlleleExperiment object
-#' @export
-SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup){
+SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup, verbose = FALSE){
   sce <- SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
   sce_add_look <- ext_rd(sce, exp_type, symbols)
   #####
+  if (verbose){
   rt_scae_lookup_end <- Sys.time()
-  diff_rt_scae_lookup <- rt_scae_lookup_end - rt_scae_lookup_start
-  print(paste("     Generating SCAE (1/5) extending rowData:", diff_rt_scae_lookup))
+  diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
+  message(paste("     Generating SCAE (1/5) extending rowData:", diff_rt_scae_lookup, "seconds"))
+  }
   #####
 
   rt_scae_filt_norm_start <- Sys.time()
   sce_filter_norm <- filter_norm(sce_add_look, threshold)
   #####
+  if (verbose){
   rt_scae_filt_norm_end <- Sys.time()
-  diff_rt_scae_filt_norm <- rt_scae_filt_norm_end - rt_scae_filt_norm_start
-  print(paste("     Generating SCAE (2/5) filtering and normalization:", diff_rt_scae_filt_norm))
+  diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
+  message(paste("     Generating SCAE (2/5) filtering and normalization:", diff_rt_scae_filt_norm, "seconds"))
+  }
   #####
 
   rt_scae_a2g_start <- Sys.time()
   scae <- alleles2genes(sce_filter_norm, lookup, exp_type)
   #####
+  if (verbose){
   rt_scae_a2g_end <- Sys.time()
-  diff_rt_scae_a2g <- rt_scae_a2g_end - rt_scae_a2g_start
-  print(paste("     Generating SCAE (3/5) alleles2genes:", diff_rt_scae_a2g))
+  diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
+  message(paste("     Generating SCAE (3/5) alleles2genes:", diff_rt_scae_a2g, "seconds"))
+  }
   #####
 
   rt_scae_g2f_start <- Sys.time()
   scae <- genes2functional(scae, lookup, exp_type)
   #####
+  if (verbose){
   rt_scae_g2f_end <- Sys.time()
-  diff_rt_scae_g2f <- rt_scae_g2f_end - rt_scae_g2f_start
-  print(paste("     Generating SCAE (4/5) genes2functional:", diff_rt_scae_g2f))
+  diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
+  message(paste("     Generating SCAE (4/5) genes2functional:", diff_rt_scae_g2f, "seconds"))
+  }
   #####
 
   rt_scae_log_start <- Sys.time()
   scae <- log_transform(scae)
   #####
+  if (verbose){
   rt_scae_log_end <- Sys.time()
-  diff_rt_scae_log <- rt_scae_log_end - rt_scae_log_start
-  print(paste("     Generating SCAE (5/5) log_transform:", diff_rt_scae_g2f))
+  diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
+  message(paste("     Generating SCAE (5/5) log_transform:", diff_rt_scae_g2f, "seconds"))
+  }
   #####
 
   .scae(scae)
@@ -111,7 +121,7 @@ ext_rd <- function(sce, exp_type, symbols){
 
   if (exp_type == "WTA"){
     if (symbols == "biomart"){
-      ensembl_ids  <- unlist(rowData(sce)$Ensembl.ID)
+      ensembl_ids  <- unlist(rowData(sce)$Ensembl_ID)
       gene_symbols <- get_ncbi_gene_names(ensembl_ids)
     }
     if (symbols == "orgdb"){
@@ -184,17 +194,17 @@ get_ncbi_gene_names <- function(ensembl_ids) {
 #'
 #' @return list of gene names
 get_ncbi_org <- function(scae){
-  ensembl_ids <- rowData(scae)$Ensembl.ID
+  ensembl_ids <- rowData(scae)$Ensembl_ID
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
   Hs_symbol  <- org.Hs.eg.db::org.Hs.egSYMBOL
   Hs_ensembl <- org.Hs.eg.db::org.Hs.egENSEMBL
-  mapped_Hs_genes.symbol  <- AnnotationDbi::mappedkeys(Hs_symbol)
-  mapped_Hs_genes.ensembl <- AnnotationDbi::mappedkeys(Hs_ensembl)
-  Hs_symbol.df  <- as.data.frame(Hs_symbol[mapped_Hs_genes.symbol])
-  Hs_ensembl.df <- as.data.frame(Hs_ensembl[mapped_Hs_genes.ensembl])
+  mapped_Hs_genes_symbol  <- AnnotationDbi::mappedkeys(Hs_symbol)
+  mapped_Hs_genes_ensembl <- AnnotationDbi::mappedkeys(Hs_ensembl)
+  Hs_symbol_df  <- as.data.frame(Hs_symbol[mapped_Hs_genes_symbol])
+  Hs_ensembl_df <- as.data.frame(Hs_ensembl[mapped_Hs_genes_ensembl])
 
-  Hs_mapping <- merge(Hs_symbol.df, Hs_ensembl.df)
+  Hs_mapping <- merge(Hs_symbol_df, Hs_ensembl_df)
 
   indic <- match(ensembl_ids, Hs_mapping$ensembl_id)
   ncbi_symbols <- Hs_mapping$symbol[match(ensembl_ids, Hs_mapping$ensembl_id)]
@@ -346,7 +356,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
       new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
       list_alid[[length(list_alid) + 1]] <- new_ids
     }else{
-      print(paste(allele_ids_lookup[i], "can't be found in the lookup table"))
+      message(paste(allele_ids_lookup[i], "can't be found in the lookup table"))
       new_ids <- list(cutname(allele_ids_lookup[i]))
       list_alid[[length(list_alid) + 1]] <- new_ids
       unknown <- TRUE
@@ -419,7 +429,7 @@ alleles2genes <- function(sce, lookup, exp_type){
                                  colData = colData(sce))
   rowData(al_sce)$Symbol <- rownames(al_gene)
   if (exp_type == "WTA"){
-    rowData(al_sce)$Ensembl.ID <- rownames(al_gene)
+    rowData(al_sce)$Ensembl_ID <- rownames(al_gene)
   }
 
   new_sce <- BiocGenerics::rbind(sce, al_sce)
@@ -481,7 +491,7 @@ genes2functional <- function(sce, lookup, exp_type){
                                    colData = colData(sce))
   rowData(func_sce)$Symbol <- rownames(func_sce)
   if (exp_type == "WTA"){
-    rowData(func_sce)$Ensembl.ID <- rownames(func_sce)
+    rowData(func_sce)$Ensembl_ID <- rownames(func_sce)
   }
 
   final_scae <- BiocGenerics::rbind(sce, func_sce)
@@ -558,16 +568,16 @@ add_sample_tags <- function(path, scae, tag_feature_mtx, tag_feature_barcodes){
   rownames(tags) <- cells$V1
   colnames(tags) <- paste("ST_", seq_len(12), sep = "")
   tags <- methods::as(tags, "CsparseMatrix")
-  dom.tags <- data.frame(Cellular.Barcode = rownames(tags),
-                         Sample.Tag = ifelse(rowMaxs(tags) >= 0.75 * rowSums(tags),
+  dom_tags <- data.frame(Cellular_Barcode = rownames(tags),
+                         Sample_Tag = ifelse(rowMaxs(tags) >= 0.75 * rowSums(tags),
                                              colnames(tags)[max.col(tags)],
                                              "Multiplet"))
-  dom.tags <- dom.tags[!dom.tags$Sample.Tag == 'Multiplet', ]
+  dom_tags <- dom_tags[!dom_tags$Sample_Tag == 'Multiplet', ]
 
-  inter <- intersect(rownames(colData(scae)), dom.tags$Cellular.Barcode)
-  colData(scae)$sample.tags <- NA
-  colData(scae[, inter])$sample.tags <- dom.tags[inter, "Sample.Tag"]
-  scae <- scae[, !is.na(colData(scae)$sample.tags)]
+  inter <- intersect(rownames(colData(scae)), dom_tags$Cellular_Barcode)
+  colData(scae)$sample_tags <- NA
+  colData(scae[, inter])$sample_tags <- dom_tags[inter, "Sample_Tag"]
+  scae <- scae[, !is.na(colData(scae)$sample_tags)]
   scae
 }
 #####

@@ -16,3 +16,33 @@ subsampled SingleCellAlleleExperiment object
 Getter function returning subsampled SCAE object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
 These rows are identified by "I" in rowData(scae)$NI_I and "A_unknown" in rowData(scae)$Quant_type.
 }
+\examples{
+library(SingleCellAlleleExperiment)
+
+example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+
+scae <- readAlleleCounts(example_data,
+                        sample_names = "example_data",
+                        filter = "yes",
+                        symbols = "orgdb",
+                        exp_type = "WTA",
+                        lookup_file = "lookup_table_HLA_only.csv",
+                        barcode_file = "cells_x_genes.barcodes.txt",
+                        gene_file = "cells_x_genes.genes.txt",
+                        matrix_file = "cells_x_genes.mtx",
+                        tag_feature_mtx = "cells_x_genes.genes.txt",
+                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                        filter_threshold = NULL
+                        )
+
+scae
+
+rownames(get_unknown(scae))
+
+scae_unknown_alleles <- get_unknown(scae)
+
+scae_unknown_alleles
+
+rownames(scae_unknown_alleles)
+
+}

@@ -4,7 +4,14 @@
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment class}
 \usage{
-SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
+SingleCellAlleleExperiment(
+  ...,
+  threshold,
+  exp_type,
+  symbols,
+  lookup,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{...}{parameters to pass to SingleCellExperiment constructor}
@@ -16,6 +23,8 @@ SingleCellAlleleExperiment(..., threshold, exp_type, symbols, lookup)
 \item{symbols}{identifier used to choose which database-function to use to retrieve the ncbi gene names}
 
 \item{lookup}{allele lookup file}
+
+\item{verbose}{FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step}
 }
 \value{
 SingleCellAlleleExperiment object

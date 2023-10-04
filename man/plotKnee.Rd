@@ -9,9 +9,9 @@ plotKnee(matrix_file, gene_file, barcode_file)
 \arguments{
 \item{matrix_file}{count matrix that was read in in the \code{read_from_sparse_allele()} function}
 
-\item{genes_file}{list with gene identifiers that was read in in the \code{read_from_sparse_allele()} function}
+\item{gene_file}{list with gene identifiers that was read in in the \code{read_from_sparse_allele()} function}
 
-\item{barcodes_file}{list with barcode identifiers that was read in in the \code{read_from_sparse_allele()} function}
+\item{barcode_file}{list with barcode identifiers that was read in in the \code{read_from_sparse_allele()} function}
 }
 \value{
 returns a knee plot for determining a count threshold used for filtering out barcodes

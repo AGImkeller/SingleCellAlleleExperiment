@@ -28,8 +28,6 @@ Imports:
   Matrix,
   S4Vectors,
   stats,
-  tibble,
-  dplyr,
   ggplot2,
   biomaRt,
   org.Hs.eg.db,
@@ -38,14 +36,14 @@ Imports:
   BiocGenerics,
   DropletUtils
 Suggests: 
-    knitr,
-    rmarkdown,
-    scran,
-    scater,
-    gridExtra,
-    tidyverse,
-    patchwork,
-    cowplot,
-    viridis,
-    BiocStyle
+  knitr,
+  rmarkdown,
+  scran,
+  scater,
+  gridExtra,
+  tidyverse,
+  patchwork,
+  cowplot,
+  viridis,
+  BiocStyle
 VignetteBuilder: knitr

@@ -20,12 +20,14 @@
 #' @return subsampled SingleCellAlleleExperiment object
 #'
 #' @examples
+#' library(SingleCellAlleleExperiment)
+#'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
 #' scae <- readAlleleCounts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
-#'                         symbols = NULL,
+#'                         symbols = "orgdb",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
 #'                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -38,9 +40,13 @@
 #'
 #'scae
 #'
+#'rownames(get_alleles(scae))
+#'
 #'scae_alleles <- get_alleles(scae)
 #'
 #'scae_alleles
+#'
+#'rownames(scae_alleles)
 #'
 #'
 #' @export
@@ -50,6 +56,7 @@ get_alleles <- function(scae) {
   alleles <- scae[subset_rows & rowData(scae)$NI_I == "I" & startsWith(rowData(scae)$Quant_type,"A"), ]
   return(alleles)
 }
+
 
 #' Get immune gene rows
 #'
@@ -63,6 +70,36 @@ get_alleles <- function(scae) {
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return subsampled SingleCellAlleleExperiment object
+#'
+#' @examples
+#' library(SingleCellAlleleExperiment)
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#' scae <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'scae
+#'
+#'rownames(get_agenes(scae))
+#'
+#'scae_immune_genes <- get_agenes(scae)
+#'
+#'scae_immune_genes
+#'
+#'rownames(scae_immune_genes)
+#'
 #' @export
 get_agenes <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
@@ -70,6 +107,7 @@ get_agenes <- function(scae) {
   agenes <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
+
 
 #' Get non-immune rows
 #'
@@ -83,6 +121,37 @@ get_agenes <- function(scae) {
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return subsampled SingleCellAlleleExperiment object
+#'
+#' @examples
+#' library(SingleCellAlleleExperiment)
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#' scae <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'scae
+#'
+#'rownames(get_nigenes(scae))
+#'
+#'scae_non_immune_genes <- get_nigenes(scae)
+#'
+#'scae_non_immune_genes
+#'
+#'rownames(scae_non_immune_genes)
+#'
+#'
 #' @export
 get_nigenes <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
@@ -90,6 +159,7 @@ get_nigenes <- function(scae) {
   agenes <- scae[subset_rows & rowData(scae)$NI_I == "NI" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
+
 
 #' Get functional class rows
 #'
@@ -103,6 +173,38 @@ get_nigenes <- function(scae) {
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return subsampled SingleCellAlleleExperiment object
+#'
+#' @examples
+#' library(SingleCellAlleleExperiment)
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#' scae <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'scae
+#'
+#'rownames(get_func(scae))
+#'
+#'scae_functional_class <- get_func(scae)
+#'
+#'scae_functional_class
+#'
+#'rownames(scae_functional_class)
+#'
+#'
+#'
 #' @export
 get_func <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
@@ -110,6 +212,7 @@ get_func <- function(scae) {
   func <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "F", ]
   return(func)
 }
+
 
 #' Get unknown allele rows
 #'
@@ -123,6 +226,36 @@ get_func <- function(scae) {
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return subsampled SingleCellAlleleExperiment object
+#'
+#' @examples
+#' library(SingleCellAlleleExperiment)
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#' scae <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'scae
+#'
+#'rownames(get_unknown(scae))
+#'
+#'scae_unknown_alleles <- get_unknown(scae)
+#'
+#'scae_unknown_alleles
+#'
+#'rownames(scae_unknown_alleles)
+#'
 #' @export
 get_unknown <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)

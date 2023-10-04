@@ -11,15 +11,16 @@
 #' @description
 #' Main read in function for reading in given allele quantification data and
 #' loading the data into an `SingleCellAlleleExperiment` object. Input data are stored in a shared folder.
-#' Expected naming scheme of the files:
+#' Expected naming scheme of the files from the data generating method:
 #'
-#'    * quantification matrix: `matrix.mtx`
-#'    * barcode information: `barcodes.txt`
-#'    * feature information: `features.txt`
+#'    * quantification matrix: `cells_x_genes.mtx`
+#'    * barcode information: `cells_x_genes.barcodes.txt`
+#'    * feature information: `cells_x_genes.genes.txt`
 #'    * allele lookup table: `lookup_table_HLA_only`
 #'
-#' @param samples character string input containing the path to the directory containing the
-#'   input files
+#' File identifiers can be specifically stated if the identifiers are different.
+#'
+#' @param samples character string input containing the path to the directory containing the input files
 #' @param sample_names character string for a sample_name identifier
 #' @param filter character string determining the filter mode. `yes` uses the inflection point of the knee plot. `no` computes the knee plot and stops funciton execution. `custom` allows for setting a custom threshold in `filter_threshold`.
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
@@ -32,16 +33,79 @@
 #' @param tag_feature_mtx character string determining the name of the file containing the count matrix of sample tag information
 #' @param tag_feature_barcodes character string determining the name of the file containing the barcode identifiers of sample tag information
 #' @param filter_threshold NULL or integer value > 0 used for `custom` filtering if `filter = "custom"`
+#' @param verbose FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
 #'
 #' @return SingleCellAlleleExperiment object
 #'
+#' @examples
+#' library(SingleCellAlleleExperiment)
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#'
+#' # preflight mode, not generating an SCAE object
+#' # used for quality-assessment by plotting the knee plot
+#' scae_preflight <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "no",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'
+#' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
+#' scae_filtered <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL,
+#'                         verbose = TRUE
+#'                         )
+#'
+#' scae_filtered
+#'
+#'
+#' # custom filtering mode, setting up a custom filter threshold for filtering out
+#' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
+#' scae_custom_filter <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "custom",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = 105
+#'                         )
+#'
+#' scae_custom_filter
+#'
+#'
+#'
 #' @export
 readAlleleCounts <- function (samples,
                               sample_names = names(samples),
-                              filter = c("yes", "no", "custom" ),
+                              filter = c("yes", "no", "custom"),
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
                               lookup_file = "lookup_table_HLA_only.csv",
@@ -51,6 +115,7 @@ readAlleleCounts <- function (samples,
                               tag_feature_mtx = "cells_x_features.mtx",
                               tag_feature_barcodes = "cells_x_features.barcodes.txt",
                               filter_threshold = NULL,
+                              verbose = FALSE,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
@@ -69,7 +134,6 @@ readAlleleCounts <- function (samples,
   if (filter == "custom" & is.null(filter_threshold)) {
     stop("For custom filtering you need to state a integer value >0 in the 'filter_threshold' parameter.")
   }
-
 
   #reading in files
   load_out <- BiocParallel::bplapply(samples,
@@ -104,15 +168,14 @@ readAlleleCounts <- function (samples,
   #preflight mode, only for plotting the knee plots
   if (filter == "no"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
-    cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
-    stop()
+    cat("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
+    return()
   }
 
   #filtering on the inflection point shown in the advanced knee plot
   if (filter == "yes"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
     cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.\n")
-
   }
 
   #putting a custom filter threshold
@@ -122,9 +185,11 @@ readAlleleCounts <- function (samples,
 
 
   #####
+  if (verbose){
   rt_one_readin_end <- Sys.time()
-  diff_rt_one <- rt_one_readin_end - rt_one_readin_start
-  print(paste("Runtime check (1/2) Read_in:",      diff_rt_one))
+  diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits = 2)
+  message(paste("Runtime check (1/2) Read_in:",      diff_rt_one, "seconds"))
+  }
   #####
 
   rt_two_scae_start <- Sys.time()
@@ -134,24 +199,30 @@ readAlleleCounts <- function (samples,
                                     threshold = inflection_threshold,
                                     exp_type = exp_type,
                                     symbols = symbols,
-                                    lookup = lookup)
+                                    lookup = lookup,
+                                    verbose = verbose)
   if (exp_type == "Amplicon"){
     rt_six_scae_start <- Sys.time()
     sce <- add_sample_tags(samples, sce, tag_feature_mtx, tag_feature_barcodes)
     #####
+    if (verbose){
     rt_six_scae_end <- Sys.time()
-    diff_rt_six <- rt_six_scae_end - rt_six_scae_start
-    print(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six))
+    diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
+      message(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six, "seconds"))
+    }
     #####
   }
 
   #####
+  if (verbose){
   rt_two_scae_end <- Sys.time()
-  diff_rt_two <- rt_two_scae_end - rt_two_scae_start
-  print(paste("Runtime check (2/2) Generating SCAE completed:",     diff_rt_two))
+  diff_rt_two <- round(rt_two_scae_end - rt_two_scae_start, digits = 2)
+  message(paste("Runtime check (2/2) Generating SCAE completed:",    diff_rt_two, "seconds"))
   diff_rt_total <- rt_two_scae_end - rt_one_readin_start
-  print(paste("Total runtime, completed read_in, filtering and normalization and generating scae object",     diff_rt_total))
+  message(paste("Total runtime, completed read_in, filtering and normalization and generating scae object",       ceiling(diff_rt_total), "seconds"))
+  }
   #####
+
   return(sce)
 }
 
@@ -172,6 +243,7 @@ readAlleleCounts <- function (samples,
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
 #'
+#'
 #' @return list with the read_in data sorted into different slots
 read_from_sparse_allele <- function(path,
                                     exp_type = exp_type,
@@ -189,7 +261,7 @@ read_from_sparse_allele <- function(path,
 
 
   # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
-  possible_names <- c("Ensembl.ID", "Symbol")
+  possible_names <- c("Ensembl_ID", "Symbol")
 
   if (exp_type == "WTA"){
     colnames(feature_info) <- possible_names[1]
@@ -212,6 +284,7 @@ read_from_sparse_allele <- function(path,
 #' @param lookup_file character string determining the name of the lookup table file
 #'
 #' @importFrom utils read.csv
+#'
 #'
 #' @return lookup table
 readLookup <- function(path, exp_type, lookup_file){
