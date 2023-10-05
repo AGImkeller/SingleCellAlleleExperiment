@@ -17,6 +17,7 @@
 #' @return definition for the scae class
 .scae <- setClass("SingleCellAlleleExperiment", contains = "SingleCellExperiment")
 
+
 #' Constructor SingleCellAlleleExperiment class
 #'
 #' @description
@@ -26,16 +27,18 @@
 #' contain allele, gene and functional level quantification results. The additional layers are stored as additional
 #' rows in the count assays as well as in extended rowData.
 #'
-#' @param ... parameters to pass to SingleCellExperiment constructor
-#' @param lookup allele lookup file
-#' @param threshold count threshold for filtering barcodes/cells
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use to retrieve the ncbi gene names
-#' @param verbose FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step
+#' @param ... Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.
+#' @param lookup A data.frame object containing the lookup table.
+#' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
+#' The value `"biomart"` uses the `biomaRt` package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
+#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
+#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
-#' @return SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup, verbose = FALSE){
   sce <- SingleCellExperiment(...)
 
@@ -109,14 +112,15 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #' subassay of the extended main assay in the `SingleCellAlleleExperiment`. "A" corresponds to allele, "G" to allele gene and
 #' "F" to functional allele class.
 #'
-#' @param sce SingleCellExperiment object
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use to retrieve the NCBI gene names
+#' @param sce A \code{\link{SingleCellExperiment}} object. Object is initally constructed in the `SingleCellAlleleExperiment` constructor.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
+#' The value `"biomart"` [biomaRt](\code{\link{biomaRt}}) package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
 #'
 #' @importFrom SummarizedExperiment rowData<-
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return SingleCellAlleleExperiment object with extended rowData
+#' @return A SingleCellExperiment object.
 ext_rd <- function(sce, exp_type, symbols){
 
   if (exp_type == "WTA"){
@@ -147,18 +151,18 @@ ext_rd <- function(sce, exp_type, symbols){
   sce
 }
 
-#' Get Ncbi genes using biomaRt
+#' Get NCBI genes using biomaRt
 #'
 #' @description
 #' This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
 #' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
 #' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `readAlleleCounts()` function.
 #'
-#' @param ensembl_ids vector containing ensembl.ids
+#' @param ensembl_ids A vector containing character strings for ensemble gene identifiers.
 #'
 #' @importFrom biomaRt useMart getBM
 #'
-#' @return vector containing the ncbi names matching the right rows for the ensembl.ids
+#' @return A vector containing character strings for NCBI gene names.
 get_ncbi_gene_names <- function(ensembl_ids) {
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
   ensembl <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
@@ -185,16 +189,16 @@ get_ncbi_gene_names <- function(ensembl_ids) {
 #' This internal function is not as accurate (does not retrieve as many ncbi gene names as `biomaRt`) but can be used without
 #' internet connection.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param sce A \code{\link{SingleCellExperiment}} object.
 #'
 #' @importFrom org.Hs.eg.db org.Hs.egSYMBOL org.Hs.egENSEMBL
 #' @importFrom AnnotationDbi mappedkeys
 #' @importFrom methods as
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return list of gene names
-get_ncbi_org <- function(scae){
-  ensembl_ids <- rowData(scae)$Ensembl_ID
+#' @return A list of character strings for gene names.
+get_ncbi_org <- function(sce){
+  ensembl_ids <- rowData(sce)$Ensembl_ID
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
   Hs_symbol  <- org.Hs.eg.db::org.Hs.egSYMBOL
@@ -223,15 +227,14 @@ get_ncbi_org <- function(scae){
 #' Internal function used in `SingleCellAlleleExperiment()` constructor as a preprocessing step for
 #' filtering the barcodes and normalizing the count values.
 #'
-#'
-#' @param sce SingleCellExperiment object
-#' @param threshold Counts threshold for barcodes
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
 #'
 #' @importFrom Matrix colSums
 #' @importFrom SingleCellExperiment counts
 #' @importFrom scuttle computeLibraryFactors
 #'
-#' @return filtered and normalized SingleCellExperiment object
+#' @return A SingleCellExperiment object.
 filter_norm <- function(sce, threshold = 0){
 
   filtered  <- sce[, colSums(counts(sce)) > threshold]
@@ -249,12 +252,13 @@ filter_norm <- function(sce, threshold = 0){
 #' Internal function used in `get_allelecounts()` to subsample the quantification assay and only
 #' return the rows specifying allele-quantification information.
 #'
-#' @param sce SingleCellExperiment object
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param exp_type symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
+#' The value `"biomart"` [biomaRt](\code{\link{biomaRt}}) package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
 #'
 #' @importFrom SingleCellExperiment counts
 #'
-#' @return subsample of the scae containing all rows with allele_counts
+#' @return A SingleCellExperiment object.
 find_allele_ids <- function(sce, exp_type){
   a <- switch(exp_type,
               "WTA"      = !grepl("ENS", rownames(counts(sce)), fixed = TRUE),
@@ -272,10 +276,10 @@ find_allele_ids <- function(sce, exp_type){
 #' Internal function used in `get_allelecounts()` to check if an allele identifier cannot be found in the lookup table AND does not have proper nomenclature
 #' form, then the execution of further step and thus the generation of an SingleCellAlleleExperiment object stopped.
 #'
-#' @param sce SingleCellExperiment object
-#' @param find_allele_ids list containing all allele identifiers present in the raw data
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param find_allele_ids A list containing allele identifiers present in the raw data.
 #'
-#' @return stops code execution if condition not met
+#' @return Error message if condition is not met.
 check_unknowns <- function(sce, find_allele_ids){
   names <- find_allele_ids
   #checks if all the identifiers of find_allele_ids have a "*" (nomenclature)
@@ -294,17 +298,17 @@ check_unknowns <- function(sce, find_allele_ids){
 #' Find not yet known allele identifiers
 #'
 #' @description
-#' Internal function used in `get_allelecounts()`to find allele identifier that arent present in the lookup table.
+#' Internal function used in `get_allelecounts()`to find allele identifier that are not present in the lookup table.
 #'
-#' @param scae SingleCellAlleleExperimentobject
-#' @param agene_names list of allele gene names
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param agene_names A list of allele gene names.
 #'
 #' @importFrom SingleCellExperiment counts
 #'
-#' @return list of identifiers that can not be found in the allele lookup table
-find_not_ident <- function(scae, agene_names){
-  #return allele genes that dont start with HLA (not found in lookup table)
-  scae_counts <- counts(get_alleles(scae))
+#' @return A list of character strings of identifiers that can not be found in the allele lookup table.
+find_not_ident <- function(sce, agene_names){
+  #return allele genes that do not start with HLA (not found in lookup table)
+  scae_counts <- counts(get_alleles(sce))
   rownames(scae_counts) <- agene_names
   # This needs to be fixed on the long run, because not all genes with extended information
   # match HLA
@@ -313,14 +317,15 @@ find_not_ident <- function(scae, agene_names){
   not_ids
 }
 
+
 #' Build new substring
 #'
 #' @description
 #' Internal function used in `get_allelecounts()`. Function is used to cut character string at "*" character and return it.
 #'
-#' @param allele_id list of unidentified allele_names that are still in a proper nomenclature form
+#' @param allele_id A list of character strings for unidentified allele_names that have proper [allele-nomenclature](https://hla.alleles.org/nomenclature/index.html).
 #'
-#' @return new identifier with a cut off name to be present in the list of gene_names
+#' @return A list of charcter strings resembling HLA gene names.
 cutname <- function(allele_id){
   id <- allele_id
   # does this work for all alleles?
@@ -335,13 +340,13 @@ cutname <- function(allele_id){
 #' The rownames  of this subassay are already translated to the corresponding allele gene identifier, which
 #' are extracted from the allele lookup table
 #'
-#' @param sce SingleCellExperiment object
-#' @param lookup allele lookup table
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param lookup A data.frame object containing the lookup table.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #'
 #' @importFrom SingleCellExperiment counts
 #'
-#' @return subsample of the sce containing all allele counts with the allele gene identifier as rownames
+#' @return A SingleCellExperiment object.
 get_allelecounts <- function(sce, lookup, exp_type){
 
   allele_ids_lookup <- find_allele_ids(sce, exp_type)
@@ -385,16 +390,16 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #' quantification assay. This subassay contains the allele gene identifiers instead of the allelen identifiers and
 #' sums up the expression counts of alleles that have the same allele gene identifiers.
 #'
-#' @param sce SingleCellExperiment object
-#' @param lookup allele lookup table
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param lookup A data.frame object containing the lookup table.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #'
 #' @importFrom Matrix colSums
 #' @importFrom SummarizedExperiment rowData<- colData<-
 #' @importFrom SingleCellExperiment rowData colData SingleCellExperiment
 #' @importFrom BiocGenerics rbind
 #'
-#' @return adds allele gene-subassay containing summarized count information for the allele genes
+#' @return A SingleCellExperiment object.
 alleles2genes <- function(sce, lookup, exp_type){
   unknown <- FALSE
 
@@ -452,16 +457,16 @@ alleles2genes <- function(sce, lookup, exp_type){
 #' quantification assay. This subassay contains the functional allele classes and
 #' sums up the expression counts of the allele genes that are in the same functional group.
 #'
-#' @param sce SingleCellExperiment object
-#' @param lookup allele lookup table
-#' @param exp_type either `"WTA"` or `"Amplicon"` depending on the used experiments technology
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param lookup A data.frame object containing the lookup table.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment
 #' @importFrom SummarizedExperiment colData<- rowData<-
 #' @importFrom Matrix colSums
 #' @importFrom BiocGenerics rbind
 #'
-#' @return adds functional subassay containing summarized count information for the functional allele classes
+#' @return A SingleCellExperiment object.
 genes2functional <- function(sce, lookup, exp_type){
 
   #find functional classes for each gene
@@ -511,16 +516,16 @@ genes2functional <- function(sce, lookup, exp_type){
 #' Log-transform normalized counts
 #'
 #' @description
-#' Internal function used in the `SingleCellAlleleExperiment()` constructor to log-normalize the raw counts and add them to `logcounts` assay.
+#' Internal function used in the `SingleCellAlleleExperiment()` constructor to log-normalize the raw counts and add them to the \code{\link{logcounts}} assay.
 #'
-#' @param sce SingleCellExperiment object
+#' @param sce A \code{\link{SingleCellExperiment}} object.
 #'
 #' @importFrom scuttle normalizeCounts
 #' @importFrom SingleCellExperiment sizeFactors counts logcounts counts<- logcounts<-
 #' @importFrom SummarizedExperiment assays<- assays
 #' @importFrom DelayedArray DelayedArray
 #'
-#' @return SingleCellAlleleExperiment object with an additional assay containing
+#' @return A SingleCellExperiment object.
 log_transform <- function(sce){
 
   normed_counts <- normalizeCounts(sce,
@@ -549,9 +554,9 @@ log_transform <- function(sce){
 #'
 #' @param path character string input containing the path to the directory containing the
 #'   input files
-#' @param scae SingleCellAlleleExperiment object
-#' @param tag_feature_mtx add text here
-#' @param tag_feature_barcodes add text here
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
+#' @param tag_feature_mtx A character string determining the name of the file containing the sample-tag quantification data.
+#' @param tag_feature_barcodes A character string determining the name of the file containing the sample-tag barcode identifiers.
 #'
 #' @importFrom methods as
 #' @importFrom utils read.table
@@ -560,7 +565,7 @@ log_transform <- function(sce){
 #' @importFrom SummarizedExperiment colData<-
 #' @importFrom SingleCellExperiment colData
 #'
-#' @return updated SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 add_sample_tags <- function(path, scae, tag_feature_mtx, tag_feature_barcodes){
 
   tags  <- Matrix::readMM(paste0(path, tag_feature_mtx, sep = ""))

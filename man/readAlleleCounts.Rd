@@ -22,36 +22,39 @@ readAlleleCounts(
 )
 }
 \arguments{
-\item{samples}{character string input containing the path to the directory containing the input files}
+\item{samples}{A character string determining the path to the directory containing the input files.}
 
-\item{sample_names}{character string for a sample_name identifier}
+\item{sample_names}{A character string for a sample identifier. Can be used to describe the used dataset or sample.}
 
-\item{filter}{character string determining the filter mode. \code{yes} uses the inflection point of the knee plot. \code{no} computes the knee plot and stops funciton execution. \code{custom} allows for setting a custom threshold in \code{filter_threshold}.}
+\item{filter}{A vector containing three character strings that describe different options for filtering. The value \code{"yes"} uses the inflection point of the knee plot to filter out low-quality cells.
+The value \code{"no"} computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
 
-\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
+\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
-\item{symbols}{identifier used to choose which database-function to use for retrieving the ncbi gene names}
+\item{symbols}{A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value \code{"orgdb"} uses the \code{\link{org.Hs.eg.db}} package.
+The value \code{"biomart"} uses the \code{biomaRt} package. Standard value is set to \code{NULL} and is updated to \code{"biomaRt"} during runtime if not specified.}
 
-\item{lookup_file}{character string determining the name of the lookup table file}
+\item{lookup_file}{A character string determining the name of the lookup table file.}
 
-\item{barcode_file}{character string determining the name of the file containing the barcode identifiers}
+\item{barcode_file}{A character string determining the name of the file containing the barcode identifiers.}
 
-\item{gene_file}{character string determining the name of the file containing the feature identifiers}
+\item{gene_file}{A character string determining the name of the file containing the feature identifiers.}
 
-\item{matrix_file}{character string determining the name of the file containing the count matrix}
+\item{matrix_file}{A character string determining the name of the file containing the count matrix.}
 
-\item{tag_feature_mtx}{character string determining the name of the file containing the count matrix of sample tag information}
+\item{tag_feature_mtx}{A character string determining the name of the file containing the sample-tag quantification data.}
 
-\item{tag_feature_barcodes}{character string determining the name of the file containing the barcode identifiers of sample tag information}
+\item{tag_feature_barcodes}{A character string determining the name of the file containing the sample-tag barcode identifiers.}
 
-\item{filter_threshold}{NULL or integer value > 0 used for \code{custom} filtering if \code{filter = "custom"}}
+\item{filter_threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is \code{NULL} when using \code{filter = c("yes", "no")}. Value must be provided when using \code{filter = "custom"}.}
 
-\item{verbose}{FALSE if no info message for runtime should be shown (default), TRUE for runtime information about each step}
+\item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
+Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
 
-\item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples}
+\item{BPPARAM}{A BiocParallelParam object specifying how loading should be parallelized for multiple samples.}
 }
 \value{
-SingleCellAlleleExperiment object
+A SingleCellAlleleExperiment object.
 }
 \description{
 Main read in function for reading in given allele quantification data and

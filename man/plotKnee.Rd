@@ -4,17 +4,17 @@
 \alias{plotKnee}
 \title{Knee plot}
 \usage{
-plotKnee(matrix_file, gene_file, barcode_file)
+plotKnee(matrix, genes, barcodes)
 }
 \arguments{
-\item{matrix_file}{count matrix that was read in in the \code{read_from_sparse_allele()} function}
+\item{matrix}{A sparse \code{\link{Matrix}} object containing the quantification data.}
 
-\item{gene_file}{list with gene identifiers that was read in in the \code{read_from_sparse_allele()} function}
+\item{genes}{A data.frame object containing gene identifiers.}
 
-\item{barcode_file}{list with barcode identifiers that was read in in the \code{read_from_sparse_allele()} function}
+\item{barcodes}{A data.frame object containing barcode identifiers.}
 }
 \value{
-returns a knee plot for determining a count threshold used for filtering out barcodes
+A knee plot about the quantification data.
 }
 \description{
 Creates a knee plot ranking the barcodes according to their total UMI count. The plot is

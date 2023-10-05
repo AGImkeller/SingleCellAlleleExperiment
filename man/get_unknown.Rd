@@ -7,10 +7,10 @@
 get_unknown(scae)
 }
 \arguments{
-\item{scae}{SingleCellAlleleExperiment object}
+\item{scae}{A \code{\link{SingleCellAlleleExperiment}} object.}
 }
 \value{
-subsampled SingleCellAlleleExperiment object
+A SingleCellAlleleExperiment object.
 }
 \description{
 Getter function returning subsampled SCAE object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
@@ -32,8 +32,7 @@ scae <- readAlleleCounts(example_data,
                         matrix_file = "cells_x_genes.mtx",
                         tag_feature_mtx = "cells_x_genes.genes.txt",
                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                        filter_threshold = NULL
-                        )
+                        filter_threshold = NULL)
 
 scae
 

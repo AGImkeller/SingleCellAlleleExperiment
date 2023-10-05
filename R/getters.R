@@ -12,12 +12,12 @@
 #' are
 #' identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return subsampled SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
 #' library(SingleCellAlleleExperiment)
@@ -35,8 +35,8 @@
 #'                         matrix_file = "cells_x_genes.mtx",
 #'                         tag_feature_mtx = "cells_x_genes.genes.txt",
 #'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         filter_threshold = NULL)
+#'
 #'
 #'scae
 #'
@@ -47,7 +47,6 @@
 #'scae_alleles
 #'
 #'rownames(scae_alleles)
-#'
 #'
 #' @export
 get_alleles <- function(scae) {
@@ -64,12 +63,12 @@ get_alleles <- function(scae) {
 #' Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
 #' identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return subsampled SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
 #' library(SingleCellAlleleExperiment)
@@ -87,8 +86,8 @@ get_alleles <- function(scae) {
 #'                         matrix_file = "cells_x_genes.mtx",
 #'                         tag_feature_mtx = "cells_x_genes.genes.txt",
 #'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         filter_threshold = NULL)
+#'
 #'
 #'scae
 #'
@@ -115,12 +114,12 @@ get_agenes <- function(scae) {
 #' Getter function returning subsampled SCAE object with all rows containing non immune gene information. These rows are
 #' identified by "NI" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return subsampled SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
 #' library(SingleCellAlleleExperiment)
@@ -138,8 +137,7 @@ get_agenes <- function(scae) {
 #'                         matrix_file = "cells_x_genes.mtx",
 #'                         tag_feature_mtx = "cells_x_genes.genes.txt",
 #'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         filter_threshold = NULL)
 #'
 #'scae
 #'
@@ -167,12 +165,12 @@ get_nigenes <- function(scae) {
 #' Getter function returning subsampled SCAE object with all rows containing functional class information. These rows are
 #' identified by "I" in rowData(scae)$NI_I and "F" in rowData(scae)$Quant_type.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return subsampled SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
 #' library(SingleCellAlleleExperiment)
@@ -190,8 +188,7 @@ get_nigenes <- function(scae) {
 #'                         matrix_file = "cells_x_genes.mtx",
 #'                         tag_feature_mtx = "cells_x_genes.genes.txt",
 #'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         filter_threshold = NULL)
 #'
 #'scae
 #'
@@ -202,7 +199,6 @@ get_nigenes <- function(scae) {
 #'scae_functional_class
 #'
 #'rownames(scae_functional_class)
-#'
 #'
 #'
 #' @export
@@ -220,12 +216,12 @@ get_func <- function(scae) {
 #' Getter function returning subsampled SCAE object with all rows containing unknown allele information thats present in the data and in the proper nomenclature.
 #' These rows are identified by "I" in rowData(scae)$NI_I and "A_unknown" in rowData(scae)$Quant_type.
 #'
-#' @param scae SingleCellAlleleExperiment object
+#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
 #' @importFrom stats complete.cases
 #' @importFrom SingleCellExperiment rowData
 #'
-#' @return subsampled SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
 #' library(SingleCellAlleleExperiment)
@@ -243,8 +239,7 @@ get_func <- function(scae) {
 #'                         matrix_file = "cells_x_genes.mtx",
 #'                         tag_feature_mtx = "cells_x_genes.genes.txt",
 #'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         filter_threshold = NULL)
 #'
 #'scae
 #'
