@@ -48,7 +48,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   if (verbose){
   rt_scae_lookup_end <- Sys.time()
   diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
-  message(paste("     Generating SCAE (1/5) extending rowData:", diff_rt_scae_lookup, "seconds"))
+  message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
   }
   #####
 
@@ -58,7 +58,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   if (verbose){
   rt_scae_filt_norm_end <- Sys.time()
   diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
-  message(paste("     Generating SCAE (2/5) filtering and normalization:", diff_rt_scae_filt_norm, "seconds"))
+  message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
   }
   #####
 
@@ -68,7 +68,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   if (verbose){
   rt_scae_a2g_end <- Sys.time()
   diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
-  message(paste("     Generating SCAE (3/5) alleles2genes:", diff_rt_scae_a2g, "seconds"))
+  message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
   }
   #####
 
@@ -78,7 +78,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   if (verbose){
   rt_scae_g2f_end <- Sys.time()
   diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
-  message(paste("     Generating SCAE (4/5) genes2functional:", diff_rt_scae_g2f, "seconds"))
+  message("     Generating SCAE (4/5) genes2functional: ", diff_rt_scae_g2f, " seconds")
   }
   #####
 
@@ -88,7 +88,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   if (verbose){
   rt_scae_log_end <- Sys.time()
   diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
-  message(paste("     Generating SCAE (5/5) log_transform:", diff_rt_scae_g2f, "seconds"))
+  message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_g2f, " seconds")
   }
   #####
 
@@ -361,7 +361,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
       new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
       list_alid[[length(list_alid) + 1]] <- new_ids
     }else{
-      message(paste(allele_ids_lookup[i], "can't be found in the lookup table"))
+      message(allele_ids_lookup[i], " can't be found in the lookup table")
       new_ids <- list(cutname(allele_ids_lookup[i]))
       list_alid[[length(list_alid) + 1]] <- new_ids
       unknown <- TRUE
@@ -422,13 +422,14 @@ alleles2genes <- function(sce, lookup, exp_type){
     al_gene[i,] <- uniq_sum
   }
 
-  if (unknown){
+  if (unknown) {
     al_gene <- al_gene[!(rownames(al_gene) %in% not_ids), , drop = FALSE]
-    filtered_rows <- sapply(rownames(rowData(sce)), function(rowname){
+    filtered_rows <- vapply(rownames(rowData(sce)), function(rowname) {
       any(startsWith(rowname, not_ids))
-    })
+    }, logical(1))
     rowData(sce)[filtered_rows, "Quant_type"] <- "A_unknown"
   }
+
 
   al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
                                  colData = colData(sce))

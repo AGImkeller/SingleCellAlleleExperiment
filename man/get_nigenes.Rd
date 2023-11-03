@@ -17,7 +17,6 @@ Getter function returning subsampled SCAE object with all rows containing non im
 identified by "NI" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 }
 \examples{
-library(SingleCellAlleleExperiment)
 
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 

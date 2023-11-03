@@ -17,7 +17,6 @@ Getter function returning subsampled SCAE object with all rows containing functi
 identified by "I" in rowData(scae)$NI_I and "F" in rowData(scae)$Quant_type.
 }
 \examples{
-library(SingleCellAlleleExperiment)
 
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 

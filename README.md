@@ -29,4 +29,5 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 The implemented object follows similar conventions like the `SCE` class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the newly implemented `SCAE` object to perform downstream analysis on immune gene expression. This allows data exploration on functional as well as allele level.
 
 ![alt text here](./inst/extdata/scae_advanced.png)
+
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.

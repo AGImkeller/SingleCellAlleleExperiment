@@ -44,7 +44,6 @@
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
@@ -102,7 +101,6 @@
 #'                         )
 #'
 #' scae_custom_filter
-#'
 #'
 #'
 #' @export
@@ -191,7 +189,7 @@ readAlleleCounts <- function (samples,
   if (verbose){
   rt_one_readin_end <- Sys.time()
   diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits = 2)
-  message(paste("Runtime check (1/2) Read_in:",      diff_rt_one, "seconds"))
+  message("Runtime check (1/2) Read_in: ",      diff_rt_one, " seconds")
   }
   #####
 
@@ -211,7 +209,7 @@ readAlleleCounts <- function (samples,
     if (verbose){
     rt_six_scae_end <- Sys.time()
     diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
-      message(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six, "seconds"))
+      message("     Generating SCAE (6/X) adding sample tags: ", diff_rt_six, " seconds")
     }
     #####
   }
@@ -220,9 +218,9 @@ readAlleleCounts <- function (samples,
   if (verbose){
   rt_two_scae_end <- Sys.time()
   diff_rt_two <- round(rt_two_scae_end - rt_two_scae_start, digits = 2)
-  message(paste("Runtime check (2/2) Generating SCAE completed:",    diff_rt_two, "seconds"))
+  message("Runtime check (2/2) Generating SCAE completed: ",    diff_rt_two, " seconds")
   diff_rt_total <- rt_two_scae_end - rt_one_readin_start
-  message(paste("Total runtime, completed read_in, filtering and normalization and generating scae object",       ceiling(diff_rt_total), "seconds"))
+  message("Total runtime, completed read_in, filtering and normalization and generating scae object ",       ceiling(diff_rt_total), " seconds")
   }
   #####
 

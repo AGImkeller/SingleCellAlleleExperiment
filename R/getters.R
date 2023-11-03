@@ -20,7 +20,6 @@
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
@@ -71,7 +70,6 @@ get_alleles <- function(scae) {
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
@@ -122,7 +120,6 @@ get_agenes <- function(scae) {
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
@@ -173,7 +170,6 @@ get_nigenes <- function(scae) {
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
@@ -224,7 +220,6 @@ get_func <- function(scae) {
 #' @return A SingleCellAlleleExperiment object.
 #'
 #' @examples
-#' library(SingleCellAlleleExperiment)
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'

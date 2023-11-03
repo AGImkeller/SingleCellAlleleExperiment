@@ -17,7 +17,6 @@ Getter function returning subsampled SCAE object with all rows containing unknow
 These rows are identified by "I" in rowData(scae)$NI_I and "A_unknown" in rowData(scae)$Quant_type.
 }
 \examples{
-library(SingleCellAlleleExperiment)
 
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 

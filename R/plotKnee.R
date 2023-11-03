@@ -25,7 +25,6 @@
 #' @importFrom S4Vectors metadata
 #'
 #' @return A knee plot about the quantification data.
-#' @export
 plotKnee <- function(matrix, genes, barcodes){
 
   barcodes <- barcodes
@@ -53,7 +52,7 @@ plotKnee <- function(matrix, genes, barcodes){
         annotate("text", x = 2, y = S4Vectors::metadata(br_out)$knee * 1.2, label = "knee", color = "dodgerblue") +
         annotate("text", x = 2.25, y = S4Vectors::metadata(br_out)$inflection * 1.2, label = "inflection", color = "forestgreen") +
         theme_bw()
-  print(gg)
+  suppressWarnings(print(gg))
 
   inflection_p <- S4Vectors::metadata(br_out)$inflection
   return(inflection_p)

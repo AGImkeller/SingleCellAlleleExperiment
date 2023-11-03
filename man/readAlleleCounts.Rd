@@ -70,7 +70,6 @@ Expected naming scheme of the files from the data generating method:
 File identifiers can be specifically stated if the identifiers are different.
 }
 \examples{
-library(SingleCellAlleleExperiment)
 
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 
@@ -128,7 +127,6 @@ scae_custom_filter <- readAlleleCounts(example_data,
                         )
 
 scae_custom_filter
-
 
 
 }
