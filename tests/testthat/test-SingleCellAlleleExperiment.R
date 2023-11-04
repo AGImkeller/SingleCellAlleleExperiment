@@ -9,10 +9,6 @@ barcode_loc <- system.file("extdata", "cells_x_genes.barcodes.txt", package = "S
 feature_loc <- system.file("extdata", "cells_x_genes.genes.txt", package = "SingleCellAlleleExperiment")
 matrix_loc <- system.file("extdata", "cells_x_genes.mtx", package = "SingleCellAlleleExperiment")
 
-#barcode_loc <- file.path(dir_path, "cells_x_genes.barcodes.txt")
-#feature_loc <- file.path(dir_path, "cells_x_genes.genes.txt")
-#matrix_loc  <- file.path(dir_path, "cells_x_genes.mtx")
-
 feature_info <- utils::read.delim(feature_loc, header = FALSE)
 cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
 mat          <- t(Matrix::readMM(matrix_loc))
@@ -53,37 +49,4 @@ test_that("colnames and colData check", {
   #check the dimension
   expect_equal(length(cell_names$V1), length(colnames(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])))
 })
-
-#library(DelayedArray)
-
-#mat <- DelayedArray(mat)
-#str(mat)
-
-#mat
-
-#DelayedArray()
-#str(mat)
-#str(counts(scae)[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])
-
-#counts(scae)[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),]
-
-#counts(scae)[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),]
-#test_that("colnames and colData check", {
-
-  #transform the raw matrix into DelayedArray object and add row- and colnames
- # rownames(mat) <- feature_info$V1
-  #colnames(mat) <- cell_names$V1
-  #mat <- DelayedArray(mat)
-
-  #check the quant matrix
-  #expect_equal(mat, counts(scae)[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])
-#})
-
-#TODO maybe test if the test is faster when both matrices are written as CsparseMatrix
-# Test with DelayedArray takes a lot of time
-#mat <- as(mat, "CsparseMatrix")
-#str(mat)
-
-
-
 

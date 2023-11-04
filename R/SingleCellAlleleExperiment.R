@@ -220,7 +220,6 @@ get_ncbi_org <- function(sce){
 #-2------------------barcode filtering and normalization-----------------------#
 
 #####
-
 #' Preprocessing
 #'
 #' @description
@@ -316,7 +315,6 @@ find_not_ident <- function(sce, agene_names){
 
   not_ids
 }
-
 
 #' Build new substring
 #'
