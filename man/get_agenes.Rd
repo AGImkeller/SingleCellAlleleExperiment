@@ -7,12 +7,41 @@
 get_agenes(scae)
 }
 \arguments{
-\item{scae}{SingleCellAlleleExperiment object}
+\item{scae}{A \code{\link{SingleCellAlleleExperiment}} object.}
 }
 \value{
-subsampled SingleCellAlleleExperiment object
+A SingleCellAlleleExperiment object.
 }
 \description{
 Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
 identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+}
+\examples{
+
+example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+
+scae <- readAlleleCounts(example_data,
+                        sample_names = "example_data",
+                        filter = "yes",
+                        symbols = "orgdb",
+                        exp_type = "WTA",
+                        lookup_file = "lookup_table_HLA_only.csv",
+                        barcode_file = "cells_x_genes.barcodes.txt",
+                        gene_file = "cells_x_genes.genes.txt",
+                        matrix_file = "cells_x_genes.mtx",
+                        tag_feature_mtx = "cells_x_genes.genes.txt",
+                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                        filter_threshold = NULL)
+
+
+scae
+
+rownames(get_agenes(scae))
+
+scae_immune_genes <- get_agenes(scae)
+
+scae_immune_genes
+
+rownames(scae_immune_genes)
+
 }

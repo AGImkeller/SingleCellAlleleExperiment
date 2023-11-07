@@ -13,19 +13,18 @@ read_from_sparse_allele(
 )
 }
 \arguments{
-\item{path}{character string input containing the path to the directory containing the
-input files}
+\item{path}{A character string determining the path to the directory containing the input files.}
 
-\item{exp_type}{either \code{WTA} or \code{Amplicon} depending on the used experiments technology}
+\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
-\item{barcode_file}{add text here}
+\item{barcode_file}{A character string determining the name of the file containing the sample-tag quantification data.}
 
-\item{gene_file}{add text here}
+\item{gene_file}{A character string determining the name of the file containing the feature identifiers.}
 
-\item{matrix_file}{add text here}
+\item{matrix_file}{A character string determining the name of the file containing the count matrix.}
 }
 \value{
-list with the read_in data sorted into different slots
+A list with three data.frames containing the input data information.
 }
 \description{
 Internal function used in \code{readAlleleCounts()} that reads in the data stated in the given directory path.

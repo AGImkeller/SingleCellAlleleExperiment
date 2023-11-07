@@ -46,12 +46,12 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 
 The implemented object follows similar conventions like the `SCE` class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the newly implemented `SCAE` object to perform downstream analysis on immune gene expression. This allows data exploration on functional as well as allele level.
 
-![alt text here](./inst/extdata/scae_advanced.png)
+![alt text here](../inst/extdata/scae_advanced.png)
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
 ## Expected input
 
-The read in function of the SCAE package `readAlleleCounts` expects specific files and file identifiers.
+The read in function of the SCAE package `readAlleleCounts()` expects specific files and file identifiers.
 The stated input directory should contain the following files:
 
   - cells_x_genes.barcodes.txt  (list of barcodes/cell identifiers)
@@ -59,6 +59,8 @@ The stated input directory should contain the following files:
   - cells_x_genes.mtx           (Contains the quantification matrix)
   - lookup_table.csv            (Info for generating multiple data layers)
     
+
+These identifiers are set as standard values, but can be changed in the corresponding parameters of the `readAlleleCounts()` function in case they are different.
 
 The used dataset for later downstream analysis and testing of the functionalities of the multi-layer object is a dual-center, two-cohort study where whole blood and peripheral blood mononuclear cells underwent scRNA-sequencing. The whole transcriptome dataset is under controlled access and not for public use. The corresponding publication *Severe COVID-19 Is Marked by a Dysregulated Myeloid Cell Compartment* can be found [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7405822/).
 
@@ -70,12 +72,9 @@ The following packages are abundant for performing the downstream analysis and v
 library(SingleCellAlleleExperiment)
 library(scran)
 library(scater)
-library(gridExtra)
 library(tidyverse)
 library(patchwork)
-library(cowplot)
 library(ggplot2)
-library(viridis)
 ```
 
 
@@ -86,10 +85,9 @@ library(viridis)
 First the directory path is stated. The directory should contain all expected files.
 
 ```{r}
-dir_path <- "../inst/extdata"
-list.files("../inst/extdata")
+dir_path <- system.file("extdata", package = "SingleCellAlleleExperiment")
+list.files(dir_path)
 ```
-
 
 ## Generate SingleCellAlleleExperiment object
 
@@ -97,15 +95,61 @@ SCAE objects implements the same object architecture as SCE objects. When readin
 allele counts, the method by default filters cells from a knee-plot inflection point.
 Alternatively, manual filter settings can be provided.
 
+The `filter` parameter of the `readAlleleCounts` function gives multiple options on how to perform filtering on the cells. The valid parameter options are given as `filter = c("yes", "no", "custom")`. Setting `filter = "yes"` automatically filters the cells on the inflection point that is computed on a knee plot. `filter = "no"` only shows the knee plot without generating a full SCAE object. This mode could be used prior to using `filter = "custom"`, where the user can give a custom threshold for manually filtering out cells in the `filter_threshold` parameter.
 
-```{r}
+Additionally the `verbose` parameter gives an option to toggle runtime-information for the different steps during object generation, which is printed to the console. Messages regarding the filtering process (inflection point threshold) won't be toggled off if `verbose = FALSE`.
+
+The three different modes for filtering and creating a SCAE object are shown in the following code-chunks:
+
+<hr>
+
+Only show the knee plot without generating a SCAE object. All function parameters are shown. Information messages (`verbose = FALSE`) are turned off.
+
+```{r warning=FALSE}
 scae <- readAlleleCounts(dir_path,
-                         sample.names = "EGA_WTA",
-                         filter = TRUE,
+                         sample_names = "example_data",
+                         filter = "no",
+                         symbols = "orgdb",
                          exp_type = "WTA",
-                         symbols = "biomart")
+                         lookup_file = "lookup_table_HLA_only.csv",
+                         barcode_file = "cells_x_genes.barcodes.txt",
+                         gene_file = "cells_x_genes.genes.txt",
+                         matrix_file = "cells_x_genes.mtx",
+                         tag_feature_mtx = "cells_x_genes.genes.txt",
+                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                         filter_threshold = NULL,
+                         verbose = FALSE)
+```
+<br>
+
+Read in and automatic filtering mode, generating a SCAE object. Filtering performed on the computed inflection point on the knee plot.
+
+```{r warning=FALSE}
+scae <- readAlleleCounts(dir_path,
+                         sample_names = "example_data",
+                         filter = "yes",
+                         symbols = "orgdb",
+                         exp_type = "WTA",
+                         verbose = TRUE)
 scae
 ```
+
+<br>
+
+Read in and custom filtering mode, generating a SCAE object. Filtering performed on the threshold stated in the `filter_threshold` parameter.
+
+```{r warning=FALSE}
+#this is the object used in the further workflow
+scae <- readAlleleCounts(dir_path,
+                         sample_names = "example_data",
+                         filter = "custom",
+                         symbols = "orgdb",
+                         exp_type = "WTA",
+                         filter_threshold = 105,
+                         verbose = FALSE)
+scae
+```
+
 
 ### RowData slot
 
@@ -169,6 +213,7 @@ head(rownames(get_func(scae)))
 
 <br>
 
+<hr>
 
 # Expression evaluation
 
@@ -195,11 +240,9 @@ The non-imune genes are combined with each of the integrated immune gene allele-
 ### Non-immune genes + alleles
 
 ```{r}
-redim_scae <- scae
+scae_ni_a <- scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))), ]
 
-ni_a <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_alleles(redim_scae))), ]
-
-ni_a
+scae_ni_a
 ```
 
 <br>
@@ -207,9 +250,9 @@ ni_a
 ### Non-immune genes + immune genes
 
 ```{r}
-ni_g <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_agenes(redim_scae))), ]
+scae_ni_g <- scae[c(rownames(get_nigenes(scae)), rownames(get_agenes(scae))), ]
 
-ni_g
+scae_ni_g
 ```
 
 <br>
@@ -217,9 +260,9 @@ ni_g
 ### Non-immune genes + functional class
 
 ```{r}
-ni_f <- redim_scae[c(rownames(get_nigenes(redim_scae)), rownames(get_func(redim_scae))), ]
+scae_ni_f <- scae[c(rownames(get_nigenes(scae)), rownames(get_func(scae))), ]
 
-ni_f
+scae_ni_f
 ```
 
 
@@ -231,17 +274,17 @@ ni_f
 Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are part from the `r Biocpkg("scran")` package. Compute a list of HVGs for each data layer. Return the top 0.1 % HVGs per layer using `getTopHVGs`.
 
 ```{r}
-df_ni_a <- modelGeneVar(ni_a)
+df_ni_a <- modelGeneVar(scae_ni_a)
 top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
 ```
 
 ```{r}
-df_ni_g <- modelGeneVar(ni_g)
+df_ni_g <- modelGeneVar(scae_ni_g)
 top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
 ```
 
 ```{r}
-df_ni_f <- modelGeneVar(ni_f)
+df_ni_f <- modelGeneVar(scae_ni_f)
 top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
 ```
 
@@ -252,13 +295,13 @@ Compute PCA for each layer and store the results in the object. Its Important to
 ```{r}
 
 set.seed(18)
-redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_a, exprs_values = "logcounts", name = "PCA_a")
-redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_g, exprs_values = "logcounts", name = "PCA_g")
-redim_scae <- runPCA(redim_scae, ncomponents = 10, subset_row = top_ni_f, exprs_values = "logcounts", name = "PCA_f")
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_a, exprs_values = "logcounts", name = "PCA_a")
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_g, exprs_values = "logcounts", name = "PCA_g")
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_f, exprs_values = "logcounts", name = "PCA_f")
 ```
 
 ```{r}
-reducedDimNames(redim_scae)
+reducedDimNames(scae)
 ```
 
 ### t-SNE
@@ -267,73 +310,76 @@ The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg(
 
 ```{r}
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_a",  name = "TSNE_a")
+scae <- runTSNE(scae, dimred= "PCA_a",  name = "TSNE_a")
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_g",  name = "TSNE_g")
+scae <- runTSNE(scae, dimred= "PCA_g",  name = "TSNE_g")
 set.seed(18)
-redim_scae <- runTSNE(redim_scae, dimred= "PCA_f",  name = "TSNE_f")
+scae <- runTSNE(scae, dimred= "PCA_f",  name = "TSNE_f")
 
 ```
 
 List of results from the performed reduced dimension analysis. 
 
 ```{r}
-reducedDimNames(redim_scae)
+reducedDimNames(scae)
 ```
 
+<hr>
 
 ## Visualization
 
 Exemplary visualization for the t-SNE results on gene level for immune genes that relate to HLA-class I. In the given dataset, these are the immune genes `HLA-A`, `HLA-B` and `HLA-C` plotted alongside their alleles. This allows for insights into potential genetic differences shown on allele-level.
 
----
 
 ### HLA-A immune gene and alleles
 
 ```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
-#determining which t-SNE (perplexity) to choose for all visualizations
 which_tsne <- "TSNE_g"
 
 #EGA_hla_a_alleles
-tsne_g_a  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-A") + ggtitle("HLA-A gene")
-tsne_g_a1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*02:01:01:01") + ggtitle("Allele A*02:01:01:01")
-tsne_g_a2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "A*26:01:01:01") + ggtitle("Allele A*26:01:01:01")
+tsne_g_a  <- plotReducedDim(scae, dimred = which_tsne, colour_by = "HLA-A") + ggtitle("HLA-A gene")
+tsne_g_a1 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "A*02:01:01:01") + ggtitle("Allele A*02:01:01:01")
+tsne_g_a2 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "A*26:01:01:01") + ggtitle("Allele A*26:01:01:01")
 
 p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
 
 p2
 ```
 
----
 
 ### HLA-B immune gene and alleles
 
 ```{r fig4, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
 
-tsne_g_b  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-B") + ggtitle("HLA-B gene")
-tsne_g_b1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*51:01:01:01") + ggtitle("Allele B*51:01:01:01")
-tsne_g_b2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "B*57:01:01:01") + ggtitle("Allele B*57:01:01:01")
+tsne_g_b  <- plotReducedDim(scae, dimred = which_tsne, colour_by = "HLA-B") + ggtitle("HLA-B gene")
+tsne_g_b1 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "B*51:01:01:01") + ggtitle("Allele B*51:01:01:01")
+tsne_g_b2 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "B*57:01:01:01") + ggtitle("Allele B*57:01:01:01")
 
 p3 <- tsne_g_b  + tsne_g_b1 + tsne_g_b2
 
 p3
 ```
 
----
 
 ### HLA-C immune gene and alleles
 
 ```{r fig5, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
 
 #EGA_hla_c_alleles 
-tsne_g_g  <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "HLA-C") + ggtitle("HLA-C gene")
-tsne_g_c1 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*04:01:01:01") + ggtitle("Allele C*04:01:01:01")
-tsne_g_c2 <- plotReducedDim(redim_scae, dimred = which_tsne, colour_by = "C*06:02:01:01") + ggtitle("Allele C*06:02:01:01")
+tsne_g_g  <- plotReducedDim(scae, dimred = which_tsne, colour_by = "HLA-C") + ggtitle("HLA-C gene")
+tsne_g_c1 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "C*04:01:01:01") + ggtitle("Allele C*04:01:01:01")
+tsne_g_c2 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "C*06:02:01:01") + ggtitle("Allele C*06:02:01:01")
 
 p1 <- tsne_g_g  + tsne_g_c1 + tsne_g_c2 
 
 p1
 ```
+
+<hr>
+
+# Additional
+
+As the SCAE object is extending the SCE object, it is also compatible with the `r Biocpkg("iSEE")` package for interactive data exploration.
 
 
 # Session Information

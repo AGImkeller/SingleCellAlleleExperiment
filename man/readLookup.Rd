@@ -7,14 +7,14 @@
 readLookup(path, exp_type, lookup_file)
 }
 \arguments{
-\item{path}{file path of the directory containing the input files as character string}
+\item{path}{A character string determining the path to the directory containing the input files.}
 
-\item{exp_type}{either "WTA" or "Amplicon" depending on the used experiments technology}
+\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
-\item{lookup_file}{add text here}
+\item{lookup_file}{A character string determining the name of the lookup table file.}
 }
 \value{
-lookup table
+A data.frame containing a representation of the lookup table.
 }
 \description{
 Internal function used in \code{readAlleleCounts()} to read in the allele lookup table.

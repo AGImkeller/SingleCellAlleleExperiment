@@ -11,37 +11,102 @@
 #' @description
 #' Main read in function for reading in given allele quantification data and
 #' loading the data into an `SingleCellAlleleExperiment` object. Input data are stored in a shared folder.
-#' Expected naming scheme of the files:
+#' Expected naming scheme of the files from the data generating method:
 #'
-#'    * quantification matrix: `matrix.mtx`
-#'    * barcode information: `barcodes.txt`
-#'    * feature information: `features.txt`
+#'    * quantification matrix: `cells_x_genes.mtx`
+#'    * barcode information: `cells_x_genes.barcodes.txt`
+#'    * feature information: `cells_x_genes.genes.txt`
 #'    * allele lookup table: `lookup_table_HLA_only`
 #'
-#' @param samples character string input containing the path to the directory containing the
-#'   input files
-#' @param sample_names character string for a sample_name identifier
-#' @param filter character string determining the filter mode. `yes` uses the inflection point of the knee plot. `no` computes the knee plot and stops funciton execution. `custom` allows for setting a custom threshold in `filter_threshold`.
-#' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples
-#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
-#' @param symbols identifier used to choose which database-function to use for retrieving the ncbi gene names
-#' @param lookup_file character string determining the name of the lookup table file
-#' @param barcode_file character string determining the name of the file containing the barcode identifiers
-#' @param gene_file character string determining the name of the file containing the feature identifiers
-#' @param matrix_file character string determining the name of the file containing the count matrix
-#' @param tag_feature_mtx character string determining the name of the file containing the count matrix of sample tag information
-#' @param tag_feature_barcodes character string determining the name of the file containing the barcode identifiers of sample tag information
-#' @param filter_threshold NULL or integer value > 0 used for `custom` filtering if `filter = "custom"`
+#' File identifiers can be specifically stated if the identifiers are different.
+#'
+#' @param samples A character string determining the path to the directory containing the input files.
+#' @param sample_names A character string for a sample identifier. Can be used to describe the used dataset or sample.
+#' @param filter A vector containing three character strings that describe different options for filtering. The value `"yes"` uses the inflection point of the knee plot to filter out low-quality cells.
+#' The value `"no"` computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value `"custom"` allows for setting a custom threshold in the `filter_threshold` parameter.
+#' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
+#' The value `"biomart"` uses the `biomaRt` package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
+#' @param lookup_file A character string determining the name of the lookup table file.
+#' @param barcode_file A character string determining the name of the file containing the barcode identifiers.
+#' @param gene_file A character string determining the name of the file containing the feature identifiers.
+#' @param matrix_file A character string determining the name of the file containing the count matrix.
+#' @param tag_feature_mtx A character string determining the name of the file containing the sample-tag quantification data.
+#' @param tag_feature_barcodes A character string determining the name of the file containing the sample-tag barcode identifiers.
+#' @param filter_threshold An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is `NULL` when using `filter = c("yes", "no")`. Value must be provided when using `filter = "custom"`.
+#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
+#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
 #'
-#' @return SingleCellAlleleExperiment object
+#' @return A SingleCellAlleleExperiment object.
+#'
+#' @examples
+#'
+#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#'
+#'
+#' # preflight mode, not generating an SCAE object
+#' # used for quality-assessment by plotting the knee plot
+#' scae_preflight <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "no",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL
+#'                         )
+#'
+#'
+#' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
+#' scae_filtered <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "yes",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = NULL,
+#'                         verbose = TRUE
+#'                         )
+#'
+#' scae_filtered
+#'
+#'
+#' # custom filtering mode, setting up a custom filter threshold for filtering out
+#' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
+#' scae_custom_filter <- readAlleleCounts(example_data,
+#'                         sample_names = "example_data",
+#'                         filter = "custom",
+#'                         symbols = "orgdb",
+#'                         exp_type = "WTA",
+#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         barcode_file = "cells_x_genes.barcodes.txt",
+#'                         gene_file = "cells_x_genes.genes.txt",
+#'                         matrix_file = "cells_x_genes.mtx",
+#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
+#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         filter_threshold = 105
+#'                         )
+#'
+#' scae_custom_filter
+#'
 #'
 #' @export
 readAlleleCounts <- function (samples,
                               sample_names = names(samples),
-                              filter = c("yes", "no", "custom" ),
+                              filter = c("yes", "no", "custom"),
                               exp_type = c("WTA", "Amplicon"),
                               symbols = NULL,
                               lookup_file = "lookup_table_HLA_only.csv",
@@ -51,6 +116,7 @@ readAlleleCounts <- function (samples,
                               tag_feature_mtx = "cells_x_features.mtx",
                               tag_feature_barcodes = "cells_x_features.barcodes.txt",
                               filter_threshold = NULL,
+                              verbose = FALSE,
                               BPPARAM = BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
@@ -69,7 +135,6 @@ readAlleleCounts <- function (samples,
   if (filter == "custom" & is.null(filter_threshold)) {
     stop("For custom filtering you need to state a integer value >0 in the 'filter_threshold' parameter.")
   }
-
 
   #reading in files
   load_out <- BiocParallel::bplapply(samples,
@@ -104,15 +169,14 @@ readAlleleCounts <- function (samples,
   #preflight mode, only for plotting the knee plots
   if (filter == "no"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
-    cat("suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
-    stop()
+    cat("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
+    return()
   }
 
   #filtering on the inflection point shown in the advanced knee plot
   if (filter == "yes"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
     cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.\n")
-
   }
 
   #putting a custom filter threshold
@@ -122,9 +186,11 @@ readAlleleCounts <- function (samples,
 
 
   #####
+  if (verbose){
   rt_one_readin_end <- Sys.time()
-  diff_rt_one <- rt_one_readin_end - rt_one_readin_start
-  print(paste("Runtime check (1/2) Read_in:",      diff_rt_one))
+  diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits = 2)
+  message("Runtime check (1/2) Read_in: ",      diff_rt_one, " seconds")
+  }
   #####
 
   rt_two_scae_start <- Sys.time()
@@ -134,26 +200,33 @@ readAlleleCounts <- function (samples,
                                     threshold = inflection_threshold,
                                     exp_type = exp_type,
                                     symbols = symbols,
-                                    lookup = lookup)
+                                    lookup = lookup,
+                                    verbose = verbose)
   if (exp_type == "Amplicon"){
     rt_six_scae_start <- Sys.time()
     sce <- add_sample_tags(samples, sce, tag_feature_mtx, tag_feature_barcodes)
     #####
+    if (verbose){
     rt_six_scae_end <- Sys.time()
-    diff_rt_six <- rt_six_scae_end - rt_six_scae_start
-    print(paste("     Generating SCAE (6/X) adding sample tags:", diff_rt_six))
+    diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
+      message("     Generating SCAE (6/X) adding sample tags: ", diff_rt_six, " seconds")
+    }
     #####
   }
 
   #####
+  if (verbose){
   rt_two_scae_end <- Sys.time()
-  diff_rt_two <- rt_two_scae_end - rt_two_scae_start
-  print(paste("Runtime check (2/2) Generating SCAE completed:",     diff_rt_two))
+  diff_rt_two <- round(rt_two_scae_end - rt_two_scae_start, digits = 2)
+  message("Runtime check (2/2) Generating SCAE completed: ",    diff_rt_two, " seconds")
   diff_rt_total <- rt_two_scae_end - rt_one_readin_start
-  print(paste("Total runtime, completed read_in, filtering and normalization and generating scae object",     diff_rt_total))
+  message("Total runtime, completed read_in, filtering and normalization and generating scae object ",       ceiling(diff_rt_total), " seconds")
+  }
   #####
+
   return(sce)
 }
+
 
 # Inspired from https://github.com/MarioniLab/DropletUtils/blob/devel/R/read10xCounts.R
 #' Reading in allele-aware quantification data
@@ -161,24 +234,23 @@ readAlleleCounts <- function (samples,
 #' @description
 #' Internal function used in `readAlleleCounts()` that reads in the data stated in the given directory path.
 #'
-#'
-#' @param path character string input containing the path to the directory containing the
-#' input files
-#' @param exp_type either `WTA` or `Amplicon` depending on the used experiments technology
-#' @param barcode_file character string determining the name of the file containing the barcode identifiers
-#' @param gene_file character string determining the name of the file containing the feature identifiers
-#' @param matrix_file character string determining the name of the file containing the count matrix
+#' @param path A character string determining the path to the directory containing the input files.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param barcode_file A character string determining the name of the file containing the sample-tag quantification data.
+#' @param gene_file A character string determining the name of the file containing the feature identifiers.
+#' @param matrix_file A character string determining the name of the file containing the count matrix.
 #'
 #' @importFrom utils read.delim read.csv
 #' @importFrom Matrix readMM t
 #'
-#' @return list with the read_in data sorted into different slots
+#'
+#' @return A list with three data.frames containing the input data information.
 read_from_sparse_allele <- function(path,
                                     exp_type = exp_type,
                                     barcode_file,
                                     gene_file,
                                     matrix_file){
-  # this needs to be provided as an input argument, not hardcoded
+
   barcode_loc <- file.path(path, barcode_file)
   feature_loc <- file.path(path, gene_file)
   matrix_loc  <- file.path(path, matrix_file)
@@ -189,7 +261,7 @@ read_from_sparse_allele <- function(path,
 
 
   # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
-  possible_names <- c("Ensembl.ID", "Symbol")
+  possible_names <- c("Ensembl_ID", "Symbol")
 
   if (exp_type == "WTA"){
     colnames(feature_info) <- possible_names[1]
@@ -207,13 +279,13 @@ read_from_sparse_allele <- function(path,
 #' @description
 #' Internal function used in `readAlleleCounts()` to read in the allele lookup table.
 #'
-#' @param path file path of the directory containing the input files as character string
-#' @param exp_type either "WTA" or "Amplicon" depending on the used experiments technology
-#' @param lookup_file character string determining the name of the lookup table file
+#' @param path A character string determining the path to the directory containing the input files.
+#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param lookup_file A character string determining the name of the lookup table file.
 #'
 #' @importFrom utils read.csv
 #'
-#' @return lookup table
+#' @return A data.frame containing a representation of the lookup table.
 readLookup <- function(path, exp_type, lookup_file){
     lookup_loc <- file.path(path, lookup_file)
     lookup <- utils::read.csv(lookup_loc)

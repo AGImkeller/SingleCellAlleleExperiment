@@ -4,17 +4,17 @@
 \alias{plotKnee}
 \title{Knee plot}
 \usage{
-plotKnee(matrix_file, genes_file, barcodes_file)
+plotKnee(matrix, genes, barcodes)
 }
 \arguments{
-\item{matrix_file}{file path of the directory containing the input files as character string}
+\item{matrix}{A sparse \code{\link{Matrix}} object containing the quantification data.}
 
-\item{genes_file}{file path of the directory containing the input files as character string}
+\item{genes}{A data.frame object containing gene identifiers.}
 
-\item{barcodes_file}{file path of the directory containing the input files as character string}
+\item{barcodes}{A data.frame object containing barcode identifiers.}
 }
 \value{
-returns a knee plot for determining a count threshold used for filtering out barcodes
+A knee plot about the quantification data.
 }
 \description{
 Creates a knee plot ranking the barcodes according to their total UMI count. The plot is
