@@ -2,6 +2,7 @@
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
 author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
+  email: "AG.imkeller@gmail.com"
 output: 
    BiocStyle::html_document:
     toc: true
@@ -42,7 +43,18 @@ and thus allows data analysis across these immunologically relevant different la
 
 The `SingleCellAlleleExperiment (SCAE)` class is a container for storing and handling allele-aware quantification data for immune genes. The SCAE class is derived from the `SingleCellExperiment (SCE)` class and uses the same overall object architecture. However, multiple data layers are integrated into the object during object generation. During object generation, the allele information is aggregated into two additional data layers via an ontology based design principle and appended to the initial raw data using a lookup table. Thus the final `SCAE` object contains quantification of all classical genes ("non-immune genes") and additionally a multi-layer representation of a set of genes of interest (e.g. "immune genes" such as HLAs, Igs, KIRs). For these genes of interest, the quantification is stored on the levels of alleles, genes, and functionally similar groups of genes (refer to Figure 1). 
 
-For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be combined into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be combined into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database and other immunogenetic databases. 
+For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that are present in the raw input data will be combined into the `HLA-A` immune gene layer. Next, all counts for the present HLA-class I immune genes will be combined into the `HLA-class I` functional class layer. The information necessary to perform these transformations is saved in a lookup table retrieved from the IPD-IMGT/HLA database and other immunogenetic databases.
+
+The structure of the lookup table that is used for aggregating the allele information into an immune gene layer and from there into functional class layer is as follows:
+
+| Allele         | Gene     | Function      |
+| -------------- |:--------:|:------------: |
+| A*01:01:01     | HLA-A    | HLA class I   |
+| A*01:01:01     | HLA-A    | HLA class I   |
+| ...            | ...      | ...           |
+| DRB1*01:01:01  | HLA-DRB1 | HLA class II  |
+
+<hr>
 
 The implemented object follows similar conventions like the `SCE` class, where rows should represent features (genes, transcripts) and columns should represent cells. Established single cell packages like `r Biocpkg("scater")` and `r Biocpkg("scran")` can be used with the newly implemented `SCAE` object to perform downstream analysis on immune gene expression. This allows data exploration on functional as well as allele level.
 
@@ -86,7 +98,7 @@ First the directory path is stated. The directory should contain all expected fi
 
 ```{r}
 dir_path <- system.file("extdata", package = "SingleCellAlleleExperiment")
-list.files(dir_path)
+list.files(dir_path)[1:4]
 ```
 
 ## Generate SingleCellAlleleExperiment object

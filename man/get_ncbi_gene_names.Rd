@@ -4,10 +4,10 @@
 \alias{get_ncbi_gene_names}
 \title{Get NCBI genes using biomaRt}
 \usage{
-get_ncbi_gene_names(ensembl_ids)
+get_ncbi_gene_names(sce)
 }
 \arguments{
-\item{ensembl_ids}{A vector containing character strings for ensemble gene identifiers.}
+\item{sce}{A \code{\link{SingleCellExperiment}} object.}
 }
 \value{
 A vector containing character strings for NCBI gene names.

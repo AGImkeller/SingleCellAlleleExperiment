@@ -9,8 +9,7 @@
 #'
 #' @description
 #' Getter function returning subsampled SCAE object with all rows containing raw allele information. These rows
-#' are
-#' identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
+#' are identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
 #'
 #' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
@@ -146,7 +145,6 @@ get_agenes <- function(scae) {
 #'
 #'rownames(scae_non_immune_genes)
 #'
-#'
 #' @export
 get_nigenes <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
@@ -195,7 +193,6 @@ get_nigenes <- function(scae) {
 #'scae_functional_class
 #'
 #'rownames(scae_functional_class)
-#'
 #'
 #' @export
 get_func <- function(scae) {

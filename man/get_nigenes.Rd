@@ -43,5 +43,4 @@ scae_non_immune_genes
 
 rownames(scae_non_immune_genes)
 
-
 }

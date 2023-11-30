@@ -13,5 +13,6 @@ cutname(allele_id)
 A list of charcter strings resembling HLA gene names.
 }
 \description{
-Internal function used in \code{get_allelecounts()}. Function is used to cut character string at "*" character and return it.
+Internal function used in \code{get_allelecounts()}. Function is used to cut character string at "*" character and return it. Only used to cut the names
+if unknown alleles, as the lookup table does not provide any corresponding immune gene name.
 }
