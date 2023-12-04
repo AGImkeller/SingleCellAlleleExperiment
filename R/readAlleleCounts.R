@@ -169,14 +169,14 @@ readAlleleCounts <- function (samples,
   #preflight mode, only for plotting the knee plots
   if (filter == "no"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
-    cat("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.\n")
+    message("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
     return()
   }
 
   #filtering on the inflection point shown in the advanced knee plot
   if (filter == "yes"){
     inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
-    cat("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.\n")
+    message("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
   }
 
   #putting a custom filter threshold

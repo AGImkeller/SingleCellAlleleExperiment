@@ -43,5 +43,4 @@ scae_functional_class
 
 rownames(scae_functional_class)
 
-
 }

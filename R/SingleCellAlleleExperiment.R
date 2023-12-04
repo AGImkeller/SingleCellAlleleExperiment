@@ -43,7 +43,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
   sce <- SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
-  sce_add_look <- ext_rd(sce, exp_type, symbols)
+  sce_add_look <- ext_rd(sce, exp_type, symbols, verbose = verbose)
   #####
   if (verbose){
   rt_scae_lookup_end <- Sys.time()
@@ -116,23 +116,51 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
 #' The value `"biomart"` [biomaRt](\code{\link{biomaRt}}) package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
+#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
+#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom SummarizedExperiment rowData<-
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return A SingleCellExperiment object.
-ext_rd <- function(sce, exp_type, symbols){
+ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
 
   if (exp_type == "WTA"){
+    gene_symbols <- ""
+
     if (symbols == "biomart"){
-      ensembl_ids  <- unlist(rowData(sce)$Ensembl_ID)
-      gene_symbols <- get_ncbi_gene_names(ensembl_ids)
+      #ensembl_ids  <- unlist(rowData(sce)$Ensembl_ID)
+
+      #this only works if biomart is currently unavailable
+      #biomart will still try to use a mirror site first
+      #only for errors, not for messages
+      #alternative is using
+      #tryCatch({
+      gene_symbols <- get_ncbi_gene_names(sce)
+      if (verbose){
+        message("Using biomart to retrieve NCBI gene identifiers.")
+      }
+      #}, error = function(e){
+      #  if (grepl("Ensembl service is currently unavailable", e$message)) {
+      #    message("Ensembl service is currently unavailable, using org.Hs.db instead")
+      #    gene_symbols <- get_ncbi_org(sce)
+      #  } else if (grepl("Ensembl site unresponsive", e$message)){
+      #    message("Ensembl service is currently unavailable, using org.Hs.db instead")
+      #    gene_symbols <- get_ncbi_org(sce)
+      #  }
+      #})
     }
+
     if (symbols == "orgdb"){
       gene_symbols <- get_ncbi_org(sce)
+
+      if (verbose){
+        message("Using org.Hs to retrieve NCBI gene identifiers.")
+      }
     }
     rowData(sce)$Symbol <- gene_symbols
   }
+
   #extend rowData with new classification columns
   allele_names_all <- find_allele_ids(sce, exp_type)
 
@@ -158,13 +186,17 @@ ext_rd <- function(sce, exp_type, symbols){
 #' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
 #' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `readAlleleCounts()` function.
 #'
-#' @param ensembl_ids A vector containing character strings for ensemble gene identifiers.
+#' @param sce A \code{\link{SingleCellExperiment}} object.
 #'
 #' @importFrom biomaRt useMart getBM
 #'
 #' @return A vector containing character strings for NCBI gene names.
-get_ncbi_gene_names <- function(ensembl_ids) {
-  ensembl_ids <- sub("\\..*", "", ensembl_ids)
+get_ncbi_gene_names <- function(sce) {
+
+  ensembl_ids_sce  <- unlist(rowData(sce)$Ensembl_ID)
+
+  ensembl_ids <- sub("\\..*", "", ensembl_ids_sce)
+
   ensembl <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
   attributes <- c("ensembl_gene_id", "external_gene_name")
 
@@ -183,6 +215,7 @@ get_ncbi_gene_names <- function(ensembl_ids) {
   return(ncbi_gene_names)
 }
 
+
 #' Get NCBI genes using the org.HS.db package
 #'
 #' @description
@@ -198,6 +231,7 @@ get_ncbi_gene_names <- function(ensembl_ids) {
 #'
 #' @return A list of character strings for gene names.
 get_ncbi_org <- function(sce){
+
   ensembl_ids <- rowData(sce)$Ensembl_ID
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
@@ -212,6 +246,8 @@ get_ncbi_org <- function(sce){
 
   indic <- match(ensembl_ids, Hs_mapping$ensembl_id)
   ncbi_symbols <- Hs_mapping$symbol[match(ensembl_ids, Hs_mapping$ensembl_id)]
+
+  message("Using org.Hs package to retrieve NCBI gene names.")
 
   return(ncbi_symbols)
 }
@@ -288,9 +324,10 @@ check_unknowns <- function(sce, find_allele_ids){
   if (check_star != check_length){
     star <- !grepl("*", names, fixed = TRUE)
     unknown_info <- rownames(sce[names[star],])
+    unknown_info_sep <- paste(unknown_info, collapse = " ")
     stop("Allele information contains unknown identifier.
          Please check the data and remove rows of the following
-         allele features identifiers: `",unknown_info, " ` or use proper nomenclature.")
+         allele features identifiers: `",unknown_info_sep, "` or use proper nomenclature.")
   }
 }
 
@@ -319,7 +356,8 @@ find_not_ident <- function(sce, agene_names){
 #' Build new substring
 #'
 #' @description
-#' Internal function used in `get_allelecounts()`. Function is used to cut character string at "*" character and return it.
+#' Internal function used in `get_allelecounts()`. Function is used to cut character string at "*" character and return it. Only used to cut the names
+#' if unknown alleles, as the lookup table does not provide any corresponding immune gene name.
 #'
 #' @param allele_id A list of character strings for unidentified allele_names that have proper [allele-nomenclature](https://hla.alleles.org/nomenclature/index.html).
 #'
@@ -548,8 +586,6 @@ log_transform <- function(sce){
 #' @description
 #' Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
 #' Adding sample tag information to colData
-#'
-#'
 #'
 #' @param path character string input containing the path to the directory containing the
 #'   input files
