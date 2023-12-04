@@ -2,7 +2,7 @@
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
 author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
-  email: "AG.imkeller@gmail.com"
+email: "AG.imkeller@gmail.com"
 output: 
    BiocStyle::html_document:
     toc: true
