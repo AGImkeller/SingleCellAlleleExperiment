@@ -1,10 +1,6 @@
- ###############################################################################
- ##############---getters to use for subsampling the main assay---##############
- ###############################################################################
 
  #---------------------------------getters-------------------------------------#
 
- #####
 #' Get allele rows
 #'
 #' @description
@@ -250,4 +246,3 @@ get_unknown <- function(scae) {
   unknown <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "A_unknown", ]
   return(unknown)
 }
- #####

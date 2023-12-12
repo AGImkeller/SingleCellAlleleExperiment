@@ -1,12 +1,5 @@
-################################################################################
-############---function plots a knee plot ranking barcode counts---#############
-################---majority of code taken from Ahmad Al Ajami---################
-################################################################################
-
 
 #------------------------------Knee plot---------------------------------------#
-
-#####
 
 #' Knee plot
 #'
@@ -25,7 +18,7 @@
 #' @importFrom S4Vectors metadata
 #'
 #' @return A knee plot about the quantification data.
-plotKnee <- function(matrix, genes, barcodes){
+plot_knee <- function(matrix, genes, barcodes){
 
   barcodes <- barcodes
   features <- genes
@@ -36,7 +29,7 @@ plotKnee <- function(matrix, genes, barcodes){
 
   names(br_out)
   fitteddf <- br_out$fitted
-  total = br_out$total
+  total <-  br_out$total
 
   data_df <- data.frame(rank = br_out$rank, total = br_out$total, fitteddf = br_out$fitted)
 
@@ -56,6 +49,4 @@ plotKnee <- function(matrix, genes, barcodes){
 
   inflection_p <- S4Vectors::metadata(br_out)$inflection
   return(inflection_p)
-
 }
-#####

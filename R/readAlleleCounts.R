@@ -1,7 +1,3 @@
-################################################################################
-#######---Read in function creating SingleCellAlleleExperiment object---########
-###############---file contains main function and its helpers---###############
-################################################################################
 
 #-----------------------------readAlleleCounts---------------------------------#
 
@@ -163,19 +159,19 @@ readAlleleCounts <- function (samples,
   colnames(full_data) <- cnames
 
   full_data <- as(full_data, "CsparseMatrix")
-  lookup <- readLookup(samples, exp_type, lookup_file)
+  lookup <- read_Lookup(samples, exp_type, lookup_file)
 
 
-  #preflight mode, only for plotting the knee plots
+  #preflight mode, only for plotting the knee plot
   if (filter == "no"){
-    inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
+    inflection_threshold <- plot_knee(full_data, feature_info, cell_names)
     message("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
     return()
   }
 
   #filtering on the inflection point shown in the advanced knee plot
   if (filter == "yes"){
-    inflection_threshold <- plotKnee(full_data, feature_info, cell_names)
+    inflection_threshold <- plot_knee(full_data, feature_info, cell_names)
     message("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
   }
 
@@ -184,14 +180,11 @@ readAlleleCounts <- function (samples,
     inflection_threshold <- filter_threshold
   }
 
-
-  #####
   if (verbose){
   rt_one_readin_end <- Sys.time()
   diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits = 2)
   message("Runtime check (1/2) Read_in: ",      diff_rt_one, " seconds")
   }
-  #####
 
   rt_two_scae_start <- Sys.time()
   sce <- SingleCellAlleleExperiment(assays = list(counts = full_data),
@@ -205,16 +198,15 @@ readAlleleCounts <- function (samples,
   if (exp_type == "Amplicon"){
     rt_six_scae_start <- Sys.time()
     sce <- add_sample_tags(samples, sce, tag_feature_mtx, tag_feature_barcodes)
-    #####
+
     if (verbose){
     rt_six_scae_end <- Sys.time()
     diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
       message("     Generating SCAE (6/X) adding sample tags: ", diff_rt_six, " seconds")
     }
-    #####
+
   }
 
-  #####
   if (verbose){
   rt_two_scae_end <- Sys.time()
   diff_rt_two <- round(rt_two_scae_end - rt_two_scae_start, digits = 2)
@@ -222,7 +214,6 @@ readAlleleCounts <- function (samples,
   diff_rt_total <- rt_two_scae_end - rt_one_readin_start
   message("Total runtime, completed read_in, filtering and normalization and generating scae object ",       ceiling(diff_rt_total), " seconds")
   }
-  #####
 
   return(sce)
 }
@@ -259,8 +250,6 @@ read_from_sparse_allele <- function(path,
   cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
   mat          <- Matrix::readMM(matrix_loc)
 
-
-  # call the kneeplot function somewhere here. the chosen kneepoint can be selected automatically
   possible_names <- c("Ensembl_ID", "Symbol")
 
   if (exp_type == "WTA"){
@@ -269,8 +258,8 @@ read_from_sparse_allele <- function(path,
     colnames(feature_info) <- possible_names[2]
   }
 
-  list(mat = Matrix::t(mat),
-       cell_names = cell_names,
+  list(mat =  Matrix::t(mat),
+       cell_names =  cell_names,
        feature_info = feature_info)
 }
 
@@ -286,9 +275,8 @@ read_from_sparse_allele <- function(path,
 #' @importFrom utils read.csv
 #'
 #' @return A data.frame containing a representation of the lookup table.
-readLookup <- function(path, exp_type, lookup_file){
+read_Lookup <- function(path, exp_type, lookup_file){
     lookup_loc <- file.path(path, lookup_file)
     lookup <- utils::read.csv(lookup_loc)
   lookup
 }
-#####

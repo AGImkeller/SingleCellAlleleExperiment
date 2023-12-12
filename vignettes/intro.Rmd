@@ -2,7 +2,7 @@
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
 author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
-  email: "AG.imkeller@gmail.com"
+email: "AG.imkeller@gmail.com"
 output: 
    BiocStyle::html_document:
     toc: true
@@ -47,12 +47,14 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 
 The structure of the lookup table that is used for aggregating the allele information into an immune gene layer and from there into functional class layer is as follows:
 
-| Allele         | Gene     | Function      |
-| -------------- |:--------:|:------------: |
-| A*01:01:01     | HLA-A    | HLA class I   |
-| A*01:01:01     | HLA-A    | HLA class I   |
-| ...            | ...      | ...           |
-| DRB1*01:01:01  | HLA-DRB1 | HLA class II  |
+
+| Allele  | Gene  | Function |
+| :--------: |:--------:|:--------: |
+| A*01:01:01 | HLA-A | HLA class I |
+| A*01:01:01 | HLA-A | HLA class I |
+| ...        | ...   | ...         |
+| DRB1*01:01:01 | HLA-DRB1 | HLA class II |
+
 
 <hr>
 
@@ -84,7 +86,6 @@ The following packages are abundant for performing the downstream analysis and v
 library(SingleCellAlleleExperiment)
 library(scran)
 library(scater)
-library(tidyverse)
 library(patchwork)
 library(ggplot2)
 ```

@@ -1,11 +1,6 @@
-################################################################################
-##############---Class definition of SingleCellAlleleExperiment---##############
-############---file contains all helpers to transform sce to scae---############
-################################################################################
 
 #---------SingleCellAlleleExperiment class definition and constructor----------#
 
-#####
 #' SingleCellAlleleExperiment class definition
 #'
 #' @description
@@ -16,6 +11,7 @@
 #'
 #' @return definition for the scae class
 .scae <- setClass("SingleCellAlleleExperiment", contains = "SingleCellExperiment")
+
 
 
 #' Constructor SingleCellAlleleExperiment class
@@ -44,65 +40,56 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 
   rt_scae_lookup_start <- Sys.time()
   sce_add_look <- ext_rd(sce, exp_type, symbols, verbose = verbose)
-  #####
   if (verbose){
   rt_scae_lookup_end <- Sys.time()
   diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
   message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
   }
-  #####
+
 
   rt_scae_filt_norm_start <- Sys.time()
   sce_filter_norm <- filter_norm(sce_add_look, threshold)
-  #####
   if (verbose){
   rt_scae_filt_norm_end <- Sys.time()
   diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
   message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
   }
-  #####
+
 
   rt_scae_a2g_start <- Sys.time()
   scae <- alleles2genes(sce_filter_norm, lookup, exp_type)
-  #####
   if (verbose){
   rt_scae_a2g_end <- Sys.time()
   diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
   message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
   }
-  #####
+
 
   rt_scae_g2f_start <- Sys.time()
   scae <- genes2functional(scae, lookup, exp_type)
-  #####
   if (verbose){
   rt_scae_g2f_end <- Sys.time()
   diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
   message("     Generating SCAE (4/5) genes2functional: ", diff_rt_scae_g2f, " seconds")
   }
-  #####
+
 
   rt_scae_log_start <- Sys.time()
   scae <- log_transform(scae)
-  #####
   if (verbose){
   rt_scae_log_end <- Sys.time()
   diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
   message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_g2f, " seconds")
   }
-  #####
 
   .scae(scae)
 }
-#####
 
-################################################################################
+
 #--------------------Functions used in the SCAE-Constructor--------------------#
-################################################################################
 
 #-1--------------------------------ext_rd--------------------------------------#
 
-#####
 #' Extending rowData
 #'
 #' @description
@@ -124,60 +111,57 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #'
 #' @return A SingleCellExperiment object.
 ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
+  test <- symbols
 
   if (exp_type == "WTA"){
-    gene_symbols <- ""
-
     if (symbols == "biomart"){
-      #ensembl_ids  <- unlist(rowData(sce)$Ensembl_ID)
-
-      #this only works if biomart is currently unavailable
-      #biomart will still try to use a mirror site first
-      #only for errors, not for messages
-      #alternative is using
-      #tryCatch({
-      gene_symbols <- get_ncbi_gene_names(sce)
-      if (verbose){
-        message("Using biomart to retrieve NCBI gene identifiers.")
-      }
-      #}, error = function(e){
-      #  if (grepl("Ensembl service is currently unavailable", e$message)) {
-      #    message("Ensembl service is currently unavailable, using org.Hs.db instead")
-      #    gene_symbols <- get_ncbi_org(sce)
-      #  } else if (grepl("Ensembl site unresponsive", e$message)){
-      #    message("Ensembl service is currently unavailable, using org.Hs.db instead")
-      #    gene_symbols <- get_ncbi_org(sce)
-      #  }
-      #})
+      test <- tryCatch({
+        gene_symbols <- get_ncbi_gene_names(sce)
+        if (verbose){
+          message("Using biomart to retrieve NCBI gene identifiers.")
+        }
+        test <- "biomart"
+      }, message = function(e){
+        if (grepl("unavailable", e$message)) {
+          message("Ensembl service is currently unavailable, using org.Hs.db instead")
+          symbols <- "orgdb"
+        } else if (grepl("unresponsive", e$message)){
+          message("Ensembl service is currently unavailable, using org.Hs.db instead")
+          symbols <- "orgdb"
+        } else {
+          symbols <- "biomart"
+        }
+        return(symbols)
+      })
     }
+    symbols = test
 
     if (symbols == "orgdb"){
       gene_symbols <- get_ncbi_org(sce)
-
       if (verbose){
         message("Using org.Hs to retrieve NCBI gene identifiers.")
       }
     }
+
     rowData(sce)$Symbol <- gene_symbols
+
+    allele_names_all <- find_allele_ids(sce, exp_type)
+
+    # Group of genes for which extended informaton is stored
+    rowData(sce[allele_names_all,])$NI_I <- "I"
+    # Allele level
+    rowData(sce[allele_names_all,])$Quant_type <- "A"
+
+    # Group of genes for which classical (gene level) informaton is stored
+    rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
+    # Gene level
+    rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
+    rowData(sce)[rownames(rowData(get_alleles(sce))),]$Symbol <- rownames(rowData(get_alleles(sce)))
   }
-
-  #extend rowData with new classification columns
-  allele_names_all <- find_allele_ids(sce, exp_type)
-
-  # Group of genes for which extended informaton is stored
-  rowData(sce[allele_names_all,])$NI_I <- "I"
-  # Allele level
-  rowData(sce[allele_names_all,])$Quant_type <- "A"
-
-  # Group of genes for which classical (gene level) informaton is stored
-  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
-  # Gene level
-  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
-
-  rowData(sce)[rownames(rowData(get_alleles(sce))),]$Symbol <- rownames(rowData(get_alleles(sce)))
-
   sce
 }
+
+
 
 #' Get NCBI genes using biomaRt
 #'
@@ -201,19 +185,19 @@ get_ncbi_gene_names <- function(sce) {
   attributes <- c("ensembl_gene_id", "external_gene_name")
 
   results <- biomaRt::getBM(
-    attributes = attributes,
-    filters = "ensembl_gene_id",
-    values  = ensembl_ids,
-    mart    = ensembl
+    attributes <-  attributes,
+    filters <- "ensembl_gene_id",
+    values  <- ensembl_ids,
+    mart    <- ensembl
   )
-
-  ncbi_gene_names <- rep(NA_character_, length(ensembl_ids))
+  ncbi_gene_names  <- rep(NA_character_, length(ensembl_ids))
   matching_indices <- match(results$ensembl_gene_id, ensembl_ids)
   ncbi_gene_names[matching_indices[!is.na(matching_indices)]] <- results$external_gene_name
 
   ncbi_gene_names[ncbi_gene_names == ""] <- NA
   return(ncbi_gene_names)
 }
+
 
 
 #' Get NCBI genes using the org.HS.db package
@@ -231,7 +215,6 @@ get_ncbi_gene_names <- function(sce) {
 #'
 #' @return A list of character strings for gene names.
 get_ncbi_org <- function(sce){
-
   ensembl_ids <- rowData(sce)$Ensembl_ID
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
@@ -247,15 +230,12 @@ get_ncbi_org <- function(sce){
   indic <- match(ensembl_ids, Hs_mapping$ensembl_id)
   ncbi_symbols <- Hs_mapping$symbol[match(ensembl_ids, Hs_mapping$ensembl_id)]
 
-  message("Using org.Hs package to retrieve NCBI gene names.")
-
   return(ncbi_symbols)
 }
-#####
+
 
 #-2------------------barcode filtering and normalization-----------------------#
 
-#####
 #' Preprocessing
 #'
 #' @description
@@ -276,11 +256,10 @@ filter_norm <- function(sce, threshold = 0){
   df_scales <- computeLibraryFactors(filtered)
   df_scales
 }
-#####
+
 
 #-3-----------------------------allele2genes-----------------------------------#
 
-#####
 #' Identify rows containing allele information for WTA
 #'
 #' @description
@@ -317,7 +296,7 @@ find_allele_ids <- function(sce, exp_type){
 #' @return Error message if condition is not met.
 check_unknowns <- function(sce, find_allele_ids){
   names <- find_allele_ids
-  #checks if all the identifiers of find_allele_ids have a "*" (nomenclature)
+  # checks if all the identifiers of find_allele_ids have a "*" (nomenclature)
   check_star   <- sum(grepl("*", names, fixed = TRUE))
   check_length <- length(names)
 
@@ -343,7 +322,7 @@ check_unknowns <- function(sce, find_allele_ids){
 #'
 #' @return A list of character strings of identifiers that can not be found in the allele lookup table.
 find_not_ident <- function(sce, agene_names){
-  #return allele genes that do not start with HLA (not found in lookup table)
+  # return allele genes that do not start with HLA (not found in lookup table)
   scae_counts <- counts(get_alleles(sce))
   rownames(scae_counts) <- agene_names
   # This needs to be fixed on the long run, because not all genes with extended information
@@ -413,7 +392,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
     return_unknown <- c(alleletogene_counts, not_ids)
     return(return_unknown)
   }else {
-    return_known <- c(alleletogene_counts)
+    return_known   <- c(alleletogene_counts)
     return(return_known)
   }
 }
@@ -466,7 +445,6 @@ alleles2genes <- function(sce, lookup, exp_type){
     rowData(sce)[filtered_rows, "Quant_type"] <- "A_unknown"
   }
 
-
   al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
                                  colData = colData(sce))
   rowData(al_sce)$Symbol <- rownames(al_gene)
@@ -481,11 +459,10 @@ alleles2genes <- function(sce, lookup, exp_type){
 
   new_sce
 }
-#####
+
 
 #-4------------------------------genes2func------------------------------------#
 
-#####
 #' Building second new subassay for the SingleCellAlleleExperiment object
 #'
 #' @description
@@ -545,11 +522,10 @@ genes2functional <- function(sce, lookup, exp_type){
 
   final_scae
 }
-#####
+
 
 #-5-------------------------log transform counts-------------------------------#
 
-#####
 #' Log-transform normalized counts
 #'
 #' @description
@@ -569,18 +545,17 @@ log_transform <- function(sce){
                                    size_factors = sizeFactors(sce),
                                    transform = "log")
 
-  assays(sce)$logcounts   <- normed_counts
+  assays(sce)$logcounts  <- normed_counts
 
   counts(sce)    <- DelayedArray(counts(sce))
   logcounts(sce) <- DelayedArray(logcounts(sce))
 
   sce
 }
-######
+
 
 #-6-------------------------add sample tags------------------------------------#
 
-#####
 #' Adding sample tag information to colData
 #'
 #' @description
@@ -620,4 +595,3 @@ add_sample_tags <- function(path, scae, tag_feature_mtx, tag_feature_barcodes){
   scae <- scae[, !is.na(colData(scae)$sample_tags)]
   scae
 }
-#####

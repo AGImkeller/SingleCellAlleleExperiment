@@ -28,11 +28,7 @@ scae <- readAlleleCounts(dir_path,
                          tag_feature_mtx = "cells_x_genes.genes.txt",
                          tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                          filter_threshold = 0,
-                         verbose = FALSE)
-
-#readin using `biomart` // is there a way to test this?
-#this might fail if there is no internet connection
-
+                         verbose = TRUE)
 
 test_that("rownames and rowData check", {
   #check the names
@@ -95,7 +91,7 @@ test_that("check input-parameter errors", {
             regexp = "")
 
 
-  # is symbols parameter does not equal c("biomart", "orgdb"),
+  # `symbols` parameter does not equal c("biomart", "orgdb"),
   # also left sample_names param empty which is then automatically set to the dir_path param
   expect_error(readAlleleCounts(dir_path,
                                 sample_names = "example_data_wta",
@@ -185,6 +181,7 @@ Unkwn*02:02:02:02 can't be found in the lookup table"))
 expect_equal(dim(counts(scae_unknown[c(rownames(get_nigenes(scae_unknown)), rownames(get_alleles(scae_unknown))),]))[1],
              (dim(mat)[1] + dim(unknown_counts)[1]))
 
+# delete files with integrated unknown alleles again
 unlink(path_genes)
 unlink(path_matrix)
 
@@ -228,6 +225,8 @@ Allele information contains unknown identifier.
 Please check the data and remove rows of the following
 allele features identifiers: `Unkwn_allele1 Unkwn_allele2` or use proper nomenclature."))
 
+
+# delete files with integrated unknown alleles again
 unlink(path_genes)
 unlink(path_matrix)
 
@@ -260,9 +259,9 @@ test_that("check biomart and orgdb", {
                                   tag_feature_mtx = "cells_x_genes.genes.txt",
                                   tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                                   filter_threshold = NULL,
-                                  verbose = TRUE),
-                regexp = message("Using biomart to retrieve NCBI gene identifiers."))
+                                  verbose = TRUE))
 
+  #regexp = message("Using biomart to retrieve NCBI gene identifiers.")
   expect_message(readAlleleCounts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
@@ -277,11 +276,4 @@ test_that("check biomart and orgdb", {
                                   filter_threshold = NULL,
                                   verbose = TRUE),
                  regexp = message("Using org.HS to retrieve NCBI gene identifiers."))
-
 })
-
-
-
-
-
-
