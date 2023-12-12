@@ -185,10 +185,10 @@ get_ncbi_gene_names <- function(sce) {
   attributes <- c("ensembl_gene_id", "external_gene_name")
 
   results <- biomaRt::getBM(
-    attributes <-  attributes,
-    filters <- "ensembl_gene_id",
-    values  <- ensembl_ids,
-    mart    <- ensembl
+    attributes =  attributes,
+    filters = "ensembl_gene_id",
+    values  = ensembl_ids,
+    mart    = ensembl
   )
   ncbi_gene_names  <- rep(NA_character_, length(ensembl_ids))
   matching_indices <- match(results$ensembl_gene_id, ensembl_ids)
@@ -199,7 +199,7 @@ get_ncbi_gene_names <- function(sce) {
 }
 
 
-
+# Code provided by Ahmad Al Ajami
 #' Get NCBI genes using the org.HS.db package
 #'
 #' @description
