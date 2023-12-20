@@ -34,7 +34,9 @@ donor-specific alleles of different immune genes. The workflow is composed of th
 2. quantification of these alleles in single-cell transcriptomic data, 
 3. exploration of single-cell transcriptomic data using `SingleCellAlleleExperiment (SCAE)` class. 
 
-The software for steps 1 and 2 is currently not yet publicly available. The present repository is dedicated to the implementation of the `SingleCellAlleleExperiment (SCAE)` class. The aim of the here presented
+The software for steps 1 and 2 can be found in the form of a *Snakemake* workflow named *[scIGD](https://github.com/AGImkeller/scIGD)*. For detailed instructions on utilizing this workflow, please refer to its documentation.
+
+The present repository is dedicated to the implementation of the `SingleCellAlleleExperiment (SCAE)` class. The aim of the here presented
 class is to provide an addition to the `SingleCellExperiment (SCE)` object that
 can simultaneously contain quantification of alleles, genes, and groups of functionally similar genes
 and thus allows data analysis across these immunologically relevant different layers of annotation. 
