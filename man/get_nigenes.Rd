@@ -20,7 +20,7 @@ identified by "NI" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 
 example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 
-scae <- readAlleleCounts(example_data,
+scae <- read_allele_counts(example_data,
                         sample_names = "example_data",
                         filter = "yes",
                         symbols = "orgdb",

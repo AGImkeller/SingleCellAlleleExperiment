@@ -20,6 +20,6 @@ input files}
 A SingleCellAlleleExperiment object.
 }
 \description{
-Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
+Internal function used in 'read_allele_counts()'. Stated here because its supposed to be a transformation step of the SCAE object.
 Adding sample tag information to colData
 }

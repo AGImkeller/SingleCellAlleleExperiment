@@ -15,5 +15,5 @@ A vector containing character strings for NCBI gene names.
 \description{
 This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
 Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
-get_ncbi_org by specifying \code{symbols = "orgdb"} in the corresponding \code{symbols} parameter of the \code{readAlleleCounts()} function.
+get_ncbi_org by specifying \code{symbols = "orgdb"} in the corresponding \code{symbols} parameter of the \code{read_allele_counts()} function.
 }

@@ -17,5 +17,5 @@ read_Lookup(path, exp_type, lookup_file)
 A data.frame containing a representation of the lookup table.
 }
 \description{
-Internal function used in \code{readAlleleCounts()} to read in the allele lookup table.
+Internal function used in \code{read_allele_counts()} to read in the allele lookup table.
 }

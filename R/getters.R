@@ -18,7 +18,7 @@
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
-#' scae <- readAlleleCounts(example_data,
+#' scae <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         symbols = "orgdb",
@@ -34,16 +34,16 @@
 #'
 #'scae
 #'
-#'rownames(get_alleles(scae))
+#'rownames(scae_subset_alleles(scae))
 #'
-#'scae_alleles <- get_alleles(scae)
+#'scae_alleles <- scae_subset_alleles(scae)
 #'
 #'scae_alleles
 #'
 #'rownames(scae_alleles)
 #'
 #' @export
-get_alleles <- function(scae) {
+scae_subset_alleles <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
   # alleles of the genes with extended quantification
   alleles <- scae[subset_rows & rowData(scae)$NI_I == "I" & startsWith(rowData(scae)$Quant_type,"A"), ]
@@ -68,7 +68,7 @@ get_alleles <- function(scae) {
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
-#' scae <- readAlleleCounts(example_data,
+#' scae <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         symbols = "orgdb",
@@ -118,7 +118,7 @@ get_agenes <- function(scae) {
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
-#' scae <- readAlleleCounts(example_data,
+#' scae <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         symbols = "orgdb",
@@ -167,7 +167,7 @@ get_nigenes <- function(scae) {
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
-#' scae <- readAlleleCounts(example_data,
+#' scae <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         symbols = "orgdb",
@@ -182,16 +182,16 @@ get_nigenes <- function(scae) {
 #'
 #'scae
 #'
-#'rownames(get_func(scae))
+#'rownames(scae_subset_functional(scae))
 #'
-#'scae_functional_class <- get_func(scae)
+#'scae_functional_class <- scae_subset_functional(scae)
 #'
 #'scae_functional_class
 #'
 #'rownames(scae_functional_class)
 #'
 #' @export
-get_func <- function(scae) {
+scae_subset_functional <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
   # functional groups of the genes with extended quantification
   func <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "F", ]
@@ -216,7 +216,7 @@ get_func <- function(scae) {
 #'
 #' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 #'
-#' scae <- readAlleleCounts(example_data,
+#' scae <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         symbols = "orgdb",
@@ -231,18 +231,32 @@ get_func <- function(scae) {
 #'
 #'scae
 #'
-#'rownames(get_unknown(scae))
+#'rownames(scae_subset_unknown_alleles(scae))
 #'
-#'scae_unknown_alleles <- get_unknown(scae)
+#'scae_unknown_alleles <- scae_subset_unknown_alleles(scae)
 #'
 #'scae_unknown_alleles
 #'
 #'rownames(scae_unknown_alleles)
 #'
 #' @export
-get_unknown <- function(scae) {
+scae_subset_unknown_alleles <- function(scae) {
   subset_rows <- stats::complete.cases(rowData(scae)$NI_I, rowData(scae)$Quant_type)
   # unknown alleles of the genes with extended quantification
   unknown <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "A_unknown", ]
   return(unknown)
 }
+
+#------------------------------getter wrapper----------------------------------#
+
+scae_subset <- function(scae, subset = c("nonimmune", "alleles", "immune_genes", "functional", "unknown_alleles")){
+
+  switch(subset,
+         "nonimmune" = get_nigenes(scae),
+         "alleles" =  scae_subset_alleles(scae),
+         "immune_genes" = get_agenes(scae),
+         "functional" = scae_subset_functional(scae),
+         "unkown_alleles" = scae_subset_unknown_alleles(scae),
+         message("Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional`, `unknown_alleles`"))
+}
+

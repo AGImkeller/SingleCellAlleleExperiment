@@ -27,5 +27,5 @@ read_from_sparse_allele(
 A list with three data.frames containing the input data information.
 }
 \description{
-Internal function used in \code{readAlleleCounts()} that reads in the data stated in the given directory path.
+Internal function used in \code{read_allele_counts()} that reads in the data stated in the given directory path.
 }

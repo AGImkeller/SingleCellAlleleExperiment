@@ -18,7 +18,7 @@
 #'
 #' @description
 #' Constructor for the `SingleCellAllelExperiment` (SCAE) class.
-#' Constructor is used in the read in function `readAlleleCounts()`. Performing all necessary steps to transform
+#' Constructor is used in the read in function `read_allele_counts()`. Performing all necessary steps to transform
 #' a `SingleCellExperiment` object into the extended `SingleCellAlleleExperiment` object. SCAE objects
 #' contain allele, gene and functional level quantification results. The additional layers are stored as additional
 #' rows in the count assays as well as in extended rowData.
@@ -156,7 +156,7 @@ ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
     rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
     # Gene level
     rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
-    rowData(sce)[rownames(rowData(get_alleles(sce))),]$Symbol <- rownames(rowData(get_alleles(sce)))
+    rowData(sce)[rownames(rowData(scae_subset_alleles(sce))),]$Symbol <- rownames(rowData(scae_subset_alleles(sce)))
   }
   sce
 }
@@ -168,7 +168,7 @@ ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
 #' @description
 #' This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
 #' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
-#' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `readAlleleCounts()` function.
+#' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `read_allele_counts()` function.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #'
@@ -182,7 +182,7 @@ get_ncbi_gene_names <- function(sce) {
   ensembl_ids <- sub("\\..*", "", ensembl_ids_sce)
 
   ensembl <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  attributes <- c("ensembl_gene_id", "external_gene_name")
+  attributes <- c("ensembl_gene_id", "hgnc_symbol")
 
   results <- biomaRt::getBM(
     attributes =  attributes,
@@ -323,7 +323,7 @@ check_unknowns <- function(sce, find_allele_ids){
 #' @return A list of character strings of identifiers that can not be found in the allele lookup table.
 find_not_ident <- function(sce, agene_names){
   # return allele genes that do not start with HLA (not found in lookup table)
-  scae_counts <- counts(get_alleles(sce))
+  scae_counts <- counts(scae_subset_alleles(sce))
   rownames(scae_counts) <- agene_names
   # This needs to be fixed on the long run, because not all genes with extended information
   # match HLA
@@ -384,7 +384,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
   }
   alid_gene_names <- unlist(list_alid)
 
-  alleletogene_counts <- counts(get_alleles(sce))
+  alleletogene_counts <- counts(scae_subset_alleles(sce))
   rownames(alleletogene_counts) <- alid_gene_names
 
   if (unknown){
@@ -559,7 +559,7 @@ log_transform <- function(sce){
 #' Adding sample tag information to colData
 #'
 #' @description
-#' Internal function used in 'readAlleleCounts()'. Stated here because its supposed to be a transformation step of the SCAE object.
+#' Internal function used in 'read_allele_counts()'. Stated here because its supposed to be a transformation step of the SCAE object.
 #' Adding sample tag information to colData
 #'
 #' @param path character string input containing the path to the directory containing the

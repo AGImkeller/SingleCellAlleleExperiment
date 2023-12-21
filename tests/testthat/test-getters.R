@@ -3,7 +3,7 @@ library(testthat)
 
 dir_path <- system.file("extdata", package = "SingleCellAlleleExperiment")
 
-scae <- readAlleleCounts(dir_path,
+scae <- read_allele_counts(dir_path,
                          sample_names = "example_data_wta",
                          filter = "custom",
                          symbols = "orgdb",
@@ -29,7 +29,7 @@ test_that("non-immune genes getter", {
 # alleles layer
 test_that("alleles getter", {
 
-  expect_equal(get_alleles(scae), scae[grepl("*", rownames(counts(scae)), fixed = TRUE),])
+  expect_equal(scae_subset_alleles(scae), scae[grepl("*", rownames(counts(scae)), fixed = TRUE),])
 
 })
 
@@ -45,7 +45,7 @@ test_that("immune genes getter", {
 # functional class layer
 test_that("functional class getter", {
 
-  expect_equal(get_func(scae), scae[grepl("class", rownames(counts(scae)), fixed = TRUE),])
+  expect_equal(scae_subset_functional(scae), scae[grepl("class", rownames(counts(scae)), fixed = TRUE),])
 
 })
 
@@ -54,7 +54,7 @@ test_that("functional class getter", {
 test_that("unknown alleles getter", {
 
   grep_con <- grepl("Unkwn", rownames(counts(scae)), fixed = TRUE)
-  expect_equal(get_unknown(scae), scae[grep_con,])
+  expect_equal(scae_subset_unknown_alleles(scae), scae[grep_con,])
 
 })
 

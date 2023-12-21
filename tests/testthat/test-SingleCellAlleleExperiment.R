@@ -16,10 +16,10 @@ mat          <- t(Matrix::readMM(matrix_loc))
 
 
 #read in using `orgdb`
-scae <- readAlleleCounts(dir_path,
+scae_org <- read_allele_counts(dir_path,
                          sample_names = "example_data_wta",
                          filter = "custom",
-                         symbols = "orgdb",
+                         symbols = "biomart",
                          exp_type = "WTA",
                          lookup_file = "lookup_table_HLA_only.csv",
                          barcode_file = "cells_x_genes.barcodes.txt",
@@ -32,13 +32,13 @@ scae <- readAlleleCounts(dir_path,
 
 test_that("rownames and rowData check", {
   #check the names
-  expect_equal(feature_info$V1, rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])))
+  expect_equal(feature_info$V1, rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
 
   #check if roWData and object rownames are equal
-  expect_equal(rownames(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),]), rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])))
+  expect_equal(rownames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),]), rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
 
   #check the dimension
-  expect_equal(length(feature_info$V1), length(rownames(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])))
+  expect_equal(length(feature_info$V1), length(rownames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
 
 })
 
@@ -47,10 +47,10 @@ test_that("colnames and colData check", {
   expect_equal(rownames(colData(scae)), cell_names$V1)
 
   #check if roWData and object rownames are equal
-  expect_equal(colnames(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),]), rownames(colData(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])))
+  expect_equal(colnames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),]), rownames(colData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
 
   #check the dimension
-  expect_equal(length(colnames(scae[c(rownames(get_nigenes(scae)), rownames(get_alleles(scae))),])), length(cell_names$V1))
+  expect_equal(length(colnames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])), length(cell_names$V1))
 })
 
 test_that("assay check", {
@@ -71,11 +71,10 @@ test_that("assay check", {
 
 
 #test different filter/no-filter modes
-
 test_that("check input-parameter errors", {
 
   # filter = "custom" but didnt set a threshold in the filter_threshold param
-  expect_error(readAlleleCounts(dir_path,
+  expect_error(read_allele_counts(dir_path,
                                 sample_names = "example_data_wta",
                                 filter = "custom",
                                 symbols = "orgdb",
@@ -93,7 +92,7 @@ test_that("check input-parameter errors", {
 
   # `symbols` parameter does not equal c("biomart", "orgdb"),
   # also left sample_names param empty which is then automatically set to the dir_path param
-  expect_error(readAlleleCounts(dir_path,
+  expect_error(read_allele_counts(dir_path,
                                 sample_names = "example_data_wta",
                                 filter = "yes",
                                 symbols = "notorgdb",
@@ -108,7 +107,7 @@ test_that("check input-parameter errors", {
                                 verbose = FALSE),
                regexp = "Invalid value for symbols parameter. Allowed values are 'biomaRt' and 'orgdb'.")
 
-  expect_message(readAlleleCounts(dir_path,
+  expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
                                   symbols = "orgdb",
@@ -124,7 +123,7 @@ test_that("check input-parameter errors", {
                  regexp = "Filtering performed based on the inflection point at: 105 UMI counts.")
 
 
-  expect_message(readAlleleCounts(dir_path,
+  expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "no",
                                   symbols = "orgdb",
@@ -161,7 +160,7 @@ test_that("test for unknown alleles that have correct nomenclature", {
   write.table(feature_info_new$V1, file = path_genes, sep = "\t", row.names = FALSE, col.names = FALSE)
   writeMM(new_full_matrix, path_matrix)
 
-  expect_message(scae_unknown <- readAlleleCounts(dir_path,
+  expect_message(scae_unknown <- read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
                                   symbols = "orgdb",
@@ -178,7 +177,7 @@ test_that("test for unknown alleles that have correct nomenclature", {
 Unkwn*02:02:02:02 can't be found in the lookup table"))
 
 # test new dimension if integration worked
-expect_equal(dim(counts(scae_unknown[c(rownames(get_nigenes(scae_unknown)), rownames(get_alleles(scae_unknown))),]))[1],
+expect_equal(dim(counts(scae_unknown[c(rownames(get_nigenes(scae_unknown)), rownames(scae_subset_alleles(scae_unknown))),]))[1],
              (dim(mat)[1] + dim(unknown_counts)[1]))
 
 # delete files with integrated unknown alleles again
@@ -207,7 +206,7 @@ test_that("test for unknown alleles that have arbitrary identifier (stop executi
   write.table(feature_info_new_stop$V1, file = path_genes, sep = "\t", row.names = FALSE, col.names = FALSE)
   writeMM(new_full_matrix_stop, path_matrix)
 
-  expect_error(readAlleleCounts(dir_path,
+  expect_error(read_allele_counts(dir_path,
                                 sample_names = "example_data_wta",
                                 filter = "yes",
                                 symbols = "orgdb",
@@ -247,7 +246,7 @@ test_that("check rowData extension with biomart and orgdb", {
 
 test_that("check biomart and orgdb", {
 
-  expect_message(readAlleleCounts(dir_path,
+  expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
                                   symbols = "biomart",
@@ -262,7 +261,7 @@ test_that("check biomart and orgdb", {
                                   verbose = TRUE))
 
   #regexp = message("Using biomart to retrieve NCBI gene identifiers.")
-  expect_message(readAlleleCounts(dir_path,
+  expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
                                   symbols = "orgdb",
