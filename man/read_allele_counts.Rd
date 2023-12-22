@@ -9,7 +9,6 @@ read_allele_counts(
   sample_names = names(samples),
   filter = c("yes", "no", "custom"),
   exp_type = c("WTA", "Amplicon"),
-  symbols = NULL,
   lookup_file = "lookup_table_HLA_only.csv",
   barcode_file = "cells_x_genes.barcodes.txt",
   gene_file = "cells_x_genes.genes.txt",
@@ -30,9 +29,6 @@ read_allele_counts(
 The value \code{"no"} computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
-
-\item{symbols}{A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value \code{"orgdb"} uses the \code{\link{org.Hs.eg.db}} package.
-The value \code{"biomart"} uses the \code{biomaRt} package. Standard value is set to \code{NULL} and is updated to \code{"biomaRt"} during runtime if not specified.}
 
 \item{lookup_file}{A character string determining the name of the lookup table file.}
 
@@ -79,7 +75,6 @@ example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 scae_preflight <- read_allele_counts(example_data,
                         sample_names = "example_data",
                         filter = "no",
-                        symbols = "orgdb",
                         exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -95,7 +90,6 @@ scae_preflight <- read_allele_counts(example_data,
 scae_filtered <- read_allele_counts(example_data,
                         sample_names = "example_data",
                         filter = "yes",
-                        symbols = "orgdb",
                         exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -115,7 +109,6 @@ scae_filtered
 scae_custom_filter <- read_allele_counts(example_data,
                         sample_names = "example_data",
                         filter = "custom",
-                        symbols = "orgdb",
                         exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = "cells_x_genes.barcodes.txt",

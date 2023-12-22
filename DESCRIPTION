@@ -1,9 +1,9 @@
 Package: SingleCellAlleleExperiment
 Title: S4 Class for Single Cell Data with Allele and Functional Levels for Immune Genes
-Version: 0.0.0.9000
+Version: 0.95.0
 Authors@R: 
   c(
-  person("Jonas", "Schuck", email="Schuck@med.uni-frankfurt.de", role = c("aut", "cre"),
+  person("Jonas", "Schuck", email="jschuckdev@gmail.com", role = c("aut", "cre"),
           comment = c(ORCID = "0009-0003-5705-4579")),
   person("Al Ajami", "Ahmad", role = c("aut"),
           comment = c(ORCID = "YOUR-ORCID-ID")),
@@ -33,7 +33,6 @@ Imports:
   S4Vectors,
   stats,
   ggplot2,
-  biomaRt,
   org.Hs.eg.db,
   AnnotationDbi,
   MatrixGenerics,
@@ -49,5 +48,7 @@ Suggests:
   testthat (>= 3.0.0)
 biocViews: DataRepresentation, Infrastructure, SingleCell, Transcriptomics,
   GeneExpression, Genetics, ImmunoOncology, DataImport
+URL: https://github.com/AGImkeller/SingleCellAlleleExperiment
+BugReport: https://github.com/AGImkeller/SingleCellAlleleExperiment/issues
 VignetteBuilder: knitr
 Config/testthat/edition: 3

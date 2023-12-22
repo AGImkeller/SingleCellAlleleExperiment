@@ -4,14 +4,7 @@
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment class}
 \usage{
-SingleCellAlleleExperiment(
-  ...,
-  threshold,
-  exp_type,
-  symbols,
-  lookup,
-  verbose = FALSE
-)
+SingleCellAlleleExperiment(..., threshold, exp_type, lookup, verbose = FALSE)
 }
 \arguments{
 \item{...}{Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.}
@@ -19,9 +12,6 @@ SingleCellAlleleExperiment(
 \item{threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
-
-\item{symbols}{A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value \code{"orgdb"} uses the \code{\link{org.Hs.eg.db}} package.
-The value \code{"biomart"} uses the \code{biomaRt} package. Standard value is set to \code{NULL} and is updated to \code{"biomaRt"} during runtime if not specified.}
 
 \item{lookup}{A data.frame object containing the lookup table.}
 

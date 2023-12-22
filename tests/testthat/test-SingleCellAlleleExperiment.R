@@ -16,10 +16,9 @@ mat          <- t(Matrix::readMM(matrix_loc))
 
 
 #read in using `orgdb`
-scae_org <- read_allele_counts(dir_path,
+scae <- read_allele_counts(dir_path,
                          sample_names = "example_data_wta",
                          filter = "custom",
-                         symbols = "biomart",
                          exp_type = "WTA",
                          lookup_file = "lookup_table_HLA_only.csv",
                          barcode_file = "cells_x_genes.barcodes.txt",
@@ -77,7 +76,6 @@ test_that("check input-parameter errors", {
   expect_error(read_allele_counts(dir_path,
                                 sample_names = "example_data_wta",
                                 filter = "custom",
-                                symbols = "orgdb",
                                 exp_type = "WTA",
                                 lookup_file = "lookup_table_HLA_only.csv",
                                 barcode_file = "cells_x_genes.barcodes.txt",
@@ -89,28 +87,9 @@ test_that("check input-parameter errors", {
                                 verbose = FALSE),
             regexp = "")
 
-
-  # `symbols` parameter does not equal c("biomart", "orgdb"),
-  # also left sample_names param empty which is then automatically set to the dir_path param
-  expect_error(read_allele_counts(dir_path,
-                                sample_names = "example_data_wta",
-                                filter = "yes",
-                                symbols = "notorgdb",
-                                exp_type = "WTA",
-                                lookup_file = "lookup_table_HLA_only.csv",
-                                barcode_file = "cells_x_genes.barcodes.txt",
-                                gene_file = "cells_x_genes.genes.txt",
-                                matrix_file = "cells_x_genes.mtx",
-                                tag_feature_mtx = "cells_x_genes.genes.txt",
-                                tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                                filter_threshold = NULL,
-                                verbose = FALSE),
-               regexp = "Invalid value for symbols parameter. Allowed values are 'biomaRt' and 'orgdb'.")
-
   expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
-                                  symbols = "orgdb",
                                   exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
                                   barcode_file = "cells_x_genes.barcodes.txt",
@@ -126,7 +105,6 @@ test_that("check input-parameter errors", {
   expect_message(read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "no",
-                                  symbols = "orgdb",
                                   exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
                                   barcode_file = "cells_x_genes.barcodes.txt",
@@ -163,7 +141,6 @@ test_that("test for unknown alleles that have correct nomenclature", {
   expect_message(scae_unknown <- read_allele_counts(dir_path,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
-                                  symbols = "orgdb",
                                   exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
                                   barcode_file = "cells_x_genes.barcodes.txt",
@@ -209,7 +186,6 @@ test_that("test for unknown alleles that have arbitrary identifier (stop executi
   expect_error(read_allele_counts(dir_path,
                                 sample_names = "example_data_wta",
                                 filter = "yes",
-                                symbols = "orgdb",
                                 exp_type = "WTA",
                                 lookup_file = "lookup_table_HLA_only.csv",
                                 barcode_file = "cells_x_genes.barcodes.txt",
@@ -232,7 +208,7 @@ unlink(path_matrix)
 })
 
 
-test_that("check rowData extension with biomart and orgdb", {
+test_that("check rowData extension for WTA and Amplicon", {
 
  expect_equal(colnames(rowData(scae))[1], "Ensembl_ID")
 
@@ -244,35 +220,20 @@ test_that("check rowData extension with biomart and orgdb", {
 
 })
 
-test_that("check biomart and orgdb", {
 
-  expect_message(read_allele_counts(dir_path,
-                                  sample_names = "example_data_wta",
-                                  filter = "yes",
-                                  symbols = "biomart",
-                                  exp_type = "WTA",
-                                  lookup_file = "lookup_table_HLA_only.csv",
-                                  barcode_file = "cells_x_genes.barcodes.txt",
-                                  gene_file = "cells_x_genes.genes.txt",
-                                  matrix_file = "cells_x_genes.mtx",
-                                  tag_feature_mtx = "cells_x_genes.genes.txt",
-                                  tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                                  filter_threshold = NULL,
-                                  verbose = TRUE))
+test_that("samples and sample", {
 
-  #regexp = message("Using biomart to retrieve NCBI gene identifiers.")
-  expect_message(read_allele_counts(dir_path,
-                                  sample_names = "example_data_wta",
-                                  filter = "yes",
-                                  symbols = "orgdb",
-                                  exp_type = "WTA",
-                                  lookup_file = "lookup_table_HLA_only.csv",
-                                  barcode_file = "cells_x_genes.barcodes.txt",
-                                  gene_file = "cells_x_genes.genes.txt",
-                                  matrix_file = "cells_x_genes.mtx",
-                                  tag_feature_mtx = "cells_x_genes.genes.txt",
-                                  tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                                  filter_threshold = NULL,
-                                  verbose = TRUE),
-                 regexp = message("Using org.HS to retrieve NCBI gene identifiers."))
+  scae_no_sample <- read_allele_counts(dir_path,
+                             filter = "custom",
+                             exp_type = "WTA",
+                             lookup_file = "lookup_table_HLA_only.csv",
+                             barcode_file = "cells_x_genes.barcodes.txt",
+                             gene_file = "cells_x_genes.genes.txt",
+                             matrix_file = "cells_x_genes.mtx",
+                             tag_feature_mtx = "cells_x_genes.genes.txt",
+                             tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                             filter_threshold = 0,
+                             verbose = TRUE)
+
+  expect_equal(colData(scae_no_sample)$Sample[1], dir_path)
 })

@@ -6,7 +6,6 @@ dir_path <- system.file("extdata", package = "SingleCellAlleleExperiment")
 scae <- read_allele_counts(dir_path,
                          sample_names = "example_data_wta",
                          filter = "custom",
-                         symbols = "orgdb",
                          exp_type = "WTA",
                          lookup_file = "lookup_table_HLA_only.csv",
                          barcode_file = "cells_x_genes.barcodes.txt",
@@ -58,4 +57,22 @@ test_that("unknown alleles getter", {
 
 })
 
+
+test_that("test wrapper getter", {
+
+  #nonimmune
+  expect_equal(scae_subset(scae, "nonimmune"), get_nigenes(scae))
+  #allele
+  expect_equal(scae_subset(scae, "alleles"), scae_subset_alleles(scae))
+  #immune
+  expect_equal(scae_subset(scae, "immune_genes"), get_agenes(scae))
+  #functional
+  expect_equal(scae_subset(scae, "functional"), scae_subset_functional(scae))
+  #unknown
+  expect_equal(scae_subset(scae, "unknown_alleles"), scae_subset_unknown_alleles(scae))
+
+  expect_message(scae_subset(scae, "wrong_layer"),
+                 regexp = "Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional`, `unknown_alleles`")
+
+})
 

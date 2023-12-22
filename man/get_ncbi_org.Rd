@@ -13,6 +13,6 @@ get_ncbi_org(sce)
 A list of character strings for gene names.
 }
 \description{
-This internal function is not as accurate (does not retrieve as many ncbi gene names as \code{biomaRt}) but can be used without
+This internal function is not as accurate (does not retrieve as many gene names as \code{biomaRt}) but can be used without
 internet connection.
 }

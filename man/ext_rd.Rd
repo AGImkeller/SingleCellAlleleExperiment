@@ -4,15 +4,12 @@
 \alias{ext_rd}
 \title{Extending rowData}
 \usage{
-ext_rd(sce, exp_type, symbols, verbose = FALSE)
+ext_rd(sce, exp_type, verbose = FALSE)
 }
 \arguments{
 \item{sce}{A \code{\link{SingleCellExperiment}} object. Object is initally constructed in the \code{SingleCellAlleleExperiment} constructor.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
-
-\item{symbols}{A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value \code{"orgdb"} uses the \code{\link{org.Hs.eg.db}} package.
-The value \code{"biomart"} \href{\code{\link{biomaRt}}}{biomaRt} package. Standard value is set to \code{NULL} and is updated to \code{"biomaRt"} during runtime if not specified.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
 Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}

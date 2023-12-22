@@ -22,8 +22,6 @@
 #' The value `"no"` computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value `"custom"` allows for setting a custom threshold in the `filter_threshold` parameter.
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
-#' The value `"biomart"` uses the `biomaRt` package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
 #' @param lookup_file A character string determining the name of the lookup table file.
 #' @param barcode_file A character string determining the name of the file containing the barcode identifiers.
 #' @param gene_file A character string determining the name of the file containing the feature identifiers.
@@ -49,7 +47,6 @@
 #' scae_preflight <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "no",
-#'                         symbols = "orgdb",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
 #'                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -65,7 +62,6 @@
 #' scae_filtered <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
-#'                         symbols = "orgdb",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
 #'                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -85,7 +81,6 @@
 #' scae_custom_filter <- read_allele_counts(example_data,
 #'                         sample_names = "example_data",
 #'                         filter = "custom",
-#'                         symbols = "orgdb",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
 #'                         barcode_file = "cells_x_genes.barcodes.txt",
@@ -104,7 +99,6 @@ read_allele_counts <- function(samples,
                               sample_names = names(samples),
                               filter = c("yes", "no", "custom"),
                               exp_type = c("WTA", "Amplicon"),
-                              symbols = NULL,
                               lookup_file = "lookup_table_HLA_only.csv",
                               barcode_file = "cells_x_genes.barcodes.txt",
                               gene_file = "cells_x_genes.genes.txt",
@@ -118,14 +112,6 @@ read_allele_counts <- function(samples,
   rt_one_readin_start <- Sys.time()
   if (is.null(sample_names)) {
     sample_names <- samples
-  }
-
-  if (is.null(symbols)) {
-    symbols <- "biomart"
-  } else {
-    if (!symbols %in% c("biomart", "orgdb")) {
-      stop("Invalid value for symbols parameter. Allowed values are 'biomaRt' and 'orgdb'.")
-    }
   }
 
   if (filter == "custom" & is.null(filter_threshold)) {
@@ -192,7 +178,6 @@ read_allele_counts <- function(samples,
                                     colData = cell_info_list,
                                     threshold = inflection_threshold,
                                     exp_type = exp_type,
-                                    symbols = symbols,
                                     lookup = lookup,
                                     verbose = verbose)
   if (exp_type == "Amplicon"){

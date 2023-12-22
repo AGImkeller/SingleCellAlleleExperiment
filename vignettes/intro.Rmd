@@ -2,7 +2,7 @@
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
 author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
-email: "AG.imkeller@gmail.com"
+email: "jschuckdev@gmail.com"
 output: 
    BiocStyle::html_document:
     toc: true
@@ -124,7 +124,6 @@ Only show the knee plot without generating a SCAE object. All function parameter
 scae <- read_allele_counts(dir_path,
                          sample_names = "example_data",
                          filter = "no",
-                         symbols = "orgdb",
                          exp_type = "WTA",
                          lookup_file = "lookup_table_HLA_only.csv",
                          barcode_file = "cells_x_genes.barcodes.txt",
@@ -143,7 +142,6 @@ Read in and automatic filtering mode, generating a SCAE object. Filtering perfor
 scae <- read_allele_counts(dir_path,
                          sample_names = "example_data",
                          filter = "yes",
-                         symbols = "orgdb",
                          exp_type = "WTA",
                          verbose = TRUE)
 scae
@@ -158,7 +156,6 @@ Read in and custom filtering mode, generating a SCAE object. Filtering performed
 scae <- read_allele_counts(dir_path,
                          sample_names = "example_data",
                          filter = "custom",
-                         symbols = "orgdb",
                          exp_type = "WTA",
                          filter_threshold = 105,
                          verbose = FALSE)

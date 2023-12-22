@@ -27,19 +27,17 @@
 #' @param lookup A data.frame object containing the lookup table.
 #' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
-#' The value `"biomart"` uses the `biomaRt` package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @return A SingleCellAlleleExperiment object.
-SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup, verbose = FALSE){
+SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose = FALSE){
   sce <- SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
-  sce_add_look <- ext_rd(sce, exp_type, symbols, verbose = verbose)
+  sce_add_look <- ext_rd(sce, exp_type, verbose = verbose)
   if (verbose){
   rt_scae_lookup_end <- Sys.time()
   diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
@@ -101,8 +99,6 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object. Object is initally constructed in the `SingleCellAlleleExperiment` constructor.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
-#' The value `"biomart"` [biomaRt](\code{\link{biomaRt}}) package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
@@ -110,37 +106,11 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, symbols, lookup
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return A SingleCellExperiment object.
-ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
-  test <- symbols
+ext_rd <- function(sce, exp_type, verbose = FALSE){
 
-  if (exp_type == "WTA"){
-    if (symbols == "biomart"){
-      test <- tryCatch({
-        gene_symbols <- get_ncbi_gene_names(sce)
-        if (verbose){
-          message("Using biomart to retrieve NCBI gene identifiers.")
-        }
-        test <- "biomart"
-      }, message = function(e){
-        if (grepl("unavailable", e$message)) {
-          message("Ensembl service is currently unavailable, using org.Hs.db instead")
-          symbols <- "orgdb"
-        } else if (grepl("unresponsive", e$message)){
-          message("Ensembl service is currently unavailable, using org.Hs.db instead")
-          symbols <- "orgdb"
-        } else {
-          symbols <- "biomart"
-        }
-        return(symbols)
-      })
-    }
-    symbols = test
-
-    if (symbols == "orgdb"){
-      gene_symbols <- get_ncbi_org(sce)
-      if (verbose){
-        message("Using org.Hs to retrieve NCBI gene identifiers.")
-      }
+    gene_symbols <- get_ncbi_org(sce)
+    if (verbose){
+      message("Using org.Hs to retrieve NCBI gene identifiers.")
     }
 
     rowData(sce)$Symbol <- gene_symbols
@@ -157,53 +127,14 @@ ext_rd <- function(sce, exp_type, symbols, verbose = FALSE){
     # Gene level
     rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
     rowData(sce)[rownames(rowData(scae_subset_alleles(sce))),]$Symbol <- rownames(rowData(scae_subset_alleles(sce)))
-  }
   sce
 }
-
-
-
-#' Get NCBI genes using biomaRt
-#'
-#' @description
-#' This internal function is used to retrieve the gene-symbol names to the corresponding ENSG accession numbers in the WTA experiment approach.
-#' Internet connection is mandatory, as its retrieving the newest possible dataset every time. If you have to work offline then use the
-#' get_ncbi_org by specifying `symbols = "orgdb"` in the corresponding `symbols` parameter of the `read_allele_counts()` function.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
-#'
-#' @importFrom biomaRt useMart getBM
-#'
-#' @return A vector containing character strings for NCBI gene names.
-get_ncbi_gene_names <- function(sce) {
-
-  ensembl_ids_sce  <- unlist(rowData(sce)$Ensembl_ID)
-
-  ensembl_ids <- sub("\\..*", "", ensembl_ids_sce)
-
-  ensembl <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  attributes <- c("ensembl_gene_id", "hgnc_symbol")
-
-  results <- biomaRt::getBM(
-    attributes =  attributes,
-    filters = "ensembl_gene_id",
-    values  = ensembl_ids,
-    mart    = ensembl
-  )
-  ncbi_gene_names  <- rep(NA_character_, length(ensembl_ids))
-  matching_indices <- match(results$ensembl_gene_id, ensembl_ids)
-  ncbi_gene_names[matching_indices[!is.na(matching_indices)]] <- results$external_gene_name
-
-  ncbi_gene_names[ncbi_gene_names == ""] <- NA
-  return(ncbi_gene_names)
-}
-
 
 # Code provided by Ahmad Al Ajami
 #' Get NCBI genes using the org.HS.db package
 #'
 #' @description
-#' This internal function is not as accurate (does not retrieve as many ncbi gene names as `biomaRt`) but can be used without
+#' This internal function is not as accurate (does not retrieve as many gene names as `biomaRt`) but can be used without
 #' internet connection.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.

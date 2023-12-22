@@ -23,7 +23,6 @@ example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
 scae <- read_allele_counts(example_data,
                         sample_names = "example_data",
                         filter = "yes",
-                        symbols = "orgdb",
                         exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = "cells_x_genes.barcodes.txt",
