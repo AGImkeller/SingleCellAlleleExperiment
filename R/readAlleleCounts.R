@@ -248,6 +248,7 @@ read_from_sparse_allele <- function(path,
        feature_info = feature_info)
 }
 
+
 #' Read in allele lookup
 #'
 #' @description
