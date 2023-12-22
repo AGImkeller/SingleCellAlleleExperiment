@@ -5,8 +5,8 @@
 \title{Reading in allele quantification data into SingleCellAlleleExperiment object}
 \usage{
 read_allele_counts(
-  samples,
-  sample_names = names(samples),
+  samples_dir,
+  sample_names = names(samples_dir),
   filter = c("yes", "no", "custom"),
   exp_type = c("WTA", "Amplicon"),
   lookup_file = "lookup_table_HLA_only.csv",
@@ -21,7 +21,7 @@ read_allele_counts(
 )
 }
 \arguments{
-\item{samples}{A character string determining the path to one directory containing all input files.}
+\item{samples_dir}{A character string determining the path to one directory containing all input files.}
 
 \item{sample_names}{A character string for a sample identifier. Can be used to describe the used dataset or sample.}
 

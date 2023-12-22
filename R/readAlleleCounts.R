@@ -16,7 +16,7 @@
 #'
 #' File identifiers can be specifically stated if the identifiers are different.
 #'
-#' @param samples A character string determining the path to one directory containing all input files.
+#' @param samples_dir A character string determining the path to one directory containing all input files.
 #' @param sample_names A character string for a sample identifier. Can be used to describe the used dataset or sample.
 #' @param filter A vector containing three character strings that describe different options for filtering. The value `"yes"` uses the inflection point of the knee plot to filter out low-quality cells.
 #' The value `"no"` computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value `"custom"` allows for setting a custom threshold in the `filter_threshold` parameter.
@@ -95,8 +95,8 @@
 #'
 #'
 #' @export
-read_allele_counts <- function(samples,
-                              sample_names = names(samples),
+read_allele_counts <- function(samples_dir,
+                              sample_names = names(samples_dir),
                               filter = c("yes", "no", "custom"),
                               exp_type = c("WTA", "Amplicon"),
                               lookup_file = "lookup_table_HLA_only.csv",
@@ -111,7 +111,7 @@ read_allele_counts <- function(samples,
 
   rt_one_readin_start <- Sys.time()
   if (is.null(sample_names)) {
-    sample_names <- samples
+    sample_names <- samples_dir
   }
 
   if (filter == "custom" & is.null(filter_threshold)) {
@@ -119,7 +119,7 @@ read_allele_counts <- function(samples,
   }
 
   #reading in files
-  load_out <- BiocParallel::bplapply(samples,
+  load_out <- BiocParallel::bplapply(samples_dir,
                                      FUN = read_from_sparse_allele,
                                      exp_type = exp_type,
                                      barcode_file = barcode_file,
@@ -145,7 +145,7 @@ read_allele_counts <- function(samples,
   colnames(full_data) <- cnames
 
   full_data <- as(full_data, "CsparseMatrix")
-  lookup <- read_Lookup(samples, exp_type, lookup_file)
+  lookup <- read_Lookup(samples_dir, exp_type, lookup_file)
 
 
   #preflight mode, only for plotting the knee plot
@@ -182,7 +182,7 @@ read_allele_counts <- function(samples,
                                     verbose = verbose)
   if (exp_type == "Amplicon"){
     rt_six_scae_start <- Sys.time()
-    sce <- add_sample_tags(samples, sce, tag_feature_mtx, tag_feature_barcodes)
+    sce <- add_sample_tags(samples_dir, sce, tag_feature_mtx, tag_feature_barcodes)
 
     if (verbose){
     rt_six_scae_end <- Sys.time()
