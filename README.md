@@ -2,8 +2,6 @@
 
 Defines a S4 class that is based on `SingleCellExperiment`. In addition to the usual gene layer `SingleCellAlleleExperiment` can also store data for immune genes such as HLAs, Immunoglobulins and KIRs at the allele level and at the level of functionally similar groups of immune genes.
 
-*Authors: Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller*
-
 ## Biological background and motivation
 
 Immune molecules such as B and T cell receptors, human leukocyte antigens (HLAs) or killer Ig-like
