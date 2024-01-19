@@ -34,6 +34,6 @@ The implemented object follows similar conventions like the `SCE` class, where r
 
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
-## Authors: 
+## Authors 
 
 - [Jonas Schuck](https://github.com/Jonas-Schuck), [Ahmad Al Ajami](https://github.com/ahmadalajami), [Federico Marini](https://github.com/federicomarini), [Katharina Imkeller](https://github.com/imkeller)
