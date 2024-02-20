@@ -54,6 +54,10 @@ devtools::install_github("AGImkeller/scaeData", build_vignettes = TRUE)
 devtools::install_github("AGImkeller/SingleCellAlleleExperiment", build_vignettes = TRUE)
 ```
 
+## Citation
+
+To be added..
+
 ## Authors 
 
 - [Jonas Schuck](https://github.com/Jonas-Schuck), [Ahmad Al Ajami](https://github.com/ahmadalajami), [Federico Marini](https://github.com/federicomarini), [Katharina Imkeller](https://github.com/imkeller)
