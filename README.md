@@ -32,6 +32,28 @@ The implemented object follows similar conventions like the `SCE` class, where r
 
 **Figure 1:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
+## Installation
+
+`SingleCellAlleleExperiment` and its data package `scaeData` are available in Bioconductor and can be installed as follows:
+
+```markdown
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("scaeData")
+BiocManager::install("SingleCellAlleleExperiment")
+```
+
+Alternatively, they can be installed from GitHub using the [devtools](https://github.com/r-lib/devtools) package:
+
+```markdown
+if (!require("devtools", quietly = TRUE))
+    install.packages("devtools")
+
+devtools::install_github("AGImkeller/scaeData", build_vignettes = TRUE)
+devtools::install_github("AGImkeller/SingleCellAlleleExperiment", build_vignettes = TRUE)
+```
+
 ## Authors 
 
 - [Jonas Schuck](https://github.com/Jonas-Schuck), [Ahmad Al Ajami](https://github.com/ahmadalajami), [Federico Marini](https://github.com/federicomarini), [Katharina Imkeller](https://github.com/imkeller)
