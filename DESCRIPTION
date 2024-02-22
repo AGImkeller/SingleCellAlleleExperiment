@@ -5,12 +5,13 @@ Authors@R:
   c(
   person("Jonas", "Schuck", email="jschuckdev@gmail.com", role = c("aut", "cre"),
           comment = c(ORCID = "0009-0003-5705-4579")),
-  person("Al Ajami", "Ahmad", role = c("aut"),
+  person("Ahmad", "Al Ajami", role = c("aut"),
           comment = c(ORCID = "YOUR-ORCID-ID")),
-  person("Marini", "Federico", role = c("aut"),
+  person("Federico", "Marini", role = c("aut"),
           comment = c(ORCID = "0000-0003-3252-7758")),
   person("Katharina", "Imkeller", role = c("aut"),
           comment = c(ORCID = "0000-0002-5177-0852")))
+Maintainer: "Jonas Schuck" <Schuck@med.uni-frankfurt.de>
 Description: 
   Defines a S4 class that is based on SingleCellExperiment. In addition to the usual gene layer
   the object can also store data for immune genes such as HLAs, Igs and KIRs at allele and functional level.
