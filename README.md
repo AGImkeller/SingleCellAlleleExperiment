@@ -54,6 +54,7 @@ The `SingleCellAlleleExperiment (SCAE)` class serves as a comprehensive multi-la
 <div style="text-align: center;">
   <img src="./inst/extdata/figures/scae_advanced.png" alt="Scheme of SingleCellAlleleExperiment object structure with lookup table." width="600" height="250">
 </div>
+
 **Figure 2:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
 <br>
