@@ -18,19 +18,19 @@ are identified by "I" in rowData(scae)$NI_I and "A" in rowData(scae)$Quant_type.
 }
 \examples{
 
-example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 
-scae <- read_allele_counts(example_data,
-                        sample_names = "example_data",
-                        filter = "yes",
-                        exp_type = "WTA",
-                        lookup_file = "lookup_table_HLA_only.csv",
-                        barcode_file = "cells_x_genes.barcodes.txt",
-                        gene_file = "cells_x_genes.genes.txt",
-                        matrix_file = "cells_x_genes.mtx",
-                        tag_feature_mtx = "cells_x_genes.genes.txt",
-                        tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                        filter_threshold = NULL)
+scae <- read_allele_counts(example_data_5k$dir,
+                          sample_names = "example_data_wta",
+                          filter = "custom",
+                          exp_type = "WTA",
+                          lookup_file = "lookup_table_HLA_only.csv",
+                          barcode_file = example_data_5k$barcodes,
+                          gene_file = example_data_5k$features,
+                          matrix_file = example_data_5k$matrix,
+                          filter_threshold = 0,
+                          example_dataset = TRUE,
+                          verbose = TRUE)
 
 
 scae

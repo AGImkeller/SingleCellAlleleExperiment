@@ -16,19 +16,19 @@
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 #'
-#' scae <- read_allele_counts(example_data,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         exp_type = "WTA",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL)
+#' scae <- read_allele_counts(example_data_5k$dir,
+#'                           sample_names = "example_data_wta",
+#'                           filter = "custom",
+#'                           exp_type = "WTA",
+#'                           lookup_file = "lookup_table_HLA_only.csv",
+#'                           barcode_file = example_data_5k$barcodes,
+#'                           gene_file = example_data_5k$features,
+#'                           matrix_file = example_data_5k$matrix,
+#'                           filter_threshold = 0,
+#'                           example_dataset = TRUE,
+#'                           verbose = TRUE)
 #'
 #'
 #'scae
@@ -65,20 +65,19 @@ scae_subset_alleles <- function(scae) {
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 #'
-#' scae <- read_allele_counts(example_data,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         exp_type = "WTA",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL)
-#'
+#' scae <- read_allele_counts(example_data_5k$dir,
+#'                           sample_names = "example_data_wta",
+#'                           filter = "custom",
+#'                           exp_type = "WTA",
+#'                           lookup_file = "lookup_table_HLA_only.csv",
+#'                           barcode_file = example_data_5k$barcodes,
+#'                           gene_file = example_data_5k$features,
+#'                           matrix_file = example_data_5k$matrix,
+#'                           filter_threshold = 0,
+#'                           example_dataset = TRUE,
+#'                           verbose = TRUE)
 #'
 #'scae
 #'
@@ -114,19 +113,19 @@ get_agenes <- function(scae) {
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 #'
-#' scae <- read_allele_counts(example_data,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         exp_type = "WTA",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL)
+#' scae <- read_allele_counts(example_data_5k$dir,
+#'                           sample_names = "example_data_wta",
+#'                           filter = "custom",
+#'                           exp_type = "WTA",
+#'                           lookup_file = "lookup_table_HLA_only.csv",
+#'                           barcode_file = example_data_5k$barcodes,
+#'                           gene_file = example_data_5k$features,
+#'                           matrix_file = example_data_5k$matrix,
+#'                           filter_threshold = 0,
+#'                           example_dataset = TRUE,
+#'                           verbose = TRUE)
 #'
 #'scae
 #'
@@ -162,19 +161,19 @@ get_nigenes <- function(scae) {
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 #'
-#' scae <- read_allele_counts(example_data,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         exp_type = "WTA",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL)
+#' scae <- read_allele_counts(example_data_5k$dir,
+#'                           sample_names = "example_data_wta",
+#'                           filter = "custom",
+#'                           exp_type = "WTA",
+#'                           lookup_file = "lookup_table_HLA_only.csv",
+#'                           barcode_file = example_data_5k$barcodes,
+#'                           gene_file = example_data_5k$features,
+#'                           matrix_file = example_data_5k$matrix,
+#'                           filter_threshold = 0,
+#'                           example_dataset = TRUE,
+#'                           verbose = TRUE)
 #'
 #'scae
 #'
@@ -210,19 +209,19 @@ scae_subset_functional <- function(scae) {
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 #'
-#' scae <- read_allele_counts(example_data,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         exp_type = "WTA",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL)
+#' scae <- read_allele_counts(example_data_5k$dir,
+#'                           sample_names = "example_data_wta",
+#'                           filter = "custom",
+#'                           exp_type = "WTA",
+#'                           lookup_file = "lookup_table_HLA_only.csv",
+#'                           barcode_file = example_data_5k$barcodes,
+#'                           gene_file = example_data_5k$features,
+#'                           matrix_file = example_data_5k$matrix,
+#'                           filter_threshold = 0,
+#'                           example_dataset = TRUE,
+#'                           verbose = TRUE)
 #'
 #'scae
 #'
@@ -244,14 +243,22 @@ scae_subset_unknown_alleles <- function(scae) {
 
 #------------------------------getter wrapper----------------------------------#
 
+#' Subset SCAE object
+#'
+#' @param scae SCAE object
+#' @param subset character string specifiying a data layer
+#'
+#' @return SCAE object
+#' @export
 scae_subset <- function(scae, subset = c("nonimmune", "alleles", "immune_genes", "functional", "unknown_alleles")){
 
-  switch(subset,
+  scae_sub<- switch(subset,
          "nonimmune" = get_nigenes(scae),
          "alleles" =  scae_subset_alleles(scae),
          "immune_genes" = get_agenes(scae),
          "functional" = scae_subset_functional(scae),
          "unknown_alleles" = scae_subset_unknown_alleles(scae),
          message("Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional`, `unknown_alleles`"))
+  return(scae_sub)
 }
 

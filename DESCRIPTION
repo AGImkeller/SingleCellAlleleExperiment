@@ -35,10 +35,10 @@ Imports:
   ggplot2,
   org.Hs.eg.db,
   AnnotationDbi,
-  MatrixGenerics,
   BiocGenerics,
   DropletUtils
-Suggests: 
+Suggests:
+  scaeData,
   knitr,
   rmarkdown,
   scran,
@@ -49,6 +49,6 @@ Suggests:
 biocViews: DataRepresentation, Infrastructure, SingleCell, Transcriptomics,
   GeneExpression, Genetics, ImmunoOncology, DataImport
 URL: https://github.com/AGImkeller/SingleCellAlleleExperiment
-BugReport: https://github.com/AGImkeller/SingleCellAlleleExperiment/issues
+BugReports: https://github.com/AGImkeller/SingleCellAlleleExperiment/issues
 VignetteBuilder: knitr
 Config/testthat/edition: 3

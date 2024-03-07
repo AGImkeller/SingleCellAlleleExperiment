@@ -8,5 +8,6 @@
 
 library(testthat)
 library(SingleCellAlleleExperiment)
+library(scaeData)
 
 test_check("SingleCellAlleleExperiment")

@@ -1,34 +1,45 @@
 #initial tests for the object, not completed yet
 
-library(SingleCellAlleleExperiment)
-library(Matrix)
 library(testthat)
+library(SingleCellAlleleExperiment)
+library(scaeData)
+library(Matrix)
 
 #--------------------read in raw data and objects for tests--------------------#
-dir_path <- system.file("extdata", package = "SingleCellAlleleExperiment")
-barcode_loc <- system.file("extdata", "cells_x_genes.barcodes.txt", package = "SingleCellAlleleExperiment")
-feature_loc <- system.file("extdata", "cells_x_genes.genes.txt", package = "SingleCellAlleleExperiment")
-matrix_loc  <- system.file("extdata", "cells_x_genes.mtx", package = "SingleCellAlleleExperiment")
+example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+
+barcode_loc <- file.path(example_data_5k$dir, example_data_5k$barcodes)
+feature_loc <- file.path(example_data_5k$dir, example_data_5k$features)
+matrix_loc  <- file.path(example_data_5k$dir, example_data_5k$matrix)
 
 feature_info <- utils::read.delim(feature_loc, header = FALSE)
 cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
 mat          <- t(Matrix::readMM(matrix_loc))
 
+sce_filter_raw <- SingleCellExperiment(assays = list(counts = mat),
+                                       rowData = feature_info,
+                                       colData = cell_names)
 
-#read in using `orgdb`
-scae <- read_allele_counts(dir_path,
-                         sample_names = "example_data_wta",
-                         filter = "custom",
-                         exp_type = "WTA",
-                         lookup_file = "lookup_table_HLA_only.csv",
-                         barcode_file = "cells_x_genes.barcodes.txt",
-                         gene_file = "cells_x_genes.genes.txt",
-                         matrix_file = "cells_x_genes.mtx",
-                         tag_feature_mtx = "cells_x_genes.genes.txt",
-                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                         filter_threshold = 0,
-                         verbose = TRUE)
+# perform zero-filtering on colSums in the example dataset as this is the necessary default performed in the constructor
+filtered_sce_raw <- sce_filter_raw[, colSums(counts(sce_filter_raw)) > 0]
+cell_names <- cell_names[1:length(colData(filtered_sce_raw)$V1), ]
+cell_names$V1 <- colData(filtered_sce_raw)$V1
 
+mat_filtered_zero <- counts(filtered_sce_raw)
+
+scae <- read_allele_counts(example_data_5k$dir,
+                           sample_names = "example_data_wta",
+                           filter = "custom",
+                           exp_type = "WTA",
+                           lookup_file = "lookup_table_HLA_only.csv",
+                           barcode_file = example_data_5k$barcodes,
+                           gene_file = example_data_5k$features,
+                           matrix_file = example_data_5k$matrix,
+                           filter_threshold = 0,
+                           example_dataset = TRUE,
+                           verbose = TRUE)
+
+#
 test_that("rownames and rowData check", {
   #check the names
   expect_equal(feature_info$V1, rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
@@ -45,7 +56,7 @@ test_that("colnames and colData check", {
   #check the names
   expect_equal(rownames(colData(scae)), cell_names$V1)
 
-  #check if roWData and object rownames are equal
+  #check if colData and object colnames are equal
   expect_equal(colnames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),]), rownames(colData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
 
   #check the dimension
@@ -54,15 +65,15 @@ test_that("colnames and colData check", {
 
 test_that("assay check", {
   #dim-check
-  expect_equal(dim(counts(scae)[1:dim(mat)[1],]), dim(mat))
+  expect_equal(dim(counts(scae)[1:dim(mat_filtered_zero)[1],]), dim(mat_filtered_zero))
 
-  scae_no_immune_layers <- scae[1:dim(mat)[1],]
+  scae_no_immune_layers <- scae[1:dim(mat_filtered_zero)[1],]
 
-  random_num1 <- sample(1:dim(mat)[1], 1)
-  random_num2 <- sample(1:dim(mat)[2], 1)
+  random_num1 <- sample(1:dim(mat_filtered_zero)[1], 1)
+  random_num2 <- sample(1:dim(mat_filtered_zero)[2], 1)
 
   #check random if random entry is equal
-  expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2], mat[random_num1, random_num2])
+  expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2], mat_filtered_zero[random_num1, random_num2])
 
   expect_type(scae[random_num1, random_num2], "S4")
 })
@@ -73,137 +84,49 @@ test_that("assay check", {
 test_that("check input-parameter errors", {
 
   # filter = "custom" but didnt set a threshold in the filter_threshold param
-  expect_error(read_allele_counts(dir_path,
+  expect_error(read_allele_counts(example_data_5k$dir,
                                 sample_names = "example_data_wta",
                                 filter = "custom",
                                 exp_type = "WTA",
                                 lookup_file = "lookup_table_HLA_only.csv",
-                                barcode_file = "cells_x_genes.barcodes.txt",
-                                gene_file = "cells_x_genes.genes.txt",
-                                matrix_file = "cells_x_genes.mtx",
-                                tag_feature_mtx = "cells_x_genes.genes.txt",
-                                tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+                                barcode_file = example_data_5k$barcodes,
+                                gene_file = example_data_5k$features,
+                                matrix_file = example_data_5k$matrix,
                                 filter_threshold = NULL,
+                                example_dataset = TRUE,
                                 verbose = FALSE),
             regexp = "")
 
-  expect_message(read_allele_counts(dir_path,
+  expect_message(read_allele_counts(example_data_5k$dir,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
                                   exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
-                                  barcode_file = "cells_x_genes.barcodes.txt",
-                                  gene_file = "cells_x_genes.genes.txt",
-                                  matrix_file = "cells_x_genes.mtx",
+                                  barcode_file = example_data_5k$barcodes,
+                                  gene_file = example_data_5k$features,
+                                  matrix_file = example_data_5k$matrix,
                                   tag_feature_mtx = "cells_x_genes.genes.txt",
                                   tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                                   filter_threshold = NULL,
+                                  example_dataset = TRUE,
                                   verbose = FALSE),
-                 regexp = "Filtering performed based on the inflection point at: 105 UMI counts.")
+                 regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
 
 
-  expect_message(read_allele_counts(dir_path,
+  expect_message(read_allele_counts(example_data_5k$dir,
                                   sample_names = "example_data_wta",
                                   filter = "no",
                                   exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
-                                  barcode_file = "cells_x_genes.barcodes.txt",
-                                  gene_file = "cells_x_genes.genes.txt",
-                                  matrix_file = "cells_x_genes.mtx",
+                                  barcode_file = example_data_5k$barcodes,
+                                  gene_file = example_data_5k$features,
+                                  matrix_file = example_data_5k$matrix,
                                   tag_feature_mtx = "cells_x_genes.genes.txt",
                                   tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                                   filter_threshold = NULL,
+                                  example_dataset = TRUE,
                                   verbose = FALSE),
-                 regexp = "Suggested threshold based on inflection point is at: 105 UMI counts.")
-
-})
-
-
-test_that("test for unknown alleles that have correct nomenclature", {
-  path_genes  <- file.path(dir_path, "cells_x_genes_unknwn.genes.txt")
-  path_matrix <- file.path(dir_path, "cells_x_genes_unknwn.mtx")
-
-
-  #generate new feature list, with the unknown alleles integrated
-  new_entries <- data.frame(V1 = c("Unkwn*01:01:01:01", "Unkwn*02:02:02:02"))
-  feature_info_new <- rbind(feature_info, new_entries)
-
-  #generate two count matrix, integrating two more rows (all 0 counts)
-  unknown_counts <- matrix(0, nrow = 2, ncol = dim(mat)[2])
-  unknown_counts <- as(unknown_counts, "CsparseMatrix")
-  new_full_matrix <- rbind(mat, unknown_counts)
-  new_full_matrix <- t(new_full_matrix)
-
-  #overwrite raw data and integrate two unknown alleles and update the matrix as well
-  write.table(feature_info_new$V1, file = path_genes, sep = "\t", row.names = FALSE, col.names = FALSE)
-  writeMM(new_full_matrix, path_matrix)
-
-  expect_message(scae_unknown <- read_allele_counts(dir_path,
-                                  sample_names = "example_data_wta",
-                                  filter = "yes",
-                                  exp_type = "WTA",
-                                  lookup_file = "lookup_table_HLA_only.csv",
-                                  barcode_file = "cells_x_genes.barcodes.txt",
-                                  gene_file = "cells_x_genes_unknwn.genes.txt",
-                                  matrix_file = "cells_x_genes_unknwn.mtx",
-                                  tag_feature_mtx = "cells_x_genes.genes.txt",
-                                  tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                                  filter_threshold = NULL,
-                                  verbose = FALSE),
-                 regexp = message("Unkwn*01:01:01:01 can't be found in the lookup table
-Unkwn*02:02:02:02 can't be found in the lookup table"))
-
-# test new dimension if integration worked
-expect_equal(dim(counts(scae_unknown[c(rownames(get_nigenes(scae_unknown)), rownames(scae_subset_alleles(scae_unknown))),]))[1],
-             (dim(mat)[1] + dim(unknown_counts)[1]))
-
-# delete files with integrated unknown alleles again
-unlink(path_genes)
-unlink(path_matrix)
-
-})
-
-
-test_that("test for unknown alleles that have arbitrary identifier (stop execution)", {
-
-  path_genes  <- file.path(dir_path, "cells_x_genes_unknwn_stop.genes.txt")
-  path_matrix <- file.path(dir_path, "cells_x_genes_unknwn_stop.mtx")
-
-  #generate new feature list, with the unknown alleles integrated, both dont have a valid nomenclature
-  new_entries_stop <- data.frame(V1 = c("Unkwn_allele1", "Unkwn_allele2"))
-  feature_info_new_stop <- rbind(feature_info, new_entries_stop)
-
-  #generate two count matrix, integrating two more rows (all 0 counts)
-  unknown_counts_stop <- matrix(0, nrow = 2, ncol = dim(mat)[2])
-  unknown_counts_stop <- as(unknown_counts_stop, "CsparseMatrix")
-  new_full_matrix_stop <- rbind(mat, unknown_counts_stop)
-  new_full_matrix_stop <- t(new_full_matrix_stop)
-
-  #overwrite raw data and integrate two unknown alleles and update the matrix as well
-  write.table(feature_info_new_stop$V1, file = path_genes, sep = "\t", row.names = FALSE, col.names = FALSE)
-  writeMM(new_full_matrix_stop, path_matrix)
-
-  expect_error(read_allele_counts(dir_path,
-                                sample_names = "example_data_wta",
-                                filter = "yes",
-                                exp_type = "WTA",
-                                lookup_file = "lookup_table_HLA_only.csv",
-                                barcode_file = "cells_x_genes.barcodes.txt",
-                                gene_file = "cells_x_genes_unknwn_stop.genes.txt",
-                                matrix_file = "cells_x_genes_unknwn_stop.mtx",
-                                tag_feature_mtx = "cells_x_genes.genes.txt",
-                                tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                                filter_threshold = NULL,
-                                verbose = TRUE),
-               regexp = message("Error in check_unknowns(sce, allele_ids_lookup) :
-Allele information contains unknown identifier.
-Please check the data and remove rows of the following
-allele features identifiers: `Unkwn_allele1 Unkwn_allele2` or use proper nomenclature."))
-
-
-# delete files with integrated unknown alleles again
-unlink(path_genes)
-unlink(path_matrix)
+                 regexp = "Suggested threshold based on inflection point is at: 282 UMI counts.")
 
 })
 
@@ -221,19 +144,18 @@ test_that("check rowData extension for WTA and Amplicon", {
 })
 
 
-test_that("samples and sample", {
+test_that("sample_names and samples_dir", {
 
-  scae_no_sample <- read_allele_counts(dir_path,
-                             filter = "custom",
-                             exp_type = "WTA",
-                             lookup_file = "lookup_table_HLA_only.csv",
-                             barcode_file = "cells_x_genes.barcodes.txt",
-                             gene_file = "cells_x_genes.genes.txt",
-                             matrix_file = "cells_x_genes.mtx",
-                             tag_feature_mtx = "cells_x_genes.genes.txt",
-                             tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-                             filter_threshold = 0,
-                             verbose = TRUE)
+  scae_no_sample <- read_allele_counts(example_data_5k$dir,
+                               filter = "custom",
+                               exp_type = "WTA",
+                               lookup_file = "lookup_table_HLA_only.csv",
+                               barcode_file = example_data_5k$barcodes,
+                               gene_file = example_data_5k$features,
+                               matrix_file = example_data_5k$matrix,
+                               filter_threshold = 0,
+                               example_dataset = TRUE,
+                               verbose = TRUE)
 
-  expect_equal(colData(scae_no_sample)$Sample[1], dir_path)
+  expect_equal(colData(scae_no_sample)$Sample[1], example_data_5k$dir)
 })

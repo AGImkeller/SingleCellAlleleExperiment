@@ -1,0 +1,171 @@
+---
+title: "An exemplary downstream analysis using the SingleCellAlleleExperiment class"
+package: SingleCellAlleleExperiment
+author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
+email: "jschuckdev@gmail.com"
+output: 
+   BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{An exemplary downstream analysis using the SingleCellAlleleExperiment class}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r options, include=FALSE, echo=FALSE}
+library(BiocStyle)
+```
+## Loading packages 
+
+The following packages are abundant for performing the here stated downstream analysis and visualization.
+
+```{r, message = FALSE}
+library(SingleCellAlleleExperiment)
+library(scaeData)
+library(scran)
+library(scater)
+library(patchwork)
+library(ggplot2)
+```
+
+
+
+Download and save the **"pbmc_5k"** dataset from the accompanying `ExperimentHub/scaeData` package.
+
+```{r}
+example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+
+example_data_5k
+```
+
+```{r warning=FALSE}
+scae <- read_allele_counts(example_data_5k$dir,
+                           sample_names = "example_data",
+                           filter = "yes",
+                           exp_type = "WTA",
+                           lookup_file = "lookup_table_HLA_only.csv",
+                           barcode_file = example_data_5k$barcodes,
+                           gene_file = example_data_5k$features,
+                           matrix_file = example_data_5k$matrix,
+                           filter_threshold = NULL,
+                           example_dataset = TRUE,
+                           verbose = TRUE)
+scae
+```
+
+# Downstream analysis
+
+In the following sections, main steps for dimensional reduction are performed, offering insights into the different data layers of the SCAE object as well giving an idea on how to perform immune gene expression analysis. 
+
+## Subsetting the different layers
+
+The non-imune genes are combined with each of the integrated immune gene allele-aware layers to determine three different subsets.
+
+### Non-immune genes + alleles
+
+```{r}
+scae_nonimmune__allels_subset <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "alleles"))), ]
+
+scae_nonimmune__allels_subset
+```
+
+<br>
+
+### Non-immune genes + immune genes
+
+```{r}
+scae_nonimmune__immune <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "immune_genes"))), ]
+
+scae_nonimmune__immune
+```
+
+<br>
+
+### Non-immune genes + functional class
+
+```{r}
+scae_nonimmune__functional <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "functional"))), ]
+
+scae_nonimmune__functional
+```
+
+
+## Dimensional Reduction
+
+
+### Model variance and HVGs for all data layers
+
+Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are part from the `r Biocpkg("scran")` package. Compute a list of HVGs for each data layer. Return the top 0.1 % HVGs per layer using `getTopHVGs`.
+
+```{r}
+df_ni_a <- modelGeneVar(scae_nonimmune__allels_subset)
+top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
+```
+
+```{r}
+df_ni_g <- modelGeneVar(scae_nonimmune__immune)
+top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
+```
+
+```{r}
+df_ni_f <- modelGeneVar(scae_nonimmune__functional)
+top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
+```
+
+### PCA
+
+Compute PCA for each layer and store the results in the object. Its Important to make unique identifiers for each layer/run or the results will be overwritten and just saved as `PCA`. Here, the `runPCA` functions from the `r Biocpkg("scater")` package is used.
+
+```{r}
+
+set.seed(18)
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_a, exprs_values = "logcounts", name = "PCA_a")
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_g, exprs_values = "logcounts", name = "PCA_g")
+scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_f, exprs_values = "logcounts", name = "PCA_f")
+```
+
+```{r}
+reducedDimNames(scae)
+```
+
+### t-SNE
+
+The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg("scater")` package. Unique identifiers are stated here for each layer as well.
+
+```{r}
+set.seed(18)
+scae <- runTSNE(scae, dimred= "PCA_a",  name = "TSNE_a")
+set.seed(18)
+scae <- runTSNE(scae, dimred= "PCA_g",  name = "TSNE_g")
+set.seed(18)
+scae <- runTSNE(scae, dimred= "PCA_f",  name = "TSNE_f")
+
+```
+
+List of results from the performed reduced dimension analysis. 
+
+```{r}
+reducedDimNames(scae)
+```
+
+<hr>
+
+## Visualization
+
+Exemplary visualization for the t-SNE results on gene level for immune genes that relate to HLA-class I. In the given dataset, these are the immune genes `HLA-A`, `HLA-B` and `HLA-C` plotted alongside their alleles. This allows for insights into potential genetic differences shown on allele-level.
+
+
+<hr>
+
+# Additional
+
+As the SCAE object is extending the SCE object, it is also compatible with the `r Biocpkg("iSEE")` package for interactive data exploration.
+
+# Session Information
+
+```{r}
+sessionInfo()
+```
+

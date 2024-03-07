@@ -29,8 +29,8 @@
 #' @param tag_feature_mtx A character string determining the name of the file containing the sample-tag quantification data.
 #' @param tag_feature_barcodes A character string determining the name of the file containing the sample-tag barcode identifiers.
 #' @param filter_threshold An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is `NULL` when using `filter = c("yes", "no")`. Value must be provided when using `filter = "custom"`.
-#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
-#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
+#' @param example_dataset A logical parameter used when reading in example datasets from `scaeData`. `FALSE` is default. Set to `TRUE` if you want to generate an `SCAE object` with one of the available datasets in `scaeData`.
+#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution. Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom BiocParallel SerialParam bplapply
 #' @importFrom S4Vectors DataFrame ROWNAMES
@@ -39,57 +39,51 @@
 #'
 #' @examples
 #'
-#' example_data <- system.file("extdata", package = "SingleCellAlleleExperiment")
+#' example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
 #'
 #'
 #' # preflight mode, not generating an SCAE object
 #' # used for quality-assessment by plotting the knee plot
-#' scae_preflight <- read_allele_counts(example_data,
+#' scae_preflight <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "no",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = NULL
-#'                         )
+#'                         barcode_file = example_data_5k$barcodes,
+#'                         gene_file = example_data_5k$features,
+#'                         matrix_file = example_data_5k$matrix,
+#'                         filter_threshold = NULL,
+#'                         example_dataset = TRUE)
 #'
 #'
 #' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
-#' scae_filtered <- read_allele_counts(example_data,
+#' scae_filtered <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
+#'                         barcode_file = example_data_5k$barcodes,
+#'                         gene_file = example_data_5k$features,
+#'                         matrix_file = example_data_5k$matrix,
 #'                         filter_threshold = NULL,
-#'                         verbose = TRUE
-#'                         )
+#'                         example_dataset = TRUE,
+#'                         verbose = TRUE)
 #'
 #' scae_filtered
 #'
 #'
 #' # custom filtering mode, setting up a custom filter threshold for filtering out
 #' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
-#' scae_custom_filter <- read_allele_counts(example_data,
+#' scae_custom_filter <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "custom",
 #'                         exp_type = "WTA",
 #'                         lookup_file = "lookup_table_HLA_only.csv",
-#'                         barcode_file = "cells_x_genes.barcodes.txt",
-#'                         gene_file = "cells_x_genes.genes.txt",
-#'                         matrix_file = "cells_x_genes.mtx",
-#'                         tag_feature_mtx = "cells_x_genes.genes.txt",
-#'                         tag_feature_barcodes = "cells_x_genes.barcodes.txt",
-#'                         filter_threshold = 105
-#'                         )
+#'                         barcode_file = example_data_5k$barcodes,
+#'                         gene_file = example_data_5k$features,
+#'                         matrix_file = example_data_5k$matrix,
+#'                         filter_threshold = 105,
+#'                         example_dataset = TRUE)
 #'
 #' scae_custom_filter
 #'
@@ -106,6 +100,7 @@ read_allele_counts <- function(samples_dir,
                               tag_feature_mtx = "cells_x_features.mtx",
                               tag_feature_barcodes = "cells_x_features.barcodes.txt",
                               filter_threshold = NULL,
+                              example_dataset = FALSE,
                               verbose = FALSE,
                               BPPARAM = BiocParallel::SerialParam()){
 
@@ -145,8 +140,14 @@ read_allele_counts <- function(samples_dir,
   colnames(full_data) <- cnames
 
   full_data <- as(full_data, "CsparseMatrix")
-  lookup <- read_Lookup(samples_dir, exp_type, lookup_file)
 
+
+  if (example_dataset){
+    integrated_lookup_dir <- system.file("extdata", package = "SingleCellAlleleExperiment")
+    lookup <- read_Lookup(integrated_lookup_dir, exp_type, lookup_file)
+  }else{
+    lookup <- read_Lookup(samples_dir, exp_type, lookup_file)
+  }
 
   #preflight mode, only for plotting the knee plot
   if (filter == "no"){
@@ -180,17 +181,16 @@ read_allele_counts <- function(samples_dir,
                                     exp_type = exp_type,
                                     lookup = lookup,
                                     verbose = verbose)
-  if (exp_type == "Amplicon"){
-    rt_six_scae_start <- Sys.time()
-    sce <- add_sample_tags(samples_dir, sce, tag_feature_mtx, tag_feature_barcodes)
+  #if (exp_type == "Amplicon"){
+  #  rt_six_scae_start <- Sys.time()
+  #  sce <- add_sample_tags(samples_dir, sce, tag_feature_mtx, tag_feature_barcodes)
 
-    if (verbose){
-    rt_six_scae_end <- Sys.time()
-    diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
-      message("     Generating SCAE (6/X) adding sample tags: ", diff_rt_six, " seconds")
-    }
-
-  }
+  #  if (verbose){
+  #  rt_six_scae_end <- Sys.time()
+  #  diff_rt_six <- round(rt_six_scae_end - rt_six_scae_start, digits = 2)
+  #    message("     Generating SCAE (6/X) adding sample tags: ", diff_rt_six, " seconds")
+  #  }
+  #}
 
   if (verbose){
   rt_two_scae_end <- Sys.time()
@@ -247,7 +247,6 @@ read_from_sparse_allele <- function(path,
        cell_names =  cell_names,
        feature_info = feature_info)
 }
-
 
 #' Read in allele lookup
 #'

@@ -108,12 +108,13 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #' @return A SingleCellExperiment object.
 ext_rd <- function(sce, exp_type, verbose = FALSE){
 
-    gene_symbols <- get_ncbi_org(sce)
-    if (verbose){
-      message("Using org.Hs to retrieve NCBI gene identifiers.")
+    if (exp_type == "WTA"){
+      if (verbose){
+        message("Using org.Hs to retrieve NCBI gene identifiers.")
+      }
+      gene_symbols <- get_ncbi_org(sce)
+      rowData(sce)$Symbol <- gene_symbols
     }
-
-    rowData(sce)$Symbol <- gene_symbols
 
     allele_names_all <- find_allele_ids(sce, exp_type)
 
@@ -482,47 +483,4 @@ log_transform <- function(sce){
   logcounts(sce) <- DelayedArray(logcounts(sce))
 
   sce
-}
-
-
-#-6-------------------------add sample tags------------------------------------#
-
-#' Adding sample tag information to colData
-#'
-#' @description
-#' Internal function used in 'read_allele_counts()'. Stated here because its supposed to be a transformation step of the SCAE object.
-#' Adding sample tag information to colData
-#'
-#' @param path character string input containing the path to the directory containing the
-#'   input files
-#' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
-#' @param tag_feature_mtx A character string determining the name of the file containing the sample-tag quantification data.
-#' @param tag_feature_barcodes A character string determining the name of the file containing the sample-tag barcode identifiers.
-#'
-#' @importFrom methods as
-#' @importFrom utils read.table
-#' @importFrom Matrix readMM rowSums
-#' @importFrom MatrixGenerics rowMaxs
-#' @importFrom SummarizedExperiment colData<-
-#' @importFrom SingleCellExperiment colData
-#'
-#' @return A SingleCellAlleleExperiment object.
-add_sample_tags <- function(path, scae, tag_feature_mtx, tag_feature_barcodes){
-
-  tags  <- Matrix::readMM(paste0(path, tag_feature_mtx, sep = ""))
-  cells <- utils::read.table(paste0(path, tag_feature_barcodes, sep = ""), header = FALSE)
-  rownames(tags) <- cells$V1
-  colnames(tags) <- paste("ST_", seq_len(12), sep = "")
-  tags <- methods::as(tags, "CsparseMatrix")
-  dom_tags <- data.frame(Cellular_Barcode = rownames(tags),
-                         Sample_Tag = ifelse(rowMaxs(tags) >= 0.75 * rowSums(tags),
-                                             colnames(tags)[max.col(tags)],
-                                             "Multiplet"))
-  dom_tags <- dom_tags[!dom_tags$Sample_Tag == 'Multiplet', ]
-
-  inter <- intersect(rownames(colData(scae)), dom_tags$Cellular_Barcode)
-  colData(scae)$sample_tags <- NA
-  colData(scae[, inter])$sample_tags <- dom_tags[inter, "Sample_Tag"]
-  scae <- scae[, !is.na(colData(scae)$sample_tags)]
-  scae
 }
