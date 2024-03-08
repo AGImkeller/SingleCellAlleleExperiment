@@ -4,18 +4,10 @@
 \alias{read_from_sparse_allele}
 \title{Reading in allele-aware quantification data}
 \usage{
-read_from_sparse_allele(
-  path,
-  exp_type = exp_type,
-  barcode_file,
-  gene_file,
-  matrix_file
-)
+read_from_sparse_allele(path, barcode_file, gene_file, matrix_file)
 }
 \arguments{
 \item{path}{A character string determining the path to the directory containing the input files.}
-
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
 \item{barcode_file}{A character string determining the name of the file containing the sample-tag quantification data.}
 

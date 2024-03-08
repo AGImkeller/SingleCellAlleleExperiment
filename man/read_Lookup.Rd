@@ -4,12 +4,10 @@
 \alias{read_Lookup}
 \title{Read in allele lookup}
 \usage{
-read_Lookup(path, exp_type, lookup_file)
+read_Lookup(path, lookup_file)
 }
 \arguments{
 \item{path}{A character string determining the path to the directory containing the input files.}
-
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
 \item{lookup_file}{A character string determining the name of the lookup table file.}
 }

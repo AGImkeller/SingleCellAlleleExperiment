@@ -16,30 +16,3 @@ A SingleCellAlleleExperiment object.
 Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
 identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 }
-\examples{
-
-example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
-
-scae <- read_allele_counts(example_data_5k$dir,
-                          sample_names = "example_data_wta",
-                          filter = "custom",
-                          exp_type = "WTA",
-                          lookup_file = "lookup_table_HLA_only.csv",
-                          barcode_file = example_data_5k$barcodes,
-                          gene_file = example_data_5k$features,
-                          matrix_file = example_data_5k$matrix,
-                          filter_threshold = 0,
-                          example_dataset = TRUE,
-                          verbose = TRUE)
-
-scae
-
-rownames(get_agenes(scae))
-
-scae_immune_genes <- get_agenes(scae)
-
-scae_immune_genes
-
-rownames(scae_immune_genes)
-
-}

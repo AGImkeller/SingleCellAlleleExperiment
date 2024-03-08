@@ -4,13 +4,10 @@
 \alias{find_allele_ids}
 \title{Identify rows containing allele information for WTA}
 \usage{
-find_allele_ids(sce, exp_type)
+find_allele_ids(sce)
 }
 \arguments{
 \item{sce}{A \code{\link{SingleCellExperiment}} object.}
-
-\item{exp_type}{symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value \code{"orgdb"} uses the \code{\link{org.Hs.eg.db}} package.
-The value \code{"biomart"} \href{\code{\link{biomaRt}}}{biomaRt} package. Standard value is set to \code{NULL} and is updated to \code{"biomaRt"} during runtime if not specified.}
 }
 \value{
 A SingleCellExperiment object.

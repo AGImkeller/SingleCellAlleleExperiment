@@ -6,7 +6,7 @@
 \usage{
 scae_subset(
   scae,
-  subset = c("nonimmune", "alleles", "immune_genes", "functional", "unknown_alleles")
+  subset = c("nonimmune", "alleles", "immune_genes", "functional_groups")
 )
 }
 \arguments{
@@ -19,4 +19,35 @@ SCAE object
 }
 \description{
 Subset SCAE object
+}
+\examples{
+
+example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+
+scae <- read_allele_counts(example_data_5k$dir,
+                          sample_names = "example_data_wta",
+                          filter = "custom",
+                          lookup_file = "lookup_table_HLA_only.csv",
+                          barcode_file = example_data_5k$barcodes,
+                          gene_file = example_data_5k$features,
+                          matrix_file = example_data_5k$matrix,
+                          filter_threshold = 0,
+                          example_dataset = TRUE,
+                          verbose = TRUE)
+
+scae
+
+scae_nonimmune_subset <- scae_subset(scae, subset = "nonimmune")
+scae_nonimmune_subset
+
+scae_alleles_subset <- scae_subset(scae, subset = "alleles")
+scae_alleles_subset
+
+scae_immune_genes_subset <- scae_subset(scae, subset = "immune_genes")
+scae_immune_genes_subset
+
+scae_functional_groups_subset <- scae_subset(scae, subset = "functional_groups")
+scae_functional_groups_subset
+
+
 }

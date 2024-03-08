@@ -7,7 +7,6 @@ example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
 scae <- read_allele_counts(example_data_5k$dir,
                          sample_names = "example_data_wta",
                          filter = "custom",
-                         exp_type = "WTA",
                          lookup_file = "lookup_table_HLA_only.csv",
                          barcode_file = example_data_5k$barcodes,
                          gene_file = example_data_5k$features,
@@ -15,6 +14,9 @@ scae <- read_allele_counts(example_data_5k$dir,
                          filter_threshold = 0,
                          example_dataset = TRUE,
                          verbose = TRUE)
+
+
+rowData(scae_subset(scae, "alleles"))
 
 # non_immune genes layer
 test_that("non-immune genes getter", {
@@ -47,13 +49,6 @@ test_that("functional class getter", {
 
 })
 
-# unknown alleles
-test_that("unknown alleles getter", {
-
-  grep_con <- rownames(counts(scae)) %in% c("B*18:01:01:01", "B*51:01:01", "C*01:02:01", "C*05:01:01:01", "DRB1*03:01:01:01", "DRB1*11:03", "DPB1*04:01:01:01", "DPB1*15:01" )
-  expect_equal(scae_subset_unknown_alleles(scae), scae[grep_con,])
-
-})
 
 test_that("test wrapper getter", {
 
@@ -64,12 +59,10 @@ test_that("test wrapper getter", {
   #immune
   expect_equal(scae_subset(scae, "immune_genes"), get_agenes(scae))
   #functional
-  expect_equal(scae_subset(scae, "functional"), scae_subset_functional(scae))
-  #unknown
-  expect_equal(scae_subset(scae, "unknown_alleles"), scae_subset_unknown_alleles(scae))
+  expect_equal(scae_subset(scae, "functional_groups"), scae_subset_functional(scae))
 
   expect_message(scae_subset(scae, "wrong_layer"),
-                 regexp = "Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional`, `unknown_alleles`")
+                 regexp = "Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`")
 
 })
 

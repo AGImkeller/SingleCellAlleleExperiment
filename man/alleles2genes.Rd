@@ -11,7 +11,7 @@ alleles2genes(sce, lookup, exp_type)
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
+\item{exp_type}{A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
 }
 \value{
 A SingleCellExperiment object.

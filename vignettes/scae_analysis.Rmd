@@ -31,20 +31,21 @@ library(ggplot2)
 ```
 
 
-
 Download and save the **"pbmc_5k"** dataset from the accompanying `ExperimentHub/scaeData` package.
 
 ```{r}
 example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+```
 
+```{r}
 example_data_5k
 ```
+
 
 ```{r warning=FALSE}
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names = "example_data",
                            filter = "yes",
-                           exp_type = "WTA",
                            lookup_file = "lookup_table_HLA_only.csv",
                            barcode_file = example_data_5k$barcodes,
                            gene_file = example_data_5k$features,
@@ -86,7 +87,7 @@ scae_nonimmune__immune
 ### Non-immune genes + functional class
 
 ```{r}
-scae_nonimmune__functional <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "functional"))), ]
+scae_nonimmune__functional <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "functional_groups"))), ]
 
 scae_nonimmune__functional
 ```
@@ -148,7 +149,29 @@ List of results from the performed reduced dimension analysis.
 
 ```{r}
 reducedDimNames(scae)
+
+head(reducedDims(scae)$TSNE_a)
+
 ```
+
+### HLA-A immune gene and alleles
+
+```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
+which_tsne <- "TSNE_a"
+
+#EGA_hla_a_alleles
+tsne_g_a  <- plotReducedDim(scae, dimred = which_tsne, colour_by = "HLA-A") + ggtitle("HLA-A gene")
+tsne_g_a
+tsne_g_a1 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "A*02:01:01:01") + ggtitle("Allele A*02:01:01:01")
+tsne_g_a1
+tsne_g_a2 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "A*29:02:01:01") + ggtitle("Allele A*29:01:01:01")
+
+p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
+
+p2
+```
+
+
 
 <hr>
 

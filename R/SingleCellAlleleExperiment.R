@@ -12,8 +12,6 @@
 #' @return definition for the scae class
 .scae <- setClass("SingleCellAlleleExperiment", contains = "SingleCellExperiment")
 
-
-
 #' Constructor SingleCellAlleleExperiment class
 #'
 #' @description
@@ -38,46 +36,47 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 
   rt_scae_lookup_start <- Sys.time()
   sce_add_look <- ext_rd(sce, exp_type, verbose = verbose)
+
   if (verbose){
-  rt_scae_lookup_end <- Sys.time()
-  diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
-  message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
+    rt_scae_lookup_end <- Sys.time()
+    diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
+    message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
   }
 
 
   rt_scae_filt_norm_start <- Sys.time()
   sce_filter_norm <- filter_norm(sce_add_look, threshold)
   if (verbose){
-  rt_scae_filt_norm_end <- Sys.time()
-  diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
-  message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
+    rt_scae_filt_norm_end <- Sys.time()
+    diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
+    message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
   }
 
 
   rt_scae_a2g_start <- Sys.time()
   scae <- alleles2genes(sce_filter_norm, lookup, exp_type)
   if (verbose){
-  rt_scae_a2g_end <- Sys.time()
-  diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
-  message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
+    rt_scae_a2g_end <- Sys.time()
+    diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
+    message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
   }
 
 
   rt_scae_g2f_start <- Sys.time()
   scae <- genes2functional(scae, lookup, exp_type)
   if (verbose){
-  rt_scae_g2f_end <- Sys.time()
-  diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
-  message("     Generating SCAE (4/5) genes2functional: ", diff_rt_scae_g2f, " seconds")
+    rt_scae_g2f_end <- Sys.time()
+    diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
+    message("     Generating SCAE (4/5) genes2functional: ", diff_rt_scae_g2f, " seconds")
   }
 
 
   rt_scae_log_start <- Sys.time()
   scae <- log_transform(scae)
   if (verbose){
-  rt_scae_log_end <- Sys.time()
-  diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
-  message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_g2f, " seconds")
+    rt_scae_log_end <- Sys.time()
+    diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
+    message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_g2f, " seconds")
   }
 
   .scae(scae)
@@ -107,27 +106,30 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #'
 #' @return A SingleCellExperiment object.
 ext_rd <- function(sce, exp_type, verbose = FALSE){
-
-    if (exp_type == "WTA"){
-      if (verbose){
-        message("Using org.Hs to retrieve NCBI gene identifiers.")
-      }
-      gene_symbols <- get_ncbi_org(sce)
-      rowData(sce)$Symbol <- gene_symbols
+  if (exp_type == "ENS"){
+    if (verbose){
+      message("Using org.Hs to retrieve NCBI gene identifiers.")
     }
+    gene_symbols <- get_ncbi_org(sce)
+    rowData(sce)$Symbol <- gene_symbols
+  }
 
-    allele_names_all <- find_allele_ids(sce, exp_type)
+  allele_names_all <- find_allele_ids(sce)
 
-    # Group of genes for which extended informaton is stored
-    rowData(sce[allele_names_all,])$NI_I <- "I"
-    # Allele level
-    rowData(sce[allele_names_all,])$Quant_type <- "A"
+  # Group of genes for which extended informaton is stored
+  rowData(sce[allele_names_all,])$NI_I <- "I"
 
-    # Group of genes for which classical (gene level) informaton is stored
-    rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
-    # Gene level
-    rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
-    rowData(sce)[rownames(rowData(scae_subset_alleles(sce))),]$Symbol <- rownames(rowData(scae_subset_alleles(sce)))
+  # Allele level
+  rowData(sce[allele_names_all,])$Quant_type <- "A"
+
+  # Group of genes for which classical (gene level) informaton is stored
+  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
+
+  # Gene level
+  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
+
+  rowData(sce)[rownames(rowData(scae_subset_alleles(sce))),]$Symbol <- rownames(rowData(scae_subset_alleles(sce)))
+
   sce
 }
 
@@ -199,85 +201,17 @@ filter_norm <- function(sce, threshold = 0){
 #' return the rows specifying allele-quantification information.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
-#' @param exp_type symbols A character string used to determine which database-funtion to use to retrieve NCBI gene names. The value `"orgdb"` uses the \code{\link{org.Hs.eg.db}} package.
-#' The value `"biomart"` [biomaRt](\code{\link{biomaRt}}) package. Standard value is set to `NULL` and is updated to `"biomaRt"` during runtime if not specified.
-#'
 #' @importFrom SingleCellExperiment counts
 #'
 #' @return A SingleCellExperiment object.
-find_allele_ids <- function(sce, exp_type){
-  a <- switch(exp_type,
-              "WTA"      = !grepl("ENS", rownames(counts(sce)), fixed = TRUE),
-              # This needs to be fixed on the long run, because not all genes with extended information
-              # match HLA
-              "Amplicon" =  grepl("HLA-", rownames(counts(sce)), fixed = TRUE),
-              NA)
+find_allele_ids <- function(sce){
+  a <- grepl("*", rownames(counts(sce)), fixed = TRUE)
+  if (sum(a) == 0){
+    a <- grepl("HLA-", rownames(counts(sce)), fixed = TRUE)
+  }
+
   allele_names_all <- rownames(counts(sce)[a,])
   allele_names_all
-}
-
-#' Internal Error handler
-#'
-#' @description
-#' Internal function used in `get_allelecounts()` to check if an allele identifier cannot be found in the lookup table AND does not have proper nomenclature
-#' form, then the execution of further step and thus the generation of an SingleCellAlleleExperiment object stopped.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
-#' @param find_allele_ids A list containing allele identifiers present in the raw data.
-#'
-#' @return Error message if condition is not met.
-check_unknowns <- function(sce, find_allele_ids){
-  names <- find_allele_ids
-  # checks if all the identifiers of find_allele_ids have a "*" (nomenclature)
-  check_star   <- sum(grepl("*", names, fixed = TRUE))
-  check_length <- length(names)
-
-  if (check_star != check_length){
-    star <- !grepl("*", names, fixed = TRUE)
-    unknown_info <- rownames(sce[names[star],])
-    unknown_info_sep <- paste(unknown_info, collapse = " ")
-    stop("Allele information contains unknown identifier.
-         Please check the data and remove rows of the following
-         allele features identifiers: `",unknown_info_sep, "` or use proper nomenclature.")
-  }
-}
-
-#' Find not yet known allele identifiers
-#'
-#' @description
-#' Internal function used in `get_allelecounts()`to find allele identifier that are not present in the lookup table.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
-#' @param agene_names A list of allele gene names.
-#'
-#' @importFrom SingleCellExperiment counts
-#'
-#' @return A list of character strings of identifiers that can not be found in the allele lookup table.
-find_not_ident <- function(sce, agene_names){
-  # return allele genes that do not start with HLA (not found in lookup table)
-  scae_counts <- counts(scae_subset_alleles(sce))
-  rownames(scae_counts) <- agene_names
-  # This needs to be fixed on the long run, because not all genes with extended information
-  # match HLA
-  not_ids <- rownames(scae_counts[!grepl(c("^HLA"), rownames(scae_counts)), , drop = FALSE])
-
-  not_ids
-}
-
-#' Build new substring
-#'
-#' @description
-#' Internal function used in `get_allelecounts()`. Function is used to cut character string at "*" character and return it. Only used to cut the names
-#' if unknown alleles, as the lookup table does not provide any corresponding immune gene name.
-#'
-#' @param allele_id A list of character strings for unidentified allele_names that have proper [allele-nomenclature](https://hla.alleles.org/nomenclature/index.html).
-#'
-#' @return A list of charcter strings resembling HLA gene names.
-cutname <- function(allele_id){
-  id <- allele_id
-  # does this work for all alleles?
-  id <- strsplit(id, "\\*")[[1]][1]
-  id
 }
 
 #' Get Subassay with allele gene names and raw allele quantification
@@ -289,44 +223,26 @@ cutname <- function(allele_id){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #'
 #' @importFrom SingleCellExperiment counts
 #'
 #' @return A SingleCellExperiment object.
-get_allelecounts <- function(sce, lookup, exp_type){
+get_allelecounts <- function(sce, lookup){
 
-  allele_ids_lookup <- find_allele_ids(sce, exp_type)
-  if (exp_type == "WTA"){
-    check_unknowns(sce, allele_ids_lookup)
-  }
-  unknown <- FALSE
-
+  allele_ids_lookup <- find_allele_ids(sce)
   list_alid <- list()
+
   for (i in seq_along(allele_ids_lookup)){
-    if (allele_ids_lookup[i] %in% lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]){
-      new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
-      list_alid[[length(list_alid) + 1]] <- new_ids
-    }else{
-      message(allele_ids_lookup[i], " can't be found in the lookup table")
-      new_ids <- list(cutname(allele_ids_lookup[i]))
-      list_alid[[length(list_alid) + 1]] <- new_ids
-      unknown <- TRUE
-    }
+    new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
+    list_alid[[length(list_alid) + 1]] <- new_ids
   }
   alid_gene_names <- unlist(list_alid)
 
   alleletogene_counts <- counts(scae_subset_alleles(sce))
   rownames(alleletogene_counts) <- alid_gene_names
 
-  if (unknown){
-    not_ids <- find_not_ident(sce, alid_gene_names)
-    return_unknown <- c(alleletogene_counts, not_ids)
-    return(return_unknown)
-  }else {
-    return_known   <- c(alleletogene_counts)
-    return(return_known)
-  }
+  return_known <- c(alleletogene_counts)
+  return(return_known)
 }
 
 #' Building first new subassay for SingleCellAllelexperiment object
@@ -339,7 +255,7 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param exp_type A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #'
 #' @importFrom Matrix colSums
 #' @importFrom SummarizedExperiment rowData<- colData<-
@@ -348,17 +264,10 @@ get_allelecounts <- function(sce, lookup, exp_type){
 #'
 #' @return A SingleCellExperiment object.
 alleles2genes <- function(sce, lookup, exp_type){
-  unknown <- FALSE
 
-  v_acounts <- get_allelecounts(sce, lookup, exp_type)
+  v_acounts <- get_allelecounts(sce, lookup)
 
-  if (length(v_acounts) < 2){
-    alleletogene_counts <- v_acounts[1][[1]]
-  }else {
-    alleletogene_counts <- v_acounts[1][[1]]
-    not_ids <- unlist(v_acounts[2:length(v_acounts)])
-    unknown <- TRUE
-  }
+  alleletogene_counts <- v_acounts[1][[1]]
 
   uniqs   <- unique(rownames(alleletogene_counts))
   al_gene <- matrix(0, nrow = length(uniqs), ncol = ncol(alleletogene_counts))
@@ -369,18 +278,12 @@ alleles2genes <- function(sce, lookup, exp_type){
     al_gene[i,] <- uniq_sum
   }
 
-  if (unknown) {
-    al_gene <- al_gene[!(rownames(al_gene) %in% not_ids), , drop = FALSE]
-    filtered_rows <- vapply(rownames(rowData(sce)), function(rowname) {
-      any(startsWith(rowname, not_ids))
-    }, logical(1))
-    rowData(sce)[filtered_rows, "Quant_type"] <- "A_unknown"
-  }
-
   al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
                                  colData = colData(sce))
   rowData(al_sce)$Symbol <- rownames(al_gene)
-  if (exp_type == "WTA"){
+
+
+  if (exp_type == "ENS"){
     rowData(al_sce)$Ensembl_ID <- rownames(al_gene)
   }
 
@@ -405,7 +308,7 @@ alleles2genes <- function(sce, lookup, exp_type){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param exp_type A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment
 #' @importFrom SummarizedExperiment colData<- rowData<-
@@ -441,7 +344,8 @@ genes2functional <- function(sce, lookup, exp_type){
   func_sce <- SingleCellExperiment(assays = list(counts = gene_func),
                                    colData = colData(sce))
   rowData(func_sce)$Symbol <- rownames(func_sce)
-  if (exp_type == "WTA"){
+
+  if (exp_type == "ENS"){
     rowData(func_sce)$Ensembl_ID <- rownames(func_sce)
   }
 
@@ -478,7 +382,6 @@ log_transform <- function(sce){
                                    transform = "log")
 
   assays(sce)$logcounts  <- normed_counts
-
   counts(sce)    <- DelayedArray(counts(sce))
   logcounts(sce) <- DelayedArray(logcounts(sce))
 

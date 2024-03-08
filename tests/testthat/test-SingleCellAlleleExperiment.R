@@ -1,5 +1,3 @@
-#initial tests for the object, not completed yet
-
 library(testthat)
 library(SingleCellAlleleExperiment)
 library(scaeData)
@@ -23,14 +21,15 @@ sce_filter_raw <- SingleCellExperiment(assays = list(counts = mat),
 # perform zero-filtering on colSums in the example dataset as this is the necessary default performed in the constructor
 filtered_sce_raw <- sce_filter_raw[, colSums(counts(sce_filter_raw)) > 0]
 cell_names <- cell_names[1:length(colData(filtered_sce_raw)$V1), ]
+cell_names <- as.data.frame(cell_names)
 cell_names$V1 <- colData(filtered_sce_raw)$V1
+
 
 mat_filtered_zero <- counts(filtered_sce_raw)
 
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names = "example_data_wta",
                            filter = "custom",
-                           exp_type = "WTA",
                            lookup_file = "lookup_table_HLA_only.csv",
                            barcode_file = example_data_5k$barcodes,
                            gene_file = example_data_5k$features,
@@ -39,7 +38,7 @@ scae <- read_allele_counts(example_data_5k$dir,
                            example_dataset = TRUE,
                            verbose = TRUE)
 
-#
+
 test_that("rownames and rowData check", {
   #check the names
   expect_equal(feature_info$V1, rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
@@ -87,7 +86,6 @@ test_that("check input-parameter errors", {
   expect_error(read_allele_counts(example_data_5k$dir,
                                 sample_names = "example_data_wta",
                                 filter = "custom",
-                                exp_type = "WTA",
                                 lookup_file = "lookup_table_HLA_only.csv",
                                 barcode_file = example_data_5k$barcodes,
                                 gene_file = example_data_5k$features,
@@ -100,13 +98,10 @@ test_that("check input-parameter errors", {
   expect_message(read_allele_counts(example_data_5k$dir,
                                   sample_names = "example_data_wta",
                                   filter = "yes",
-                                  exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
                                   barcode_file = example_data_5k$barcodes,
                                   gene_file = example_data_5k$features,
                                   matrix_file = example_data_5k$matrix,
-                                  tag_feature_mtx = "cells_x_genes.genes.txt",
-                                  tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                                   filter_threshold = NULL,
                                   example_dataset = TRUE,
                                   verbose = FALSE),
@@ -116,13 +111,10 @@ test_that("check input-parameter errors", {
   expect_message(read_allele_counts(example_data_5k$dir,
                                   sample_names = "example_data_wta",
                                   filter = "no",
-                                  exp_type = "WTA",
                                   lookup_file = "lookup_table_HLA_only.csv",
                                   barcode_file = example_data_5k$barcodes,
                                   gene_file = example_data_5k$features,
                                   matrix_file = example_data_5k$matrix,
-                                  tag_feature_mtx = "cells_x_genes.genes.txt",
-                                  tag_feature_barcodes = "cells_x_genes.barcodes.txt",
                                   filter_threshold = NULL,
                                   example_dataset = TRUE,
                                   verbose = FALSE),
@@ -148,7 +140,6 @@ test_that("sample_names and samples_dir", {
 
   scae_no_sample <- read_allele_counts(example_data_5k$dir,
                                filter = "custom",
-                               exp_type = "WTA",
                                lookup_file = "lookup_table_HLA_only.csv",
                                barcode_file = example_data_5k$barcodes,
                                gene_file = example_data_5k$features,

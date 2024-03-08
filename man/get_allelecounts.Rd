@@ -4,14 +4,12 @@
 \alias{get_allelecounts}
 \title{Get Subassay with allele gene names and raw allele quantification}
 \usage{
-get_allelecounts(sce, lookup, exp_type)
+get_allelecounts(sce, lookup)
 }
 \arguments{
 \item{sce}{A \code{\link{SingleCellExperiment}} object.}
 
 \item{lookup}{A data.frame object containing the lookup table.}
-
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 }
 \value{
 A SingleCellExperiment object.

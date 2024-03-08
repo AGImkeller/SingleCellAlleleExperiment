@@ -7,14 +7,11 @@
 read_allele_counts(
   samples_dir,
   sample_names = names(samples_dir),
-  filter = c("yes", "no", "custom"),
-  exp_type = c("WTA", "Amplicon"),
+  filter_mode = c("yes", "no", "custom"),
   lookup_file = "lookup_table_HLA_only.csv",
   barcode_file = "cells_x_genes.barcodes.txt",
   gene_file = "cells_x_genes.genes.txt",
   matrix_file = "cells_x_genes.mtx",
-  tag_feature_mtx = "cells_x_features.mtx",
-  tag_feature_barcodes = "cells_x_features.barcodes.txt",
   filter_threshold = NULL,
   example_dataset = FALSE,
   verbose = FALSE,
@@ -26,10 +23,8 @@ read_allele_counts(
 
 \item{sample_names}{A character string for a sample identifier. Can be used to describe the used dataset or sample.}
 
-\item{filter}{A vector containing three character strings that describe different options for filtering. The value \code{"yes"} uses the inflection point of the knee plot to filter out low-quality cells.
+\item{filter_mode}{A vector containing three character strings that describe different options for filtering. The value \code{"yes"} uses the inflection point of the knee plot to filter out low-quality cells.
 The value \code{"no"} computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
-
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
 \item{lookup_file}{A character string determining the name of the lookup table file.}
 
@@ -38,10 +33,6 @@ The value \code{"no"} computes the knee plot and stops funciton execution. This 
 \item{gene_file}{A character string determining the name of the file containing the feature identifiers.}
 
 \item{matrix_file}{A character string determining the name of the file containing the count matrix.}
-
-\item{tag_feature_mtx}{A character string determining the name of the file containing the sample-tag quantification data.}
-
-\item{tag_feature_barcodes}{A character string determining the name of the file containing the sample-tag barcode identifiers.}
 
 \item{filter_threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is \code{NULL} when using \code{filter = c("yes", "no")}. Value must be provided when using \code{filter = "custom"}.}
 
@@ -77,7 +68,6 @@ example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
 scae_preflight <- read_allele_counts(example_data_5k$dir,
                         sample_names = "example_data",
                         filter = "no",
-                        exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = example_data_5k$barcodes,
                         gene_file = example_data_5k$features,
@@ -90,7 +80,6 @@ scae_preflight <- read_allele_counts(example_data_5k$dir,
 scae_filtered <- read_allele_counts(example_data_5k$dir,
                         sample_names = "example_data",
                         filter = "yes",
-                        exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = example_data_5k$barcodes,
                         gene_file = example_data_5k$features,
@@ -107,7 +96,6 @@ scae_filtered
 scae_custom_filter <- read_allele_counts(example_data_5k$dir,
                         sample_names = "example_data",
                         filter = "custom",
-                        exp_type = "WTA",
                         lookup_file = "lookup_table_HLA_only.csv",
                         barcode_file = example_data_5k$barcodes,
                         gene_file = example_data_5k$features,

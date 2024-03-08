@@ -108,19 +108,21 @@ library(scater)
 
 ## Reading in data and performing quality check
 
-
-
 ### Stating input directory containing the expected files
 
 Download and save the **"pbmc_5k"** dataset from the accompanying `ExperimentHub/scaeData` package.
 
 ```{r}
 example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+```
 
+
+```{r}
 example_data_5k
 ```
 
-The return of the `scaeDataGet()` function is a list containing four elements. the `$dir` slot contains the directory where the files downloaded from `ExperimentHub` are saved on your device. The remaining three slots `$barcodes`, `$features`, `$matrix` contain the corresponding file names (named by ExperimentHub). The list is then used to pass the saved information to the corresponding parameters of the `read_allele_counts()` function of the here presented package. See next section.
+
+The return value of the `scaeDataGet()` function is a list containing four elements. The `$dir` slot contains the directory where the files downloaded from `ExperimentHub` are saved on your device. The remaining three slots `$barcodes`, `$features`, `$matrix` contain the corresponding file names (named by ExperimentHub). The list is then used to pass the saved information to the related parameters of the `read_allele_counts()` function of the here presented package. See next section.
 
 ### Generate SingleCellAlleleExperiment object
 
@@ -154,7 +156,6 @@ Only show the knee plot without generating a SCAE object. All function parameter
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names = "example_data",
                            filter = "no",
-                           exp_type = "WTA",
                            lookup_file = "lookup_table_HLA_only.csv",
                            barcode_file = example_data_5k$barcodes,
                            gene_file = example_data_5k$features,
@@ -173,7 +174,6 @@ Automatic filtering mode and generation of a SCAE object. Filtering is performed
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names = "example_data",
                            filter = "yes",
-                           exp_type = "WTA",
                            lookup_file = "lookup_table_HLA_only.csv",
                            barcode_file = example_data_5k$barcodes,
                            gene_file = example_data_5k$features,
@@ -193,7 +193,6 @@ Custom filtering mode and generation of a SCAE object. Filtering performed on th
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names = "example_data",
                            filter = "custom",
-                           exp_type = "WTA",
                            lookup_file = "lookup_table_HLA_only.csv",
                            barcode_file = example_data_5k$barcodes,
                            gene_file = example_data_5k$features,
@@ -202,8 +201,6 @@ scae <- read_allele_counts(example_data_5k$dir,
                            example_dataset = TRUE)
 scae
 ```
-
-devtools::build_vignette
 
 ### Showcasing different object slots
 
@@ -262,7 +259,7 @@ head(rownames(scae_immune_genes_subset))
 #### Functional gene group
 
 ```{r}
-scae_functional_groups_subset <- scae_subset(scae, "functional")
+scae_functional_groups_subset <- scae_subset(scae, "functional_groups")
 
 head(rownames(scae_functional_groups_subset))
 ```
@@ -278,7 +275,7 @@ Checking the expression for the allele-layer, immune gene layer and functional c
 ```{r}
 scae_immune_layers_subset <- c(rownames(scae_subset(scae, "alleles")),
                                rownames(scae_subset(scae, "immune_genes")),
-                               rownames(scae_subset(scae, "functional")))
+                               rownames(scae_subset(scae, "functional_groups")))
 
 scater::plotExpression(scae, scae_immune_layers_subset)
 ```
