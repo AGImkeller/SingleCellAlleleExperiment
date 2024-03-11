@@ -44,7 +44,7 @@
 #' scae_preflight <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "no",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         lookup_file = "lookup_table_HLA_5k.csv",
 #'                         barcode_file = example_data_5k$barcodes,
 #'                         gene_file = example_data_5k$features,
 #'                         matrix_file = example_data_5k$matrix,
@@ -56,7 +56,7 @@
 #' scae_filtered <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "yes",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         lookup_file = "lookup_table_HLA_5k.csv",
 #'                         barcode_file = example_data_5k$barcodes,
 #'                         gene_file = example_data_5k$features,
 #'                         matrix_file = example_data_5k$matrix,
@@ -72,7 +72,7 @@
 #' scae_custom_filter <- read_allele_counts(example_data_5k$dir,
 #'                         sample_names = "example_data",
 #'                         filter = "custom",
-#'                         lookup_file = "lookup_table_HLA_only.csv",
+#'                         lookup_file = "lookup_table_HLA_5k.csv",
 #'                         barcode_file = example_data_5k$barcodes,
 #'                         gene_file = example_data_5k$features,
 #'                         matrix_file = example_data_5k$matrix,
@@ -86,7 +86,7 @@
 read_allele_counts <- function(samples_dir,
                                sample_names = names(samples_dir),
                                filter_mode = c("yes", "no", "custom"),
-                               lookup_file = "lookup_table_HLA_only.csv",
+                               lookup_file = "lookup_table_HLA_5k.csv",
                                barcode_file = "cells_x_genes.barcodes.txt",
                                gene_file = "cells_x_genes.genes.txt",
                                matrix_file = "cells_x_genes.mtx",
@@ -133,7 +133,7 @@ read_allele_counts <- function(samples_dir,
 
 
   if (example_dataset){
-    integrated_lookup_dir <- system.file("extdata", package = "SingleCellAlleleExperiment")
+    integrated_lookup_dir <- system.file("extdata", package = "scaeData")
     lookup <- read_Lookup(integrated_lookup_dir, lookup_file)
   }else{
     lookup <- read_Lookup(samples_dir, lookup_file)
@@ -215,10 +215,10 @@ read_from_sparse_allele <- function(path,
   possible_names <- c("Ensembl_ID", "Symbol")
 
   if (grepl("ENS", feature_info$V1[1])){
-    exp_type = "ENS"
+    exp_type <- "ENS"
     colnames(feature_info) <- possible_names[1]
   }else{
-    exp_type = "noENS"
+    exp_type <- "noENS"
     colnames(feature_info) <- possible_names[2]
   }
 
