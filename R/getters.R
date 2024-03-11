@@ -101,7 +101,7 @@ scae_subset_functional <- function(scae) {
 #' scae <- read_allele_counts(example_data_5k$dir,
 #'                           sample_names = "example_data_wta",
 #'                           filter = "custom",
-#'                           lookup_file = "lookup_table_HLA_5k.csv",
+#'                           lookup_file = "pbmc_5k_lookup_table.csv",
 #'                           barcode_file = example_data_5k$barcodes,
 #'                           gene_file = example_data_5k$features,
 #'                           matrix_file = example_data_5k$matrix,
