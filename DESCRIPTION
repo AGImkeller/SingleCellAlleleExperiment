@@ -46,6 +46,7 @@ Suggests:
   patchwork,
   BiocStyle,
   testthat (>= 3.0.0)
+Remotes: github::AGImkeller/scaeData
 biocViews: DataRepresentation, Infrastructure, SingleCell, Transcriptomics,
   GeneExpression, Genetics, ImmunoOncology, DataImport
 URL: https://github.com/AGImkeller/SingleCellAlleleExperiment
