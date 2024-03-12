@@ -12,7 +12,7 @@ scae_subset(
 \arguments{
 \item{scae}{SCAE object}
 
-\item{subset}{character string specifiying a data layer}
+\item{subset}{character string specifying a data layer}
 }
 \value{
 SCAE object

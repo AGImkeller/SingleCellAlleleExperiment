@@ -11,7 +11,7 @@ genes2functional(sce, lookup, exp_type)
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{exp_type}{A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
+\item{exp_type}{A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
 }
 \value{
 A SingleCellExperiment object.

@@ -24,7 +24,7 @@ read_allele_counts(
 \item{sample_names}{A character string for a sample identifier. Can be used to describe the used dataset or sample.}
 
 \item{filter_mode}{A vector containing three character strings that describe different options for filtering. The value \code{"yes"} uses the inflection point of the knee plot to filter out low-quality cells.
-The value \code{"no"} computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
+The value \code{"no"} computes the knee plot and stops function execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
 
 \item{lookup_file}{A character string determining the name of the lookup table file.}
 
