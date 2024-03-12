@@ -62,7 +62,7 @@ In the following sections, main steps for dimensional reduction are performed, o
 
 ## Subsetting the different layers
 
-The non-imune genes are combined with each of the integrated immune gene allele-aware layers to determine three different subsets.
+The non-immune genes are combined with each of the integrated immune gene allele-aware layers to determine three different subsets.
 
 ### Non-immune genes + alleles
 
