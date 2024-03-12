@@ -215,10 +215,10 @@ read_from_sparse_allele <- function(path,
   possible_names <- c("Ensembl_ID", "Symbol")
 
   if (grepl("ENS", feature_info$V1[1])){
-    exp_type = "ENS"
+    exp_type <- "ENS"
     colnames(feature_info) <- possible_names[1]
   }else{
-    exp_type = "noENS"
+    exp_type <- "noENS"
     colnames(feature_info) <- possible_names[2]
   }
 
