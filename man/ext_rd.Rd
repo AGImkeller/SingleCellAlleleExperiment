@@ -7,7 +7,7 @@
 ext_rd(sce, exp_type, verbose = FALSE)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object. Object is initally constructed in the \code{SingleCellAlleleExperiment} constructor.}
+\item{sce}{A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the \code{SingleCellAlleleExperiment} constructor.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 

@@ -19,7 +19,7 @@
 #' @param samples_dir A character string determining the path to one directory containing all input files.
 #' @param sample_names A character string for a sample identifier. Can be used to describe the used dataset or sample.
 #' @param filter_mode A vector containing three character strings that describe different options for filtering. The value `"yes"` uses the inflection point of the knee plot to filter out low-quality cells.
-#' The value `"no"` computes the knee plot and stops funciton execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value `"custom"` allows for setting a custom threshold in the `filter_threshold` parameter.
+#' The value `"no"` computes the knee plot and stops function execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value `"custom"` allows for setting a custom threshold in the `filter_threshold` parameter.
 #' @param BPPARAM A BiocParallelParam object specifying how loading should be parallelized for multiple samples.
 #' @param lookup_file A character string determining the name of the lookup table file.
 #' @param barcode_file A character string determining the name of the file containing the barcode identifiers.
