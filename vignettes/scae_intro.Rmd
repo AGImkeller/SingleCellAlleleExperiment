@@ -38,6 +38,7 @@ vignette: >
 
 ```{r options, include=FALSE, echo=FALSE}
 library(BiocStyle)
+knitr::opts_chunk$set(crop = NULL)
 ```
 
 # Introduction to the workflow
