@@ -1,6 +1,6 @@
 Package: SingleCellAlleleExperiment
 Title: S4 Class for Single Cell Data with Allele and Functional Levels for Immune Genes
-Version: 0.96.0
+Version: 0.99.0
 Authors@R: 
   c(
   person("Jonas", "Schuck", email="jschuckdev@gmail.com", role = c("aut", "cre"),
