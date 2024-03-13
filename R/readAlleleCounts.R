@@ -53,33 +53,33 @@
 #'
 #'
 #' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
-#' scae_filtered <- read_allele_counts(example_data_5k$dir,
-#'                         sample_names = "example_data",
-#'                         filter = "yes",
-#'                         lookup_file = "pbmc_5k_lookup_table.csv",
-#'                         barcode_file = example_data_5k$barcodes,
-#'                         gene_file = example_data_5k$features,
-#'                         matrix_file = example_data_5k$matrix,
-#'                         filter_threshold = NULL,
-#'                         example_dataset = TRUE,
-#'                         verbose = TRUE)
+#' #scae_filtered <- read_allele_counts(example_data_5k$dir,
+#' #                       sample_names = "example_data",
+#' #                         filter = "yes",
+#' #                         lookup_file = "pbmc_5k_lookup_table.csv",
+#' #                         barcode_file = example_data_5k$barcodes,
+#' #                         gene_file = example_data_5k$features,
+#' #                         matrix_file = example_data_5k$matrix,
+#' #                         filter_threshold = NULL,
+#' #                         example_dataset = TRUE,
+#' #                         verbose = TRUE)
 #'
-#' scae_filtered
+#' # scae_filtered
 #'
 #'
 #' # custom filtering mode, setting up a custom filter threshold for filtering out
 #' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
-#' scae_custom_filter <- read_allele_counts(example_data_5k$dir,
-#'                         sample_names = "example_data",
-#'                         filter = "custom",
-#'                         lookup_file = "pbmc_5k_lookup_table.csv",
-#'                         barcode_file = example_data_5k$barcodes,
-#'                         gene_file = example_data_5k$features,
-#'                         matrix_file = example_data_5k$matrix,
-#'                         filter_threshold = 105,
-#'                         example_dataset = TRUE)
+#' # scae_custom_filter <- read_allele_counts(example_data_5k$dir,
+#' #                         sample_names = "example_data",
+#' #                         filter = "custom",
+#' #                         lookup_file = "pbmc_5k_lookup_table.csv",
+#' #                         barcode_file = example_data_5k$barcodes,
+#' #                         gene_file = example_data_5k$features,
+#' #                         matrix_file = example_data_5k$matrix,
+#' #                         filter_threshold = 105,
+#' #                         example_dataset = TRUE)
 #'
-#' scae_custom_filter
+#' # scae_custom_filter
 #'
 #'
 #' @export

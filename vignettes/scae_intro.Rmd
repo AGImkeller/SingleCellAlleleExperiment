@@ -128,9 +128,9 @@ The return value of the `scaeDataGet()` function is a list containing four eleme
 
 For the usage of the corresponding lookup table, specify one of the following file names:
 
-  - "lookup_table_HLA_5k.csv" is used for the `pbmc_5k" dataset.
-  - "lookup_table_HLA_10k.csv" is used for the `pbmc_10k" dataset.
-  - "lookup_table_HLA_20k.csv" is used for the `pbmc_20k" dataset.
+  - "pbmc_5k_lookup_table.csv" is used for the `pbmc_5k" dataset.
+  - "pbmc_10k_lookup_table.csv" is used for the `pbmc_10k" dataset.
+  - "pbmc_20k_lookup_table.csv" is used for the `pbmc_20k" dataset.
 
 These are still part of the `scaeData` package, but are not fetched from `ExperimentHub` but rather read in as internal files.
 
