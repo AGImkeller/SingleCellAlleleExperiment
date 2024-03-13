@@ -42,7 +42,7 @@ We have developed a workflow, that allows quantification of expression and inter
 
 This workflow is designed to support both **10x** and **BD Rhapsody** data, encompassing amplicon/targeted sequencing as well as whole-transcriptome-based data, providing flexibility to users working with different experimental setups.
 
-![alt text](./inst/extdata/figures/scIGD_SCAE_workflow_final.png)
+![scIGD workflow](vignettes/scIGD_SCAE_workflow_final.png)
 **Figure 1:** Overview of the scIGD workflow for unraveling immunogenomic diversity in single-cell data, highlighting the integration of the SingleCellAlleleExperiment package for comprehensive data analysis.
 
 ## The `SingleCellAlleleExperiment (SCAE)` class
@@ -52,7 +52,7 @@ The `SingleCellAlleleExperiment (SCAE)` class serves as a comprehensive multi-la
 <br>
 
 <div style="text-align: center;">
-  <img src="./inst/extdata/figures/scae_advanced.png" alt="Scheme of SingleCellAlleleExperiment object structure with lookup table." width="600" height="250">
+  <img src="vignettes/scae_advanced.png" alt="Scheme of SingleCellAlleleExperiment object structure with lookup table." width="600" height="250">
 </div>
 
 **Figure 2:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
