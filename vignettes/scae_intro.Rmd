@@ -1,8 +1,30 @@
 ---
 title: "An introduction to the SingleCellAlleleExperiment class"
 package: SingleCellAlleleExperiment
-author: "Jonas Schuck, Ahmad Al Ajami, Federico Marini and Katharina Imkeller"
-email: "jschuckdev@gmail.com"
+author:
+- name: Jonas Schuck
+  affiliation: 
+  - Goethe University, University Hospital Frankfurt, Neurological Institute (Edinger Institute), Frankfurt/Main
+  - University Cancer Center, Frankfurt/Main
+  - Frankfurt Cancer Institute, Frankfurt/Main
+  email: schuck@med.uni-frankfurt.de
+- name: Ahmad Al Ajami
+  affiliation: 
+  - Goethe University, University Hospital Frankfurt, Neurological Institute (Edinger Institute), Frankfurt/Main
+  - University Cancer Center, Frankfurt/Main
+  - Frankfurt Cancer Institute, Frankfurt/Main
+  email: alajami@med.uni-frankfurt.de
+- name: Federico Marini
+  affiliation: 
+  - Institute of Medical Biostatistics, Epidemiology and Informatics (IMBEI), Mainz
+  - Research Center for Immunotherapy (FZI), Mainz
+  email: marinif@uni-mainz.de
+- name: Katharina Imkeller
+  affiliation: 
+  - Goethe University, University Hospital Frankfurt, Neurological Institute (Edinger Institute), Frankfurt/Main
+  - University Cancer Center, Frankfurt/Main
+  - Frankfurt Cancer Institute, Frankfurt/Main
+  email: imkeller@med.uni-frankfurt.de
 output: 
    BiocStyle::html_document:
     toc: true
@@ -47,10 +69,7 @@ The `SingleCellAlleleExperiment (SCAE)` class serves as a comprehensive multi-la
 
 <br>
 
-<div style="text-align: center;">
-  <img src="../inst/extdata/figures/scae_advanced.png" alt="Scheme of SingleCellAlleleExperiment object structure with lookup table." width="600" height="250">
-</div>
-
+![alt text](../inst/extdata/figures/scae_advanced.png)
 **Figure 2:** Scheme of SingleCellAlleleExperiment object structure with lookup table.
 
 <br>
@@ -102,7 +121,7 @@ The following packages are abundant for performing the here stated downstream an
 library(SingleCellAlleleExperiment)
 library(scaeData)
 library(scater)
-library(scater)
+library(scran)
 library(patchwork)
 
 ```
