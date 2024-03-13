@@ -26,7 +26,7 @@ scae_subset_alleles <- function(scae) {
 #'
 #' @description
 #' Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
-#' identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+#' identified by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 #'
 #' @param scae A \code{\link{SingleCellAlleleExperiment}} object.
 #'
@@ -90,7 +90,7 @@ scae_subset_functional <- function(scae) {
 #' Subset SCAE object
 #'
 #' @param scae SCAE object
-#' @param subset character string specifiying a data layer
+#' @param subset character string specifying a data layer
 #'
 #' @return SCAE object
 #'

@@ -11,7 +11,7 @@ alleles2genes(sce, lookup, exp_type)
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{exp_type}{A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
+\item{exp_type}{A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
 }
 \value{
 A SingleCellExperiment object.
@@ -19,6 +19,6 @@ A SingleCellExperiment object.
 \description{
 Internal function for the first assay extension used in the \code{SingleCellAlleleExperiment()} constructor
 computing the first of the two new subassays that get appended to the
-quantification assay. This subassay contains the allele gene identifiers instead of the allelen identifiers and
+quantification assay. This subassay contains the allele gene identifiers instead of the allele identifiers and
 sums up the expression counts of alleles that have the same allele gene identifiers.
 }

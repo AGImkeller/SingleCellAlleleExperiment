@@ -96,7 +96,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #' subassay of the extended main assay in the `SingleCellAlleleExperiment`. "A" corresponds to allele, "G" to allele gene and
 #' "F" to functional allele class.
 #'
-#' @param sce A \code{\link{SingleCellExperiment}} object. Object is initally constructed in the `SingleCellAlleleExperiment` constructor.
+#' @param sce A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the `SingleCellAlleleExperiment` constructor.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
@@ -250,12 +250,12 @@ get_allelecounts <- function(sce, lookup){
 #' @description
 #' Internal function for the first assay extension used in the `SingleCellAlleleExperiment()` constructor
 #' computing the first of the two new subassays that get appended to the
-#' quantification assay. This subassay contains the allele gene identifiers instead of the allelen identifiers and
+#' quantification assay. This subassay contains the allele gene identifiers instead of the allele identifiers and
 #' sums up the expression counts of alleles that have the same allele gene identifiers.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #'
 #' @importFrom Matrix colSums
 #' @importFrom SummarizedExperiment rowData<- colData<-
@@ -308,7 +308,7 @@ alleles2genes <- function(sce, lookup, exp_type){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining wether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment
 #' @importFrom SummarizedExperiment colData<- rowData<-

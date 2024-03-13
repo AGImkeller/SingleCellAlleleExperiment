@@ -14,5 +14,5 @@ A SingleCellAlleleExperiment object.
 }
 \description{
 Getter function returning subsampled SCAE object with all rows containing immune gene information. These rows are
-identfied by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
+identified by "I" in rowData(scae)$NI_I and "G" in rowData(scae)$Quant_type.
 }
