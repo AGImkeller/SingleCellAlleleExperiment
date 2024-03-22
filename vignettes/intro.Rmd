@@ -15,7 +15,7 @@ vignette: >
 ---
 
 ```{r options, include=FALSE, echo=FALSE}
-if (!requireNamespace("BiocManager", quietly=TRUE))
+if (!require("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("BiocStyle")
@@ -27,7 +27,7 @@ library(BiocStyle)
 From Bioconductor:
 
 ```{r, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly=TRUE))
+if (!require("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("SingleCellAlleleExperiment")
@@ -120,16 +120,16 @@ The used dataset for later downstream analysis and testing of the functionalitie
 The following packages are abundant for performing the here stated downstream analysis and visualization.
 
 ```{r, message = FALSE}
-if (!requireNamespace("BiocManager", quietly=TRUE))
+if (!require("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
-if (!requireNamespace("scran", quietly=TRUE))
+if (!require("scran", quietly=TRUE))
     BiocManager::install("scran")
-if (!requireNamespace("scater", quietly=TRUE))
+if (!require("scater", quietly=TRUE))
     BiocManager::install("scater")
-if (!requireNamespace("patchwork", quietly=TRUE))
+if (!require("patchwork", quietly=TRUE))
     install.packages("patchwork")
-if (!requireNamespace("ggplot2", quietly=TRUE))
+if (!require("ggplot2", quietly=TRUE))
     install.packages("ggplot2")
 
 library(SingleCellAlleleExperiment)
