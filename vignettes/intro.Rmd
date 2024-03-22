@@ -119,7 +119,7 @@ The used dataset for later downstream analysis and testing of the functionalitie
 
 The following packages are abundant for performing the here stated downstream analysis and visualization.
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo=FALSE}
 if (!require("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
@@ -132,8 +132,14 @@ if (!require("patchwork", quietly=TRUE))
 if (!require("ggplot2", quietly=TRUE))
     install.packages("ggplot2")
 
-library(SingleCellAlleleExperiment)
+```
 
+```{r, message = FALSE}
+library(scran)
+library(scater)
+library(patchwork)
+library(ggplot2)
+library(SingleCellAlleleExperiment)
 ```
 
 
