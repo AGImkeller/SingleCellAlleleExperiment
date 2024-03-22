@@ -128,9 +128,9 @@ if (!require("scran", quietly=TRUE))
 if (!require("scater", quietly=TRUE))
     BiocManager::install("scater")
 if (!require("patchwork", quietly=TRUE))
-    install.packages("patchwork")
+    BiocManager::install("patchwork")
 if (!require("ggplot2", quietly=TRUE))
-    install.packages("ggplot2")
+    BiocManager::("ggplot2")
 
 ```
 
