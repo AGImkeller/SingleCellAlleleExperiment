@@ -130,7 +130,7 @@ if (!require("scater", quietly=TRUE))
 if (!require("patchwork", quietly=TRUE))
     BiocManager::install("patchwork")
 if (!require("ggplot2", quietly=TRUE))
-    BiocManager::("ggplot2")
+    BiocManager::install("ggplot2")
 
 ```
 
