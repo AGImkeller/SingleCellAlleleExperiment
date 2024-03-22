@@ -31,19 +31,19 @@ plot_knee <- function(matrix, genes, barcodes){
   fitteddf <- br_out$fitted
   total <-  br_out$total
 
-  data_df <- data.frame(rank = br_out$rank, total = br_out$total, fitteddf = br_out$fitted)
+  data_df <- data.frame(rank=br_out$rank, total=br_out$total, fitteddf=br_out$fitted)
 
-  gg <- ggplot(data_df, aes(x = rank, y = total)) +
+  gg <- ggplot(data_df, aes(x=rank, y=total)) +
         geom_point() +
-        geom_line(aes(y = fitteddf), color = "red") +
+        geom_line(aes(y=fitteddf), color="red") +
         scale_x_log10() +
         scale_y_log10() +
         annotation_logticks() +
-        labs(x = "Barcode rank", y = "Total UMI count") +
-        geom_hline(yintercept = S4Vectors::metadata(br_out)$knee, color = "dodgerblue", linetype = "dashed") +
-        geom_hline(yintercept = S4Vectors::metadata(br_out)$inflection, color = "forestgreen", linetype = "dashed") +
-        annotate("text", x = 2, y = S4Vectors::metadata(br_out)$knee * 1.2, label = "knee", color = "dodgerblue") +
-        annotate("text", x = 2.25, y = S4Vectors::metadata(br_out)$inflection * 1.2, label = "inflection", color = "forestgreen") +
+        labs(x="Barcode rank", y="Total UMI count") +
+        geom_hline(yintercept=S4Vectors::metadata(br_out)$knee, color="dodgerblue", linetype="dashed") +
+        geom_hline(yintercept=S4Vectors::metadata(br_out)$inflection, color="forestgreen", linetype="dashed") +
+        annotate("text", x=2, y=S4Vectors::metadata(br_out)$knee * 1.2, label="knee", color="dodgerblue") +
+        annotate("text", x=2.25, y=S4Vectors::metadata(br_out)$inflection * 1.2, label="inflection", color="forestgreen") +
         theme_bw()
   suppressWarnings(print(gg))
 

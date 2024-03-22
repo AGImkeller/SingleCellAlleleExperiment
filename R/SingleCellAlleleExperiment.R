@@ -31,7 +31,7 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @return A SingleCellAlleleExperiment object.
-SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose = FALSE){
+SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose=FALSE){
   sce <- SingleCellExperiment(...)
 
   rt_scae_lookup_start <- Sys.time()
@@ -39,7 +39,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 
   if (verbose){
     rt_scae_lookup_end <- Sys.time()
-    diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits = 2)
+    diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits=2)
     message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
   }
 
@@ -48,7 +48,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
   sce_filter_norm <- filter_norm(sce_add_look, threshold)
   if (verbose){
     rt_scae_filt_norm_end <- Sys.time()
-    diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits = 2)
+    diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits=2)
     message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
   }
 
@@ -57,7 +57,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
   scae <- alleles2genes(sce_filter_norm, lookup, exp_type)
   if (verbose){
     rt_scae_a2g_end <- Sys.time()
-    diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits = 2)
+    diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits=2)
     message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
   }
 
@@ -76,7 +76,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
   if (verbose){
     rt_scae_log_end <- Sys.time()
     diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
-    message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_g2f, " seconds")
+    message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_log, " seconds")
   }
 
   .scae(scae)
@@ -105,7 +105,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return A SingleCellExperiment object.
-ext_rd <- function(sce, exp_type, verbose = FALSE){
+ext_rd <- function(sce, exp_type, verbose=FALSE){
   if (exp_type == "ENS"){
     if (verbose){
       message("Using org.Hs to retrieve NCBI gene identifiers.")
@@ -152,11 +152,11 @@ get_ncbi_org <- function(sce){
   ensembl_ids <- rowData(sce)$Ensembl_ID
   ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
-  Hs_symbol  <- org.Hs.eg.db::org.Hs.egSYMBOL
+  Hs_symbol <- org.Hs.eg.db::org.Hs.egSYMBOL
   Hs_ensembl <- org.Hs.eg.db::org.Hs.egENSEMBL
-  mapped_Hs_genes_symbol  <- AnnotationDbi::mappedkeys(Hs_symbol)
+  mapped_Hs_genes_symbol <- AnnotationDbi::mappedkeys(Hs_symbol)
   mapped_Hs_genes_ensembl <- AnnotationDbi::mappedkeys(Hs_ensembl)
-  Hs_symbol_df  <- as.data.frame(Hs_symbol[mapped_Hs_genes_symbol])
+  Hs_symbol_df <- as.data.frame(Hs_symbol[mapped_Hs_genes_symbol])
   Hs_ensembl_df <- as.data.frame(Hs_ensembl[mapped_Hs_genes_ensembl])
 
   Hs_mapping <- merge(Hs_symbol_df, Hs_ensembl_df)
@@ -184,7 +184,7 @@ get_ncbi_org <- function(sce){
 #' @importFrom scuttle computeLibraryFactors
 #'
 #' @return A SingleCellExperiment object.
-filter_norm <- function(sce, threshold = 0){
+filter_norm <- function(sce, threshold=0){
 
   filtered  <- sce[, colSums(counts(sce)) > threshold]
   df_scales <- computeLibraryFactors(filtered)
@@ -205,9 +205,9 @@ filter_norm <- function(sce, threshold = 0){
 #'
 #' @return A SingleCellExperiment object.
 find_allele_ids <- function(sce){
-  a <- grepl("*", rownames(counts(sce)), fixed = TRUE)
+  a <- grepl("*", rownames(counts(sce)), fixed=TRUE)
   if (sum(a) == 0){
-    a <- grepl("HLA-", rownames(counts(sce)), fixed = TRUE)
+    a <- grepl("HLA-", rownames(counts(sce)), fixed=TRUE)
   }
 
   allele_names_all <- rownames(counts(sce)[a,])
@@ -233,7 +233,7 @@ get_allelecounts <- function(sce, lookup){
   list_alid <- list()
 
   for (i in seq_along(allele_ids_lookup)){
-    new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed = TRUE),]$Gene)
+    new_ids <- list(lookup[grepl(allele_ids_lookup[i], lookup$Allele, fixed=TRUE),]$Gene)
     list_alid[[length(list_alid) + 1]] <- new_ids
   }
   alid_gene_names <- unlist(list_alid)
@@ -269,17 +269,17 @@ alleles2genes <- function(sce, lookup, exp_type){
 
   alleletogene_counts <- v_acounts[1][[1]]
 
-  uniqs   <- unique(rownames(alleletogene_counts))
-  al_gene <- matrix(0, nrow = length(uniqs), ncol = ncol(alleletogene_counts))
+  uniqs <- unique(rownames(alleletogene_counts))
+  al_gene <- matrix(0, nrow=length(uniqs), ncol=ncol(alleletogene_counts))
   rownames(al_gene) <- uniqs
 
   for (i in seq_along(uniqs)){
-    uniq_sum <- colSums(alleletogene_counts[rownames(alleletogene_counts) %in% uniqs[i], , drop = FALSE])
+    uniq_sum <- colSums(alleletogene_counts[rownames(alleletogene_counts) %in% uniqs[i], , drop=FALSE])
     al_gene[i,] <- uniq_sum
   }
 
-  al_sce <- SingleCellExperiment(assays = list(counts = al_gene),
-                                 colData = colData(sce))
+  al_sce <- SingleCellExperiment(assays=list(counts=al_gene),
+                                 colData=colData(sce))
   rowData(al_sce)$Symbol <- rownames(al_gene)
 
 
@@ -331,18 +331,16 @@ genes2functional <- function(sce, lookup, exp_type){
   rownames(genetofunc_counts) <- gene_func_names
 
   uniqs     <- unique(rownames(genetofunc_counts))
-  gene_func <- matrix(0,
-                      nrow = length(uniqs),
-                      ncol = ncol(sce[1,]))
+  gene_func <- matrix(0, nrow=length(uniqs), ncol=ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 
   for (i in seq_along(uniqs)){
-    gene_colsums  <- colSums(genetofunc_counts[rownames(genetofunc_counts) %in% uniqs[i], , drop = FALSE])
+    gene_colsums  <- colSums(genetofunc_counts[rownames(genetofunc_counts) %in% uniqs[i], , drop=FALSE])
     gene_func[i,] <- gene_colsums
   }
 
-  func_sce <- SingleCellExperiment(assays = list(counts = gene_func),
-                                   colData = colData(sce))
+  func_sce <- SingleCellExperiment(assays=list(counts=gene_func),
+                                   colData=colData(sce))
   rowData(func_sce)$Symbol <- rownames(func_sce)
 
   if (exp_type == "ENS"){
@@ -378,11 +376,11 @@ genes2functional <- function(sce, lookup, exp_type){
 log_transform <- function(sce){
 
   normed_counts <- normalizeCounts(sce,
-                                   size_factors = sizeFactors(sce),
-                                   transform = "log")
+                                   size_factors=sizeFactors(sce),
+                                   transform="log")
 
   assays(sce)$logcounts  <- normed_counts
-  counts(sce)    <- DelayedArray(counts(sce))
+  counts(sce) <- DelayedArray(counts(sce))
   logcounts(sce) <- DelayedArray(logcounts(sce))
 
   sce

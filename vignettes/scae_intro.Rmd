@@ -38,7 +38,18 @@ vignette: >
 
 ```{r options, include=FALSE, echo=FALSE}
 library(BiocStyle)
-knitr::opts_chunk$set(crop = NULL)
+knitr::opts_chunk$set(crop=NULL)
+```
+
+# Installation
+
+From Bioconductor:
+
+```{r, eval=FALSE}
+if (!require("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SingleCellAlleleExperiment")
 ```
 
 # Introduction to the workflow
@@ -83,15 +94,12 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 
 **Table 1:** Scheme of the lookup table used to aggregate allele information into multiple data layers.
 
-<div style="margin: 0 auto; width: 50%;">
-
 | Allele       | Gene       | Function    |
 | :----------- | :--------- | :---------- |
 | A*01:01:01   | HLA-A      | HLA class I |
-| A*01:01:01   | HLA-A      | HLA class I |
+| A*02:01:01   | HLA-A      | HLA class I |
 | ...          | ...        | ...         |
 | DRB1*01:01:01| HLA-DRB1   | HLA class II|
-</div>
 
 <br>
 
@@ -116,7 +124,7 @@ The dataset used for the here shown downstream analysis is taken from the accomp
 
 ## Loading packages 
 
-The following packages are abundant for performing the here stated downstream analysis and visualization.
+The following packages are abundant for performing the here stated downstream analysis and visualization. Make sure they are installed to use this vignette.
 
 ```{r, message = FALSE}
 library(SingleCellAlleleExperiment)
@@ -124,9 +132,7 @@ library(scaeData)
 library(scater)
 library(scran)
 library(patchwork)
-
 ```
-
 
 ## Reading in data and performing quality check
 
@@ -135,14 +141,13 @@ library(patchwork)
 Download and save the **"pbmc_5k"** dataset from the accompanying `ExperimentHub/scaeData` package.
 
 ```{r}
-example_data_10k <- scaeData::scaeDataGet(dataset = "pbmc_10k")
+example_data_10k <- scaeData::scaeDataGet(dataset="pbmc_10k")
 ```
 
 
 ```{r}
 example_data_10k
 ```
-
 
 The return value of the `scaeDataGet()` function is a list containing four elements. The `$dir` slot contains the directory where the files downloaded from `ExperimentHub` are saved on your device. The remaining three slots `$barcodes`, `$features`, `$matrix` contain the corresponding file names (named by ExperimentHub). The list is then used to pass the saved information to the related parameters of the `read_allele_counts()` function of the here presented package. See next section.
 
@@ -184,15 +189,15 @@ Only show the knee plot without generating a SCAE object. All function parameter
 
 ```{r warning=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
-                           sample_names = "example_data",
-                           filter = "no",
-                           lookup_file = "pbmc_10k_lookup_table.csv",
-                           barcode_file = example_data_10k$barcodes,
-                           gene_file = example_data_10k$features,
-                           matrix_file = example_data_10k$matrix,
-                           filter_threshold = NULL,
-                           example_dataset = TRUE,
-                           verbose = FALSE)
+                           sample_names="example_data",
+                           filter="no",
+                           lookup_file="pbmc_10k_lookup_table.csv",
+                           barcode_file=example_data_10k$barcodes,
+                           gene_file=example_data_10k$features,
+                           matrix_file=example_data_10k$matrix,
+                           filter_threshold=NULL,
+                           example_dataset=TRUE,
+                           verbose=FALSE)
 
 ```
 
@@ -202,15 +207,15 @@ Automatic filtering mode and generation of a SCAE object. Filtering is performed
 
 ```{r warning=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
-                           sample_names = "example_data",
-                           filter = "yes",
-                           lookup_file = "pbmc_10k_lookup_table.csv",
-                           barcode_file = example_data_10k$barcodes,
-                           gene_file = example_data_10k$features,
-                           matrix_file = example_data_10k$matrix,
-                           filter_threshold = NULL,
-                           example_dataset = TRUE,
-                           verbose = TRUE)
+                           sample_names="example_data",
+                           filter="yes",
+                           lookup_file="pbmc_10k_lookup_table.csv",
+                           barcode_file=example_data_10k$barcodes,
+                           gene_file=example_data_10k$features,
+                           matrix_file=example_data_10k$matrix,
+                           filter_threshold=NULL,
+                           example_dataset=TRUE,
+                           verbose=TRUE)
 scae
 ```
 
@@ -221,14 +226,14 @@ Custom filtering mode and generation of a SCAE object. Filtering performed on th
 ```{r warning=FALSE}
 #this is the object used in the further workflow
 scae <- read_allele_counts(example_data_10k$dir,
-                           sample_names = "example_data",
-                           filter = "custom",
-                           lookup_file = "pbmc_10k_lookup_table.csv",
-                           barcode_file = example_data_10k$barcodes,
-                           gene_file = example_data_10k$features,
-                           matrix_file = example_data_10k$matrix,
-                           filter_threshold = 282,
-                           example_dataset = TRUE)
+                           sample_names="example_data",
+                           filter="custom",
+                           lookup_file="pbmc_10k_lookup_table.csv",
+                           barcode_file=example_data_10k$barcodes,
+                           gene_file=example_data_10k$features,
+                           matrix_file=example_data_10k$matrix,
+                           filter_threshold=282,
+                           example_dataset=TRUE)
 scae
 ```
 
@@ -359,17 +364,17 @@ Using the `modelGeneVar()` function prior to `getTopHVGs`. Both functions are pa
 
 ```{r}
 df_ni_a <- modelGeneVar(scae_nonimmune__allels_subset)
-top_ni_a <- getTopHVGs(df_ni_a, prop = 0.1)
+top_ni_a <- getTopHVGs(df_ni_a, prop=0.1)
 ```
 
 ```{r}
 df_ni_g <- modelGeneVar(scae_nonimmune__immune)
-top_ni_g <- getTopHVGs(df_ni_g, prop = 0.1)
+top_ni_g <- getTopHVGs(df_ni_g, prop=0.1)
 ```
 
 ```{r}
 df_ni_f <- modelGeneVar(scae_nonimmune__functional)
-top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
+top_ni_f <- getTopHVGs(df_ni_f, prop=0.1)
 ```
 
 ### PCA
@@ -377,10 +382,9 @@ top_ni_f <- getTopHVGs(df_ni_f, prop = 0.1)
 Compute PCA for each layer and store the results in the object. Its Important to make unique identifiers for each layer/run or the results will be overwritten and just saved as `PCA`. Here, the `runPCA` functions from the `r Biocpkg("scater")` package is used.
 
 ```{r}
-set.seed(18)
-scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_a, exprs_values = "logcounts", name = "PCA_a")
-scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_g, exprs_values = "logcounts", name = "PCA_g")
-scae <- runPCA(scae, ncomponents = 10, subset_row = top_ni_f, exprs_values = "logcounts", name = "PCA_f")
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_a, exprs_values="logcounts", name="PCA_a")
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_g, exprs_values="logcounts", name="PCA_g")
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_f, exprs_values="logcounts", name="PCA_f")
 ```
 
 ```{r}
@@ -393,12 +397,11 @@ The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg(
 
 ```{r}
 set.seed(18)
-scae <- runTSNE(scae, dimred= "PCA_a",  name = "TSNE_a")
+scae <- runTSNE(scae, dimred="PCA_a",  name="TSNE_a")
 set.seed(18)
-scae <- runTSNE(scae, dimred= "PCA_g",  name = "TSNE_g")
+scae <- runTSNE(scae, dimred="PCA_g",  name="TSNE_g")
 set.seed(18)
-scae <- runTSNE(scae, dimred= "PCA_f",  name = "TSNE_f")
-
+scae <- runTSNE(scae, dimred="PCA_f",  name="TSNE_f")
 ```
 
 List of results from the performed reduced dimension analysis. 
@@ -412,13 +415,11 @@ reducedDimNames(scae)
 ```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
 which_tsne <- "TSNE_g"
 
-#EGA_hla_a_alleles
-tsne_g_a  <- plotReducedDim(scae, dimred = which_tsne, colour_by = "HLA-DRB1") + ggtitle("HLA-DRB1 gene")
-tsne_g_a1 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "DRB1*07:01:01:01") + ggtitle("Allele DRB1*07:01:01:01")
-tsne_g_a2 <- plotReducedDim(scae, dimred = which_tsne, colour_by = "DRB1*13:01:01") + ggtitle("Allele DRB1*13:01:01")
+tsne_g_a  <- plotReducedDim(scae, dimred=which_tsne, colour_by="HLA-DRB1") + ggtitle("HLA-DRB1 gene")
+tsne_g_a1 <- plotReducedDim(scae, dimred=which_tsne, colour_by="DRB1*07:01:01:01") + ggtitle("Allele DRB1*07:01:01:01")
+tsne_g_a2 <- plotReducedDim(scae, dimred=which_tsne, colour_by="DRB1*13:01:01") + ggtitle("Allele DRB1*13:01:01")
 
 p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
-
 p2
 ```
 

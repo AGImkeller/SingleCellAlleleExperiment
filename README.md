@@ -2,7 +2,7 @@
 
 Defines a S4 class that is based on `SingleCellExperiment`. In addition to the usual gene layer, `SingleCellAlleleExperiment` can also store data for immune genes such as HLAs, Immunoglobulins and KIRs at the allele level and at the level of functionally similar groups of immune genes.
 
-# Installation (not part of Bioconductor yet)
+# Installation
 
 `SingleCellAlleleExperiment` and its data package `scaeData` are available in Bioconductor and can be installed as follows:
 
@@ -72,7 +72,7 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 | Allele       | Gene       | Function    |
 | :----------- | :--------- | :---------- |
 | A*01:01:01   | HLA-A      | HLA class I |
-| A*01:01:01   | HLA-A      | HLA class I |
+| A*02:01:01   | HLA-A      | HLA class I |
 | ...          | ...        | ...         |
 | DRB1*01:01:01| HLA-DRB1   | HLA class II|
 </div>

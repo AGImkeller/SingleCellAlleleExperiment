@@ -42,27 +42,27 @@
 #' # preflight mode, not generating an SCAE object
 #' # used for quality-assessment by plotting the knee plot
 #' scae_preflight <- read_allele_counts(example_data_5k$dir,
-#'                         sample_names = "example_data",
-#'                         filter = "no",
-#'                         lookup_file = "pbmc_5k_lookup_table.csv",
-#'                         barcode_file = example_data_5k$barcodes,
-#'                         gene_file = example_data_5k$features,
-#'                         matrix_file = example_data_5k$matrix,
-#'                         filter_threshold = NULL,
-#'                         example_dataset = TRUE)
+#'                           sample_names="example_data",
+#'                           filter="no",
+#'                           lookup_file="pbmc_5k_lookup_table.csv",
+#'                           barcode_file=example_data_5k$barcodes,
+#'                           gene_file=example_data_5k$features,
+#'                           matrix_file=example_data_5k$matrix,
+#'                           filter_threshold=NULL,
+#'                           example_dataset=TRUE)
 #'
 #'
 #' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
 #' #scae_filtered <- read_allele_counts(example_data_5k$dir,
-#' #                       sample_names = "example_data",
-#' #                         filter = "yes",
-#' #                         lookup_file = "pbmc_5k_lookup_table.csv",
-#' #                         barcode_file = example_data_5k$barcodes,
-#' #                         gene_file = example_data_5k$features,
-#' #                         matrix_file = example_data_5k$matrix,
-#' #                         filter_threshold = NULL,
-#' #                         example_dataset = TRUE,
-#' #                         verbose = TRUE)
+#' #                         sample_names="example_data",
+#' #                         filter="yes",
+#' #                         lookup_file="pbmc_5k_lookup_table.csv",
+#' #                         barcode_file=example_data_5k$barcodes,
+#' #                         gene_file=example_data_5k$features,
+#' #                         matrix_file=example_data_5k$matrix,
+#' #                         filter_threshold=NULL,
+#' #                         example_dataset=TRUE,
+#' #                         verbose=TRUE)
 #'
 #' # scae_filtered
 #'
@@ -70,30 +70,30 @@
 #' # custom filtering mode, setting up a custom filter threshold for filtering out
 #' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
 #' # scae_custom_filter <- read_allele_counts(example_data_5k$dir,
-#' #                         sample_names = "example_data",
-#' #                         filter = "custom",
-#' #                         lookup_file = "pbmc_5k_lookup_table.csv",
-#' #                         barcode_file = example_data_5k$barcodes,
-#' #                         gene_file = example_data_5k$features,
-#' #                         matrix_file = example_data_5k$matrix,
-#' #                         filter_threshold = 105,
-#' #                         example_dataset = TRUE)
+#' #                         sample_names="example_data",
+#' #                         filter="custom",
+#' #                         lookup_file="pbmc_5k_lookup_table.csv",
+#' #                         barcode_file=example_data_5k$barcodes,
+#' #                         gene_file=example_data_5k$features,
+#' #                         matrix_file=example_data_5k$matrix,
+#' #                         filter_threshold=200,
+#' #                         example_dataset=TRUE)
 #'
 #' # scae_custom_filter
 #'
 #'
 #' @export
 read_allele_counts <- function(samples_dir,
-                               sample_names = names(samples_dir),
-                               filter_mode = c("yes", "no", "custom"),
-                               lookup_file = "pbmc_5k_lookup_table.csv",
-                               barcode_file = "cells_x_genes.barcodes.txt",
-                               gene_file = "cells_x_genes.genes.txt",
-                               matrix_file = "cells_x_genes.mtx",
-                               filter_threshold = NULL,
-                               example_dataset = FALSE,
-                               verbose = FALSE,
-                               BPPARAM = BiocParallel::SerialParam()){
+                               sample_names=names(samples_dir),
+                               filter_mode=c("yes", "no", "custom"),
+                               lookup_file="pbmc_5k_lookup_table.csv",
+                               barcode_file="cells_x_genes.barcodes.txt",
+                               gene_file="cells_x_genes.genes.txt",
+                               matrix_file="cells_x_genes.mtx",
+                               filter_threshold=NULL,
+                               example_dataset=FALSE,
+                               verbose=FALSE,
+                               BPPARAM=BiocParallel::SerialParam()){
 
   rt_one_readin_start <- Sys.time()
   if (is.null(sample_names)) {
@@ -106,11 +106,11 @@ read_allele_counts <- function(samples_dir,
 
   #reading in files
   load_out <- BiocParallel::bplapply(samples_dir,
-                                     FUN = read_from_sparse_allele,
-                                     barcode_file = barcode_file,
-                                     gene_file = gene_file,
-                                     matrix_file = matrix_file,
-                                     BPPARAM = BPPARAM)
+                                     FUN=read_from_sparse_allele,
+                                     barcode_file=barcode_file,
+                                     gene_file=gene_file,
+                                     matrix_file=matrix_file,
+                                     BPPARAM=BPPARAM)
 
   current <- load_out[[1]]
   full_data <- current$mat
@@ -119,10 +119,10 @@ read_allele_counts <- function(samples_dir,
   exp_type <- current$exp_type
 
   #prepare colData
-  cell_info_list <- S4Vectors::DataFrame(Sample = rep(sample_names,
-                                                      length(cell_names)),
-                                         Barcode = cell_names$V1,
-                                         row.names = NULL)
+  cell_info_list <- S4Vectors::DataFrame(Sample=rep(sample_names,
+                                         length(cell_names)),
+                                         Barcode=cell_names$V1,
+                                         row.names=NULL)
   #prepare rowData
   rownames(feature_info) <- feature_info[,1]
 
@@ -133,7 +133,7 @@ read_allele_counts <- function(samples_dir,
 
 
   if (example_dataset){
-    integrated_lookup_dir <- system.file("extdata", package = "scaeData")
+    integrated_lookup_dir <- system.file("extdata", package="scaeData")
     lookup <- read_Lookup(integrated_lookup_dir, lookup_file)
   }else{
     lookup <- read_Lookup(samples_dir, lookup_file)
@@ -159,18 +159,18 @@ read_allele_counts <- function(samples_dir,
 
   if (verbose){
     rt_one_readin_end <- Sys.time()
-    diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits = 2)
+    diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits=2)
     message("Runtime check (1/2) Read_in: ",      diff_rt_one, " seconds")
   }
 
   rt_two_scae_start <- Sys.time()
-  sce <- SingleCellAlleleExperiment(assays = list(counts = full_data),
-                                    rowData = feature_info,
-                                    colData = cell_info_list,
-                                    threshold = inflection_threshold,
-                                    exp_type = exp_type,
-                                    lookup = lookup,
-                                    verbose = verbose)
+  sce <- SingleCellAlleleExperiment(assays=list(counts=full_data),
+                                    rowData=feature_info,
+                                    colData=cell_info_list,
+                                    threshold=inflection_threshold,
+                                    exp_type=exp_type,
+                                    lookup=lookup,
+                                    verbose=verbose)
 
   if (verbose){
     rt_two_scae_end <- Sys.time()
@@ -208,8 +208,8 @@ read_from_sparse_allele <- function(path,
   feature_loc <- file.path(path, gene_file)
   matrix_loc  <- file.path(path, matrix_file)
 
-  feature_info <- utils::read.delim(feature_loc, header = FALSE)
-  cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
+  feature_info <- utils::read.delim(feature_loc, header=FALSE)
+  cell_names   <- utils::read.csv(barcode_loc, sep="", header=FALSE)
   mat          <- Matrix::readMM(matrix_loc)
 
   possible_names <- c("Ensembl_ID", "Symbol")
@@ -222,10 +222,10 @@ read_from_sparse_allele <- function(path,
     colnames(feature_info) <- possible_names[2]
   }
 
-  list(mat =  Matrix::t(mat),
-       cell_names =  cell_names,
-       feature_info = feature_info,
-       exp_type = exp_type)
+  list(mat=Matrix::t(mat),
+       cell_names= cell_names,
+       feature_info=feature_info,
+       exp_type=exp_type)
 }
 
 #' Read in allele lookup

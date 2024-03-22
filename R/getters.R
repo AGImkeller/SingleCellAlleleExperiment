@@ -96,42 +96,42 @@ scae_subset_functional <- function(scae) {
 #'
 #' @examples
 #'
-#' example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+#' example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
 #'
 #' scae <- read_allele_counts(example_data_5k$dir,
-#'                           sample_names = "example_data_wta",
-#'                           filter = "custom",
-#'                           lookup_file = "pbmc_5k_lookup_table.csv",
-#'                           barcode_file = example_data_5k$barcodes,
-#'                           gene_file = example_data_5k$features,
-#'                           matrix_file = example_data_5k$matrix,
-#'                           filter_threshold = 0,
-#'                           example_dataset = TRUE,
-#'                           verbose = TRUE)
+#'                           sample_names="example_data_wta",
+#'                           filter="custom",
+#'                           lookup_file="pbmc_5k_lookup_table.csv",
+#'                           barcode_file=example_data_5k$barcodes,
+#'                           gene_file=example_data_5k$features,
+#'                           matrix_file=example_data_5k$matrix,
+#'                           filter_threshold=0,
+#'                           example_dataset=TRUE,
+#'                           verbose=TRUE)
 #'
 #' scae
 #'
-#' scae_nonimmune_subset <- scae_subset(scae, subset = "nonimmune")
+#' scae_nonimmune_subset <- scae_subset(scae, subset="nonimmune")
 #' scae_nonimmune_subset
 #'
-#' scae_alleles_subset <- scae_subset(scae, subset = "alleles")
+#' scae_alleles_subset <- scae_subset(scae, subset="alleles")
 #' scae_alleles_subset
 #'
-#' scae_immune_genes_subset <- scae_subset(scae, subset = "immune_genes")
+#' scae_immune_genes_subset <- scae_subset(scae, subset="immune_genes")
 #' scae_immune_genes_subset
 #'
-#' scae_functional_groups_subset <- scae_subset(scae, subset = "functional_groups")
+#' scae_functional_groups_subset <- scae_subset(scae, subset="functional_groups")
 #' scae_functional_groups_subset
 #'
 #'
 #' @export
-scae_subset <- function(scae, subset = c("nonimmune", "alleles", "immune_genes", "functional_groups")){
+scae_subset <- function(scae, subset=c("nonimmune", "alleles", "immune_genes", "functional_groups")){
 
   scae_sub<- switch(subset,
-                    "nonimmune" = get_nigenes(scae),
-                    "alleles" =  scae_subset_alleles(scae),
-                    "immune_genes" = get_agenes(scae),
-                    "functional_groups" = scae_subset_functional(scae),
+                    "nonimmune"=get_nigenes(scae),
+                    "alleles"=scae_subset_alleles(scae),
+                    "immune_genes"=get_agenes(scae),
+                    "functional_groups"=scae_subset_functional(scae),
                     message("Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`"))
   return(scae_sub)
 }
