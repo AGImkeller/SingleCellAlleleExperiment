@@ -138,7 +138,7 @@ library(patchwork)
 
 ### Stating input directory containing the expected files
 
-Download and save the **"pbmc_5k"** dataset from the accompanying `ExperimentHub/scaeData` package.
+Download and save the **"pbmc_10k"** dataset from the accompanying `ExperimentHub/scaeData` package.
 
 ```{r}
 example_data_10k <- scaeData::scaeDataGet(dataset="pbmc_10k")
@@ -151,14 +151,21 @@ example_data_10k
 
 The return value of the `scaeDataGet()` function is a list containing four elements. The `$dir` slot contains the directory where the files downloaded from `ExperimentHub` are saved on your device. The remaining three slots `$barcodes`, `$features`, `$matrix` contain the corresponding file names (named by ExperimentHub). The list is then used to pass the saved information to the related parameters of the `read_allele_counts()` function of the here presented package. See next section.
 
-For the usage of the corresponding lookup table, specify one of the following file names:
+For the usage of the corresponding lookup table, specify a directory containing the lookup table as seen in the next chunk. For the available example datasets in `scaeData`, you can choose one of the following names. This provides the lookup table to the corresponding dataset:
 
   - "pbmc_5k_lookup_table.csv" is used for the `pbmc_5k" dataset.
   - "pbmc_10k_lookup_table.csv" is used for the `pbmc_10k" dataset.
   - "pbmc_20k_lookup_table.csv" is used for the `pbmc_20k" dataset.
 
-These are still part of the `scaeData` package, but are not fetched from `ExperimentHub` but rather read in as internal files.
+These are part of the `scaeData` package, but are not fetched from `ExperimentHub` but rather read in as internal files.
 
+```{r}
+lookup <- utils::read.csv(system.file("extdata", "pbmc_10k_lookup_table.csv", package="scaeData"))
+```
+
+```{r}
+lookup
+```
 
 ### Generate SingleCellAlleleExperiment object
 
@@ -190,13 +197,12 @@ Only show the knee plot without generating a SCAE object. All function parameter
 ```{r warning=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
                            sample_names="example_data",
-                           filter="no",
-                           lookup_file="pbmc_10k_lookup_table.csv",
+                           filter_mode="no",
+                           lookup_file=lookup,
                            barcode_file=example_data_10k$barcodes,
                            gene_file=example_data_10k$features,
                            matrix_file=example_data_10k$matrix,
                            filter_threshold=NULL,
-                           example_dataset=TRUE,
                            verbose=FALSE)
 
 ```
@@ -208,13 +214,12 @@ Automatic filtering mode and generation of a SCAE object. Filtering is performed
 ```{r warning=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
                            sample_names="example_data",
-                           filter="yes",
-                           lookup_file="pbmc_10k_lookup_table.csv",
+                           filter_mode="yes",
+                           lookup_file=lookup,
                            barcode_file=example_data_10k$barcodes,
                            gene_file=example_data_10k$features,
                            matrix_file=example_data_10k$matrix,
                            filter_threshold=NULL,
-                           example_dataset=TRUE,
                            verbose=TRUE)
 scae
 ```
@@ -227,13 +232,12 @@ Custom filtering mode and generation of a SCAE object. Filtering performed on th
 #this is the object used in the further workflow
 scae <- read_allele_counts(example_data_10k$dir,
                            sample_names="example_data",
-                           filter="custom",
-                           lookup_file="pbmc_10k_lookup_table.csv",
+                           filter_mode="custom",
+                           lookup_file=lookup,
                            barcode_file=example_data_10k$barcodes,
                            gene_file=example_data_10k$features,
                            matrix_file=example_data_10k$matrix,
-                           filter_threshold=282,
-                           example_dataset=TRUE)
+                           filter_threshold=282)
 scae
 ```
 

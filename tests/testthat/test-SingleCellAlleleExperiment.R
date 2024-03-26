@@ -2,19 +2,19 @@ library(testthat)
 library(SingleCellAlleleExperiment)
 library(scaeData)
 library(Matrix)
-
 #--------------------read in raw data and objects for tests--------------------#
-example_data_5k <- scaeData::scaeDataGet(dataset = "pbmc_5k")
+example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
+lookup <- utils::read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
 
 barcode_loc <- file.path(example_data_5k$dir, example_data_5k$barcodes)
 feature_loc <- file.path(example_data_5k$dir, example_data_5k$features)
 matrix_loc  <- file.path(example_data_5k$dir, example_data_5k$matrix)
 
-feature_info <- utils::read.delim(feature_loc, header = FALSE)
-cell_names   <- utils::read.csv(barcode_loc, sep = "", header = FALSE)
+feature_info <- utils::read.delim(feature_loc, header=FALSE)
+cell_names   <- utils::read.csv(barcode_loc, sep="", header=FALSE)
 mat          <- t(Matrix::readMM(matrix_loc))
 
-sce_filter_raw <- SingleCellExperiment(assays = list(counts = mat),
+sce_filter_raw <- SingleCellExperiment(assays = list(counts=mat),
                                        rowData = feature_info,
                                        colData = cell_names)
 
@@ -28,15 +28,14 @@ cell_names$V1 <- colData(filtered_sce_raw)$V1
 mat_filtered_zero <- counts(filtered_sce_raw)
 
 scae <- read_allele_counts(example_data_5k$dir,
-                           sample_names = "example_data_wta",
-                           filter = "custom",
-                           lookup_file = "pbmc_5k_lookup_table.csv",
-                           barcode_file = example_data_5k$barcodes,
-                           gene_file = example_data_5k$features,
-                           matrix_file = example_data_5k$matrix,
-                           filter_threshold = 0,
-                           example_dataset = TRUE,
-                           verbose = TRUE)
+                           sample_names="example_data_wta",
+                           filter_mode="custom",
+                           lookup_file=lookup,
+                           barcode_file=example_data_5k$barcodes,
+                           gene_file=example_data_5k$features,
+                           matrix_file=example_data_5k$matrix,
+                           filter_threshold=0,
+                           verbose=TRUE)
 
 
 test_that("rownames and rowData check", {
@@ -78,46 +77,43 @@ test_that("assay check", {
 })
 
 
-
 #test different filter/no-filter modes
 test_that("check input-parameter errors", {
 
-  # filter = "custom" but didnt set a threshold in the filter_threshold param
+  #Testing for the error message of the filter_mode="custom" mode if threshold is not set
   expect_error(read_allele_counts(example_data_5k$dir,
-                                sample_names = "example_data_wta",
-                                filter = "custom",
-                                lookup_file = "pbmc_5k_lookup_table.csv",
-                                barcode_file = example_data_5k$barcodes,
-                                gene_file = example_data_5k$features,
-                                matrix_file = example_data_5k$matrix,
-                                filter_threshold = NULL,
-                                example_dataset = TRUE,
-                                verbose = FALSE),
+                                sample_names="example_data_wta",
+                                filter_mode="custom",
+                                lookup_file=lookup,
+                                barcode_file=example_data_5k$barcodes,
+                                gene_file=example_data_5k$features,
+                                matrix_file=example_data_5k$matrix,
+                                filter_threshold=NULL,
+                                verbose=FALSE),
             regexp = "")
 
+  #Testing for the correct output message of the filter_mode="yes" mode
   expect_message(read_allele_counts(example_data_5k$dir,
-                                  sample_names = "example_data_wta",
-                                  filter = "yes",
-                                  lookup_file = "pbmc_5k_lookup_table.csv",
-                                  barcode_file = example_data_5k$barcodes,
-                                  gene_file = example_data_5k$features,
-                                  matrix_file = example_data_5k$matrix,
-                                  filter_threshold = NULL,
-                                  example_dataset = TRUE,
-                                  verbose = FALSE),
+                                  sample_names="example_data_wta",
+                                  filter_mode="yes",
+                                  lookup_file=lookup,
+                                  barcode_file=example_data_5k$barcodes,
+                                  gene_file=example_data_5k$features,
+                                  matrix_file=example_data_5k$matrix,
+                                  filter_threshold=NULL,
+                                  verbose=FALSE),
                  regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
 
-
+  #Testing for the correct output message of the filter_mode="no" mode
   expect_message(read_allele_counts(example_data_5k$dir,
-                                  sample_names = "example_data_wta",
-                                  filter = "no",
-                                  lookup_file = "pbmc_5k_lookup_table.csv",
-                                  barcode_file = example_data_5k$barcodes,
-                                  gene_file = example_data_5k$features,
-                                  matrix_file = example_data_5k$matrix,
-                                  filter_threshold = NULL,
-                                  example_dataset = TRUE,
-                                  verbose = FALSE),
+                                  sample_names="example_data_wta",
+                                  filter_mode="no",
+                                  lookup_file=lookup,
+                                  barcode_file=example_data_5k$barcodes,
+                                  gene_file=example_data_5k$features,
+                                  matrix_file=example_data_5k$matrix,
+                                  filter_threshold=NULL,
+                                  verbose=FALSE),
                  regexp = "Suggested threshold based on inflection point is at: 282 UMI counts.")
 
 })
@@ -139,14 +135,13 @@ test_that("check rowData extension for WTA and Amplicon", {
 test_that("sample_names and samples_dir", {
 
   scae_no_sample <- read_allele_counts(example_data_5k$dir,
-                               filter = "custom",
-                               lookup_file = "pbmc_5k_lookup_table.csv",
-                               barcode_file = example_data_5k$barcodes,
-                               gene_file = example_data_5k$features,
-                               matrix_file = example_data_5k$matrix,
-                               filter_threshold = 0,
-                               example_dataset = TRUE,
-                               verbose = TRUE)
+                               filter_mode="custom",
+                               lookup_file=lookup,
+                               barcode_file=example_data_5k$barcodes,
+                               gene_file=example_data_5k$features,
+                               matrix_file=example_data_5k$matrix,
+                               filter_threshold=0,
+                               verbose=TRUE)
 
   expect_equal(colData(scae_no_sample)$Sample[1], example_data_5k$dir)
 })

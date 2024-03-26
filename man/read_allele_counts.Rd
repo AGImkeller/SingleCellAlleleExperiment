@@ -8,12 +8,11 @@ read_allele_counts(
   samples_dir,
   sample_names = names(samples_dir),
   filter_mode = c("yes", "no", "custom"),
-  lookup_file = "pbmc_5k_lookup_table.csv",
+  lookup_file = lookup,
   barcode_file = "cells_x_genes.barcodes.txt",
   gene_file = "cells_x_genes.genes.txt",
   matrix_file = "cells_x_genes.mtx",
   filter_threshold = NULL,
-  example_dataset = FALSE,
   verbose = FALSE,
   BPPARAM = BiocParallel::SerialParam()
 )
@@ -26,7 +25,7 @@ read_allele_counts(
 \item{filter_mode}{A vector containing three character strings that describe different options for filtering. The value \code{"yes"} uses the inflection point of the knee plot to filter out low-quality cells.
 The value \code{"no"} computes the knee plot and stops function execution. This mode serves as a preflight mode to observe the knee plot before filtering. The value \code{"custom"} allows for setting a custom threshold in the \code{filter_threshold} parameter.}
 
-\item{lookup_file}{A character string determining the name of the lookup table file.}
+\item{lookup_file}{A data.frame object containing the lookup table provided as output from the \verb{scIGD workflow}.}
 
 \item{barcode_file}{A character string determining the name of the file containing the barcode identifiers.}
 
@@ -35,8 +34,6 @@ The value \code{"no"} computes the knee plot and stops function execution. This 
 \item{matrix_file}{A character string determining the name of the file containing the count matrix.}
 
 \item{filter_threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is \code{NULL} when using \code{filter = c("yes", "no")}. Value must be provided when using \code{filter = "custom"}.}
-
-\item{example_dataset}{A logical parameter used when reading in example datasets from \code{scaeData}. \code{FALSE} is default. Set to \code{TRUE} if you want to generate an \verb{SCAE object} with one of the available datasets in \code{scaeData}.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution. Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
 
@@ -53,7 +50,7 @@ Expected naming scheme of the files from the data generating method:
 \item quantification matrix: \code{cells_x_genes.mtx}
 \item barcode information: \code{cells_x_genes.barcodes.txt}
 \item feature information: \code{cells_x_genes.genes.txt}
-\item allele lookup table: \code{lookup_table_HLA_only}
+\item allele lookup table: \code{lookup_table.csv}
 }
 
 File identifiers can be specifically stated if the identifiers are different.
@@ -61,31 +58,30 @@ File identifiers can be specifically stated if the identifiers are different.
 \examples{
 
 example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
+lookup <- read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
 
 
 # preflight mode, not generating an SCAE object
 # used for quality-assessment by plotting the knee plot
 scae_preflight <- read_allele_counts(example_data_5k$dir,
                           sample_names="example_data",
-                          filter="no",
-                          lookup_file="pbmc_5k_lookup_table.csv",
+                          filter_mode="no",
+                          lookup_file=lookup,
                           barcode_file=example_data_5k$barcodes,
                           gene_file=example_data_5k$features,
                           matrix_file=example_data_5k$matrix,
-                          filter_threshold=NULL,
-                          example_dataset=TRUE)
+                          filter_threshold=NULL)
 
 
 # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
 #scae_filtered <- read_allele_counts(example_data_5k$dir,
 #                         sample_names="example_data",
-#                         filter="yes",
-#                         lookup_file="pbmc_5k_lookup_table.csv",
+#                         filter_mode="yes",
+#                         lookup_file=lookup,
 #                         barcode_file=example_data_5k$barcodes,
 #                         gene_file=example_data_5k$features,
 #                         matrix_file=example_data_5k$matrix,
 #                         filter_threshold=NULL,
-#                         example_dataset=TRUE,
 #                         verbose=TRUE)
 
 # scae_filtered
@@ -95,13 +91,12 @@ scae_preflight <- read_allele_counts(example_data_5k$dir,
 # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
 # scae_custom_filter <- read_allele_counts(example_data_5k$dir,
 #                         sample_names="example_data",
-#                         filter="custom",
-#                         lookup_file="pbmc_5k_lookup_table.csv",
+#                         filter_mode="custom",
+#                         lookup_file=lookup,
 #                         barcode_file=example_data_5k$barcodes,
 #                         gene_file=example_data_5k$features,
 #                         matrix_file=example_data_5k$matrix,
-#                         filter_threshold=200,
-#                         example_dataset=TRUE)
+#                         filter_threshold=200)
 
 # scae_custom_filter
 
