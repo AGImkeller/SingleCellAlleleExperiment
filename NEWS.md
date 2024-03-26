@@ -1,4 +1,9 @@
-# SingleCellAlleleExperiment 0.95.0 (development version)
+# SingleCellAlleleExperiment 0.99.1
+
+- minor changes made regarding the Bioconductor submission review of `scaeData` which also affected this package.
+
+
+# SingleCellAlleleExperiment 0.99.0 
 
 * The package is defining a S4 class that is extending the SingleCellExperiment class.
   The multi-layer data structure integrates data for immune genes at allele and 
@@ -10,5 +15,4 @@
   Use the `read_allele_counts()` function to read in the data and generate an 
   SCAE object. This function also offers parameters to perform filtering on the data,
   as well as visualize the filtering step in a so called `knee plot`.
-  
   
