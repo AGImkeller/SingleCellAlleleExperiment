@@ -397,13 +397,21 @@ reducedDimNames(scae)
 
 ### t-SNE
 
-The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg("scater")` package. Unique identifiers are stated here for each layer as well.
+The same goes for running t-SNE with the `runTSNE` function from the `r Biocpkg("scater")` package. Unique identifiers are stated here for each layer as well. For simplicity, we only compute the t-SNE on the `gene layer`. Information regarding how this process is conducted on the other additional layers, can be seen in the non evaluated code chunks below:
 
 ```{r}
 set.seed(18)
-scae <- runTSNE(scae, dimred="PCA_a",  name="TSNE_a")
-set.seed(18)
 scae <- runTSNE(scae, dimred="PCA_g",  name="TSNE_g")
+```
+
+The following two chunks show how the t-SNE could be computed on the `allele` and `functional_group` layer. These chunks are not run by default:
+
+```{r, eval=FALSE}
+set.seed(18)
+scae <- runTSNE(scae, dimred="PCA_a",  name="TSNE_a")
+```
+
+```{r, eval=FALSE}
 set.seed(18)
 scae <- runTSNE(scae, dimred="PCA_f",  name="TSNE_f")
 ```

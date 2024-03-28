@@ -1,3 +1,7 @@
+# SingleCellAlleleExperiment 0.99.2
+
+- minor changes in the vignette to reduce build-time. Content is the same.
+
 # SingleCellAlleleExperiment 0.99.1
 
 - minor changes made regarding the Bioconductor submission review of `scaeData` which also affected this package.
