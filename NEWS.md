@@ -1,3 +1,7 @@
+# SingleCellAlleleExperiment 0.99.3
+
+- retriggering bioc build during package submission.
+
 # SingleCellAlleleExperiment 0.99.2
 
 - minor changes in the vignette to reduce build-time. Content is the same.
