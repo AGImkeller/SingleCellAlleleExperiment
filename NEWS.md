@@ -1,3 +1,8 @@
+# SingleCellAlleleExperiment 1.3.2
+
+Fixing error in vignette regarding the knee plot in 3.21 devel / R4.5
+Removing the fitted line from knee plot
+
 # SingleCellAlleleExperiment 1.3.1
 
 Fixing error in vignette regarding the knee plot in 3.21 devel

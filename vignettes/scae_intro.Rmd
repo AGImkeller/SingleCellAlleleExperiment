@@ -253,7 +253,6 @@ inflection_point <- metadata(scae)[["knee_info"]]$inflection_point
 
 ggplot(knee_df, aes(x=rank, y=total)) +
        geom_point() +
-       geom_line(aes(y=fitted), color="red", na.rm = TRUE) +
        scale_x_log10() +
        scale_y_log10() +
        annotation_logticks() +
