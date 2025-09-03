@@ -1,3 +1,8 @@
+# SingleCellAlleleExperiment 1.5.1
+
+Adressing 3.22 devel error for failing test after DropletUtils update
+Minor changes regarding Links set in documentation
+
 # SingleCellAlleleExperiment 1.3.2
 
 Fixing error in vignette regarding the knee plot in 3.21 devel / R4.5

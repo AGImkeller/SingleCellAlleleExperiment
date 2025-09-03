@@ -264,7 +264,7 @@ read_from_sparse_allele <- function(path,
 #' total UMI count. The information is later on passed to the
 #' `metadata(scae)[["knee_info"]]` slot.
 #'
-#' @param matrix A sparse \code{\link{Matrix}} object containing
+#' @param matrix A sparse \code{\link[Matrix]{Matrix}} object containing
 #' the quantification data.
 #' @param genes A data.frame object containing gene identifiers.
 #' @param barcodes A data.frame object containing barcode identifiers.

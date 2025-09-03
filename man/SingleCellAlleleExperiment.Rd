@@ -19,7 +19,7 @@ SingleCellAlleleExperiment(
 )
 }
 \arguments{
-\item{...}{Arguments passed to the \code{\link{SingleCellExperiment}}
+\item{...}{Arguments passed to the \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 constructor to fill the slots of the SCE-class.}
 
 \item{lookup}{A data.frame object containing the lookup table.}
@@ -56,7 +56,7 @@ immunological relevant, different layers of annotation.
 }
 \details{
 The SingleCellAlleleExperiment class builds upon and extends the data
-representation that can be facilitated using a \code{\link{SingleCellExperiment}}
+representation that can be facilitated using a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 object.
 
 The Constructor \code{SingleCellAlleleExperiment()} can be used on its own,
@@ -66,7 +66,7 @@ convenient way using this packages read in function \code{read_allele_counts()}
 A getter function \code{scae_subset()} allows to subset the object according to
 the newly implemented layers.
 
-In this class, similar to the \code{\link{SingleCellExperiment}} class,
+In this class, similar to the \code{\link[SingleCellExperiment]{SingleCellExperiment}} class,
 rows should represent genomic features (including immune genes, represented
 as allele information), while columns represent single cells/barcodes.
 

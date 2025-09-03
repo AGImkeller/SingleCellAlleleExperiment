@@ -7,7 +7,7 @@
 find_allele_ids(sce)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object.}
+\item{sce}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.}
 }
 \value{
 A SingleCellExperiment object

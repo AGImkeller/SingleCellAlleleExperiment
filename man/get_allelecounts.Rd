@@ -7,7 +7,7 @@
 get_allelecounts(sce, lookup)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object.}
+\item{sce}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.}
 
 \item{lookup}{A data.frame object containing the lookup table.}
 }

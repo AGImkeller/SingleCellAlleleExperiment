@@ -7,7 +7,7 @@
 get_knee_info(matrix, genes, barcodes)
 }
 \arguments{
-\item{matrix}{A sparse \code{\link{Matrix}} object containing
+\item{matrix}{A sparse \code{\link[Matrix]{Matrix}} object containing
 the quantification data.}
 
 \item{genes}{A data.frame object containing gene identifiers.}

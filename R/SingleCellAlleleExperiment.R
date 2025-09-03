@@ -8,7 +8,7 @@
 #' immunological relevant, different layers of annotation.
 #'
 #' The SingleCellAlleleExperiment class builds upon and extends the data
-#' representation that can be facilitated using a \code{\link{SingleCellExperiment}}
+#' representation that can be facilitated using a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' object.
 #'
 #' The Constructor `SingleCellAlleleExperiment()` can be used on its own,
@@ -22,7 +22,7 @@
 #' @seealso [read_allele_counts()]
 #' @seealso [scae_subset()]
 #'
-#' @param ... Arguments passed to the \code{\link{SingleCellExperiment}}
+#' @param ... Arguments passed to the \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' constructor to fill the slots of the SCE-class.
 #' @param lookup A data.frame object containing the lookup table.
 #' @param metadata A list containing a dataframe and two integer values of
@@ -41,7 +41,7 @@
 #' should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @details
-#' In this class, similar to the \code{\link{SingleCellExperiment}} class,
+#' In this class, similar to the \code{\link[SingleCellExperiment]{SingleCellExperiment}} class,
 #' rows should represent genomic features (including immune genes, represented
 #' as allele information), while columns represent single cells/barcodes.
 #'
@@ -185,7 +185,7 @@ SingleCellAlleleExperiment <- function(...,
 ##-1--------------------------------ext_rd------------------------------------##
 
 #' Extend rowData with new annotation columns
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @param exp_type Internal character string parameter that determines in which
 #' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
 #' @param gene_symbols A logical parameter to decide whether to compute additional
@@ -225,7 +225,7 @@ ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
 
 ## Code provided by Ahmad Al Ajami
 #' Get NCBI genes using the org.HS.db package
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @importFrom methods as
 #' @importFrom SingleCellExperiment rowData
 #' @return A list of character strings for gene names.
@@ -259,7 +259,7 @@ get_ncbi_org <- function(sce){
 #' quantification assay and only return the rows specifying
 #' allele-quantification information.
 #'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @importFrom SingleCellExperiment counts
 #' @return A SingleCellExperiment object
 find_allele_ids <- function(sce){
@@ -280,7 +280,7 @@ find_allele_ids <- function(sce){
 #' The rownames  of this subassay are already translated to the corresponding
 #' immune gene identifier, which are extracted from the lookup table.
 #'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
 #' @importFrom SingleCellExperiment counts
 #' @return A SingleCellExperiment object
@@ -312,7 +312,7 @@ get_allelecounts <- function(sce, lookup){
 #' allele identifiers present in the raw data and sums up the expression counts
 #' of alleles that have the same allele gene identifiers.
 #'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
 #' @param exp_type Internal character string parameter that determines in which
 #' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
@@ -368,7 +368,7 @@ alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
 #' contains the functional allele classes and sums up the expression counts of
 #' the allele genes that are in the same functional group.
 #'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param sce A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
 #' @param exp_type Internal character string parameter that determines in which
 #' format the gene symbols in the input data are. Can be `c("ENS","noENS")`

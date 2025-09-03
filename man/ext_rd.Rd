@@ -7,7 +7,7 @@
 ext_rd(sce, exp_type, gene_symbols, verbose = FALSE)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object.}
+\item{sce}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.}
 
 \item{exp_type}{Internal character string parameter that determines in which
 format the gene symbols in the input data are. Can be \code{c("ENS","noENS")}}

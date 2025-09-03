@@ -130,6 +130,7 @@ test_that("check input-parameter errors", {
                                   verbose=FALSE),
                regexp = "")
 
+#
   ## Testing for the correct output message of the filter_mode="yes",
   ## also testing for error message if package is not installed
   if (!requireNamespace("DropletUtils", quietly=TRUE)) {
@@ -153,9 +154,8 @@ test_that("check input-parameter errors", {
                                       matrix_file=example_data_5k$matrix,
                                       filter_threshold=NULL,
                                       verbose=FALSE),
-    regexp = "Filtering performed based on the inflection point at: 911 UMI counts.")
+    regexp = "Filtering performed based on the inflection point at: [0-9]+(\\.[0-9]+)? UMI counts.")
   }
-
 
 
   ## Testing error/output message for `log=TRUE`

@@ -7,7 +7,7 @@
 get_ncbi_org(sce)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object.}
+\item{sce}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.}
 }
 \value{
 A list of character strings for gene names.
